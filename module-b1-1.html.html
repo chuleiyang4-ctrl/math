@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module B1.1 — The Number Line</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* inlined from tokens.css so this page renders correctly even when
+     opened on its own — see tokens.css for the single source of truth
+     used to re-skin the whole course */
+  :root{
+    --bg:#0a0e1a; --bg-2:#0d1220; --panel:#0f1526; --panel-2:#101a30;
+    --ink:#e7ebf3; --ink-dim:#9098ae; --ink-faint:#565f78;
+    --cyan:#5fd4e8; --amber:#e8b95f; --green:#7ee0a8;
+    --line:rgba(231,235,243,0.09);
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Source Serif 4',Georgia,serif;
+    --font-mono:'IBM Plex Mono',monospace;
+    --radius:10px; --content-w:720px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .contours{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.22;}
+  .topbar{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:16px 28px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);}
+  .topbar .brand{color:var(--ink-dim);letter-spacing:0.04em;}
+  .topbar .brand b{color:var(--ink);font-weight:600;}
+  main{position:relative;z-index:1;max-width:var(--content-w);margin:0 auto;padding:48px 24px 110px;}
+  .badge{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);background:rgba(232,185,95,0.1);border:1px solid rgba(232,185,95,0.25);padding:5px 12px;border-radius:4px;margin-bottom:20px;}
+  h1{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,5vw,42px);margin:0 0 16px;line-height:1.18;letter-spacing:-0.01em;}
+  h1 em{font-style:normal;color:var(--cyan);}
+  .subtitle{font-family:var(--font-body);color:var(--ink-dim);font-size:18px;max-width:600px;margin:0 0 46px;line-height:1.6;}
+  .step{margin-bottom:56px;}
+  .step-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .step-num{width:26px;height:26px;border-radius:6px;background:rgba(95,212,232,0.12);border:1px solid rgba(95,212,232,0.3);color:var(--cyan);font-family:var(--font-mono);font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .step-head h2{font-family:var(--font-display);font-size:19px;font-weight:600;margin:0;letter-spacing:0.01em;}
+  .step-body p{margin:0 0 16px;}
+  .step-body strong{color:var(--amber);font-weight:600;}
+  .step-body em{color:var(--cyan);font-style:normal;font-weight:600;}
+  .formula-box{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0;text-align:center;overflow-x:auto;}
+  .formula-box.compact{padding:16px 20px;}
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;margin-top:16px;font-family:var(--font-display);font-size:13.5px;}
+  @media (max-width:520px){.legend{grid-template-columns:1fr;}}
+  .legend-item{display:flex;gap:9px;align-items:flex-start;}
+  .legend-sym{font-family:var(--font-mono);color:var(--cyan);flex:0 0 auto;min-width:38px;}
+  .legend-text{color:var(--ink-dim);font-family:var(--font-body);font-size:14.5px;line-height:1.5;}
+  .callout{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0;}
+  .worked{display:flex;gap:22px;align-items:center;flex-wrap:wrap;}
+  .worked-visual{flex:0 0 auto;width:140px;height:140px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .worked-steps{flex:1;min-width:220px;}
+  .worked-steps .row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-family:var(--font-mono);font-size:13.5px;}
+  .worked-steps .row:last-child{border-bottom:none;}
+  .worked-steps .row .l{color:var(--ink-dim);}
+  .worked-steps .row .r{color:var(--green);}
+  .interactive{background:var(--panel);border:1px solid rgba(95,212,232,0.22);border-radius:var(--radius);padding:4px;margin:18px 0;}
+  .interactive-top{display:flex;justify-content:space-between;align-items:center;padding:13px 16px 9px;font-family:var(--font-display);}
+  .interactive-title{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan);letter-spacing:0.05em;}
+  .interactive-hint{font-size:11.5px;color:var(--ink-faint);font-family:var(--font-mono);}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none;cursor:grab;}
+  .sliders{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;padding:14px 16px;border-top:1px solid var(--line);}
+  @media (max-width:480px){.sliders{grid-template-columns:1fr;}}
+  .slider-group .lbl{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:12px;margin-bottom:6px;color:var(--ink-dim);}
+  .slider-group .lbl b{color:var(--amber);}
+  input[type=range]{width:100%;accent-color:var(--amber);}
+  .hud{display:flex;border-top:1px solid var(--line);flex-wrap:wrap;}
+  .hud-cell{flex:1;min-width:110px;padding:12px 16px;border-right:1px solid var(--line);}
+  .hud-cell:last-child{border-right:none;}
+  .hud-cell .k{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.05em;text-transform:uppercase;}
+  .hud-cell .v{font-family:var(--font-mono);font-size:14.5px;margin-top:3px;}
+  .hud-cell.a .v{color:var(--cyan);}
+  .hud-cell.b .v{color:var(--amber);}
+  .hud-cell.r .v{color:var(--green);}
+  .next{margin-top:60px;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;font-family:var(--font-display);}
+  .next-label{font-size:12.5px;color:var(--ink-faint);font-family:var(--font-mono);}
+  .next-title{font-size:14.5px;color:var(--ink-dim);}
+</style>
+</head>
+<body>
+
+<svg class="contours" preserveAspectRatio="none" viewBox="0 0 400 900">
+  <defs>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fd4e8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e8b95f" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#fade)" stroke-width="1">
+    <path d="M-20,60 Q100,20 200,70 T420,50"/>
+    <path d="M-20,140 Q120,100 200,150 T420,130"/>
+    <path d="M-20,320 Q90,270 210,330 T420,300"/>
+    <path d="M-20,420 Q140,380 220,430 T420,400"/>
+    <path d="M-20,650 Q100,600 200,660 T420,630"/>
+    <path d="M-20,760 Q130,710 210,770 T420,740"/>
+  </g>
+</svg>
+
+<div class="topbar">
+  <span class="brand"><b>STEM LAB</b> · Math for AI — A Unified Course</span>
+  <span>Module B1 · Lesson 1 of 4</span>
+</div>
+
+<main>
+  <span class="badge">Module B1.1</span>
+  <h1>The Number Line — Numbers as <em>Positions</em> You Can Walk To</h1>
+  <p class="subtitle">Before a number can be part of an arrow, a formula, or a graph, it's just a spot you can stand on — and the whole rest of this course is built on that one idea.</p>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">1</div><h2>Intuition First</h2></div>
+    <div class="step-body">
+      <p>Picture a long sidewalk with evenly spaced marks painted on it, like a giant tape measure stretched out on the ground. Stand at the mark labeled 0 — call that "home." Every other mark is just a distance from home: walk 3 marks to the right and you're standing at 3. Walk 7 marks to the right and you're standing at 7. The number isn't a mysterious symbol — it's simply <strong>how many steps you took, and which way you're facing</strong>.</p>
+      <p>This is exactly what a thermometer or a treadmill display is doing. The thermometer's liquid doesn't "mean" 72 degrees in some abstract sense — it has physically risen to the mark labeled 72, the same way you'd walk to that mark on the sidewalk. Once numbers are positions on a line, two of them can be compared just by looking at which one is farther right, and the distance between them is just the length of sidewalk you'd have to cover to get from one to the other.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">2</div><h2>A Distance You Can Check by Hand</h2></div>
+    <div class="step-body">
+      <p>You're standing at the mark for 3. A friend is standing at the mark for 8. How many steps do you have to walk to reach them?</p>
+      <div class="callout">
+        <div class="worked">
+          <div class="worked-visual" id="miniVisual"></div>
+          <div class="worked-steps">
+            <div class="row"><span class="l">friend's mark − your mark</span><span class="r">8 − 3</span></div>
+            <div class="row"><span class="l">= </span><span class="r">5</span></div>
+            <div class="row"><span class="l">steps to walk</span><span class="r">5</span></div>
+          </div>
+        </div>
+      </div>
+      <p>Subtracting the smaller position from the larger one gives you exactly the number of steps between them — the distance. It doesn't matter which direction you're facing when you start; the sidewalk between 3 and 8 is always 5 marks long.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">3</div><h2>Try It — Walk the Line</h2></div>
+    <div class="step-body"><p>Drag the slider to walk your marker along the line. Watch your position update, and watch the distance to the fixed flag change as you get closer or farther from it.</p></div>
+    <div class="interactive">
+      <div class="interactive-top">
+        <span class="interactive-title">◆ NUMBER LINE WALKER — LIVE</span>
+        <span class="interactive-hint">drag the slider</span>
+      </div>
+      <canvas id="mainCanvas" width="672" height="200"></canvas>
+      <div class="sliders">
+        <div class="slider-group"><div class="lbl"><span>your position</span><b id="posVal">3</b></div><input type="range" id="pos" min="-10" max="10" step="1" value="3"></div>
+        <div class="slider-group"><div class="lbl"><span>flag position</span><b id="flagVal">8</b></div><input type="range" id="flag" min="-10" max="10" step="1" value="8"></div>
+      </div>
+      <div class="hud">
+        <div class="hud-cell a"><div class="k">your position</div><div class="v" id="hud1">3</div></div>
+        <div class="hud-cell b"><div class="k">flag position</div><div class="v" id="hud2">8</div></div>
+        <div class="hud-cell r"><div class="k">steps apart</div><div class="v" id="hud3">5</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">4</div><h2>Formal Definition</h2></div>
+    <div class="step-body">
+      <p>The <strong>number line</strong> is an ordered arrangement of numbers along a straight line, where every number has exactly one position, and position increases as you move right. For any two positions a and b, the distance between them is:</p>
+      <div class="formula-box compact" data-tex="\text{distance} = |a - b|"></div>
+      <p>The vertical bars mean "strip off any negative sign" — they guarantee a distance is never negative, no matter which point you subtract from which:</p>
+      <div class="formula-box compact" data-tex="|8-3| = |3-8| = 5"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">a, b</span><span class="legend-text">two positions (numbers) marked on the line</span></div>
+        <div class="legend-item"><span class="legend-sym">| · |</span><span class="legend-text">absolute value — the size of a number with its direction/sign stripped away</span></div>
+        <div class="legend-item"><span class="legend-sym">0</span><span class="legend-text">the reference point every other position is measured from — "home"</span></div>
+        <div class="legend-item"><span class="legend-sym">distance</span><span class="legend-text">how many steps apart two positions are, always a non-negative number</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next">
+    <span class="next-title">Next — B1.2 Negative Numbers — Walking the Other Direction</span>
+    <span class="next-label">MODULE B1 · LESSON 2 OF 4</span>
+  </div>
+</main>
+
+<script>
+  // 1. Render all formulas
+  document.querySelectorAll('[data-tex]').forEach(el=>{
+    katex.render(el.getAttribute('data-tex'), el, {displayMode:true, throwOnError:false});
+  });
+
+  // 2. Small static worked-example SVG — a mini number line from 0 to 8
+  (function(){
+    const el = document.getElementById('miniVisual');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 140 140');
+    const y = 70;
+    let ticks = '';
+    for(let i=0;i<=8;i++){
+      const x = 10 + i*15;
+      ticks += `<line x1="${x}" y1="${y-4}" x2="${x}" y2="${y+4}" stroke="#565f78" stroke-width="1"/>`;
+    }
+    svg.innerHTML = `
+      <line x1="10" y1="${y}" x2="130" y2="${y}" stroke="#2a3350" stroke-width="1.5"/>
+      ${ticks}
+      <circle cx="55" cy="${y}" r="5" fill="#e8b95f"/>
+      <text x="50" y="${y-12}" fill="#e8b95f" font-size="9" font-family="IBM Plex Mono">3</text>
+      <circle cx="130" cy="${y}" r="5" fill="#5fd4e8"/>
+      <text x="122" y="${y-12}" fill="#5fd4e8" font-size="9" font-family="IBM Plex Mono">8</text>
+      <line x1="55" y1="${y+16}" x2="130" y2="${y+16}" stroke="#7ee0a8" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="80" y="${y+32}" fill="#7ee0a8" font-size="9" font-family="IBM Plex Mono">5 steps</text>
+    `;
+    el.appendChild(svg);
+  })();
+
+  // 3. Interactive: draggable position marker + fixed flag on a number line
+  (function(){
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const marginX = 40;
+    const lineY = H/2;
+    const minV = -10, maxV = 10;
+
+    function toX(v){ return marginX + (v - minV) / (maxV - minV) * (W - marginX*2); }
+
+    const posSlider = document.getElementById('pos');
+    const flagSlider = document.getElementById('flag');
+    const posVal = document.getElementById('posVal');
+    const flagVal = document.getElementById('flagVal');
+    const hud1 = document.getElementById('hud1');
+    const hud2 = document.getElementById('hud2');
+    const hud3 = document.getElementById('hud3');
+
+    function draw(){
+      const pos = parseInt(posSlider.value);
+      const flag = parseInt(flagSlider.value);
+      posVal.textContent = pos;
+      flagVal.textContent = flag;
+
+      ctx.clearRect(0,0,W,H);
+
+      // line
+      ctx.strokeStyle = 'rgba(231,235,243,0.25)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(marginX, lineY); ctx.lineTo(W - marginX, lineY); ctx.stroke();
+
+      // ticks
+      ctx.font = '10px IBM Plex Mono'; ctx.textAlign = 'center';
+      for(let v = minV; v <= maxV; v++){
+        const x = toX(v);
+        const tall = (v % 5 === 0);
+        ctx.strokeStyle = 'rgba(231,235,243,0.3)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, lineY - (tall?9:5)); ctx.lineTo(x, lineY + (tall?9:5)); ctx.stroke();
+        if(tall){
+          ctx.fillStyle = '#565f78';
+          ctx.fillText(v.toString(), x, lineY + 24);
+        }
+      }
+
+      // distance bracket
+      const x1 = toX(Math.min(pos,flag)), x2 = toX(Math.max(pos,flag));
+      ctx.strokeStyle = 'rgba(126,224,168,0.5)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(x1, lineY - 30); ctx.lineTo(x2, lineY - 30); ctx.stroke();
+      ctx.fillStyle = '#7ee0a8'; ctx.font = '600 12px IBM Plex Mono';
+      ctx.fillText(Math.abs(flag-pos).toString(), (x1+x2)/2, lineY - 36);
+
+      // flag marker
+      const fx = toX(flag);
+      ctx.fillStyle = '#5fd4e8';
+      ctx.beginPath(); ctx.moveTo(fx, lineY - 14); ctx.lineTo(fx+10, lineY - 20); ctx.lineTo(fx, lineY - 26); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(fx, lineY - 26); ctx.lineTo(fx, lineY); ctx.strokeStyle = '#5fd4e8'; ctx.lineWidth = 2; ctx.stroke();
+
+      // your position marker
+      const px = toX(pos);
+      ctx.fillStyle = '#e8b95f';
+      ctx.beginPath(); ctx.arc(px, lineY, 7, 0, Math.PI*2); ctx.fill();
+
+      hud1.textContent = pos;
+      hud2.textContent = flag;
+      hud3.textContent = Math.abs(flag - pos);
+    }
+
+    posSlider.addEventListener('input', draw);
+    flagSlider.addEventListener('input', draw);
+    draw();
+  })();
+</script>
+
+</body>
+</html>
