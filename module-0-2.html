@@ -76,8 +76,16 @@
   .next-label{font-size:12.5px;color:var(--ink-faint);font-family:var(--font-mono);}
   .next-title{font-size:14.5px;color:var(--ink-dim);}
 </style>
+
+  <style>
+    .course-page-nav{position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;padding:7px;background:rgba(10,13,24,.88);border:1px solid rgba(150,170,255,.22);border-radius:13px;backdrop-filter:blur(14px);box-shadow:0 12px 35px rgba(0,0,0,.28)}
+    .course-page-nav a{color:#dce5ff;text-decoration:none;font:600 12px/1 system-ui,sans-serif;padding:9px 11px;border-radius:8px;border:1px solid rgba(150,170,255,.14)}
+    .course-page-nav a:hover{color:#fff;background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45)}
+    @media(max-width:640px){.course-page-nav{top:auto;right:10px;left:10px;bottom:10px;justify-content:center}.course-page-nav a{flex:1;text-align:center}}
+  </style>
 </head>
 <body>
+<nav class="course-page-nav" aria-label="Course navigation"><a href="index.html">⌂ Home</a><a href="module-0-1.html">← Previous</a><a href="module-0-3.html">Next →</a></nav>
 
 <svg class="contours" preserveAspectRatio="none" viewBox="0 0 400 900">
   <defs>
@@ -182,10 +190,10 @@
     </div>
   </div>
 
-  <div class="next">
+  <a class="next" href="module-0-3.html">
     <span class="next-title">Next — 0.3 Linear Transformations — Matrices as Moving Space</span>
     <span class="next-label">MODULE 0 · LESSON 3 OF 3</span>
-  </div>
+  </a>
 </main>
 
 <script>
