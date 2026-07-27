@@ -83,9 +83,19 @@
     .course-page-nav a:hover{color:#fff;background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45)}
     @media(max-width:640px){.course-page-nav{top:auto;right:10px;left:10px;bottom:10px;justify-content:center}.course-page-nav a{flex:1;text-align:center}}
   </style>
+
+<style id="course-theme-style">
+  body[data-theme="eye"]{--bg:#eef0df;--bg-2:#e7ead8;--panel:#f8f6ea;--panel-2:#eef0df;--ink:#253127;--ink-dim:#657067;--ink-faint:#7c867d;--cyan:#247d75;--amber:#9b6b20;--green:#237552;--line:rgba(58,77,58,.18);background:#eef0df;color:var(--ink)}
+  body[data-font="sans"]{--font-body:'Space Grotesk',Arial,sans-serif}
+  body[data-font="reader"]{--font-body:'Source Serif 4',Georgia,serif}
+  .course-page-nav button{color:#dce5ff;background:transparent;font:600 12px/1 system-ui,sans-serif;padding:9px 10px;border-radius:8px;border:1px solid rgba(150,170,255,.14);cursor:pointer}
+  .course-page-nav button:hover,.course-page-nav button.active{color:#fff;background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45)}
+  body[data-theme="eye"] .course-page-nav{background:rgba(247,245,233,.92)}
+  body[data-theme="eye"] .course-page-nav a,body[data-theme="eye"] .course-page-nav button{color:#425047}
+</style>
 </head>
 <body>
-<nav class="course-page-nav" aria-label="Course navigation"><a href="index.html">⌂ Home</a><a href="module-0-1.html">← Previous</a><a href="module-0-3.html">Next →</a></nav>
+<nav class="course-page-nav" aria-label="Course navigation"><a href="index.html">⌂ Home</a><a href="module-0-1.html">← Previous</a><a href="module-0-3.html">Next →</a><button type="button" data-course-theme="dark">Dark</button><button type="button" data-course-theme="eye">Eye</button><button type="button" data-course-font="sans">Aa</button><button type="button" data-course-font="reader">Serif</button></nav>
 
 <svg class="contours" preserveAspectRatio="none" viewBox="0 0 400 900">
   <defs>
@@ -291,5 +301,6 @@
   })();
 </script>
 
+<script id="course-theme-script">(()=>{const setTheme=value=>{document.body.dataset.theme=value;localStorage.setItem('math-theme',value);document.querySelectorAll('[data-course-theme]').forEach(button=>button.classList.toggle('active',button.dataset.courseTheme===value))};const setFont=value=>{document.body.dataset.font=value;localStorage.setItem('math-font',value);document.querySelectorAll('[data-course-font]').forEach(button=>button.classList.toggle('active',button.dataset.courseFont===value))};document.querySelectorAll('[data-course-theme]').forEach(button=>button.addEventListener('click',()=>setTheme(button.dataset.courseTheme)));document.querySelectorAll('[data-course-font]').forEach(button=>button.addEventListener('click',()=>setFont(button.dataset.courseFont)));setTheme(localStorage.getItem('math-theme')||'dark');setFont(localStorage.getItem('math-font')||'reader')})();</script>
 </body>
 </html>
