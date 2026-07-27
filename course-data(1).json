@@ -1,0 +1,537 @@
+{
+  "series": "Math for AI — A Unified Course",
+  "modules": [
+    {
+      "moduleId": "Module B1",
+      "moduleName": "Foundations — The Number Line & the Coordinate Grid",
+      "source": "Khan Academy Pre-algebra / Algebra Basics",
+      "lessons": [
+        {
+          "id": "B1.1",
+          "title": "The Number Line — Numbers as Positions You Can Walk To",
+          "status": "done",
+          "componentType": "NumberLineWalker",
+          "coreAnalogy": "A number line is a sidewalk you can walk along, marked off in even steps",
+          "application": "Thermometer scale; treadmill distance readout"
+        },
+        {
+          "id": "B1.2",
+          "title": "Negative Numbers — Walking the Other Direction",
+          "status": "not_started",
+          "componentType": "NegativeDirectionWalker",
+          "coreAnalogy": "A negative number is the same number of steps, just walked the other way",
+          "application": "Bank account debt; elevation below sea level"
+        },
+        {
+          "id": "B1.3",
+          "title": "The Coordinate Plane — Locating Points With Two Numbers at Once",
+          "status": "not_started",
+          "componentType": "CoordinatePlaneLocator",
+          "coreAnalogy": "A coordinate is a street address — one number for each direction",
+          "application": "GPS coordinates; pixel grid in an image"
+        },
+        {
+          "id": "B1.4",
+          "title": "Variables & Multiplication as Scaling",
+          "status": "not_started",
+          "componentType": "VariableScalingKnob",
+          "coreAnalogy": "A variable is an empty box waiting for a number; multiplying is a dial that stretches or shrinks it",
+          "application": "Doubling a recipe; unit price times quantity"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 0",
+      "moduleName": "Vectors as Space Arrows",
+      "source": "3Blue1Brown Ch.1-3",
+      "lessons": [
+        {
+          "id": "0.1",
+          "title": "Vectors as Space Arrows — Geometry of Addition & Scaling",
+          "status": "done",
+          "componentType": "VectorAddition2D",
+          "coreAnalogy": "Vector as an arrow floating in space",
+          "application": "3D game engine movement; LiDAR point cloud"
+        },
+        {
+          "id": "0.2",
+          "title": "Span, Linear Combinations & Basis Vectors",
+          "status": "done",
+          "componentType": "SpanVisualizer2D",
+          "coreAnalogy": "Basis vectors as the coordinate 'grid' of space",
+          "application": "Color mixing (RGB as basis vectors)"
+        },
+        {
+          "id": "0.3",
+          "title": "Linear Transformations — Matrices as Moving Space",
+          "status": "done",
+          "componentType": "MatrixTransform2D",
+          "coreAnalogy": "A matrix moves the whole grid, vectors ride along",
+          "application": "Image rotation/skew filters"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 1",
+      "moduleName": "From Algebra to Calculus",
+      "source": "Khan Academy Precalculus",
+      "lessons": [
+        {
+          "id": "1.1",
+          "title": "Functions as Machines — Input, Output & Composition",
+          "status": "done",
+          "componentType": "FunctionMachine",
+          "coreAnalogy": "Function as an input-output machine",
+          "application": "Audio signal chains"
+        },
+        {
+          "id": "1.2",
+          "title": "Rates, Ratios & the Idea of 'Approaching' a Value",
+          "status": "done",
+          "componentType": "ApproachSlider",
+          "coreAnalogy": "Getting closer and closer without arriving",
+          "application": "Speedometer vs odometer"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 2",
+      "moduleName": "Trigonometry & the Unit Circle",
+      "source": "Khan Academy Trigonometry / AP Calc prereq",
+      "lessons": [
+        {
+          "id": "2.1",
+          "title": "The Unit Circle — Angles as Rotation, Not Just Triangles",
+          "status": "done",
+          "componentType": "UnitCircleTracer",
+          "coreAnalogy": "An angle is how far a unit vector has rotated",
+          "application": "Camera/character rotation in game engines"
+        },
+        {
+          "id": "2.2",
+          "title": "Sine & Cosine — Reading Height and Width Off the Circle",
+          "status": "not_started",
+          "componentType": "SineCosineWave",
+          "coreAnalogy": "Sine and cosine are just the circle's shadow on two axes",
+          "application": "Audio waveforms; oscillation"
+        },
+        {
+          "id": "2.3",
+          "title": "Tangent & the Reciprocal Functions",
+          "status": "not_started",
+          "componentType": "TangentSlopeCircle",
+          "coreAnalogy": "Tangent as the slope of the spinning radius",
+          "application": "Line-of-sight and slope calculations in physics engines"
+        },
+        {
+          "id": "2.4",
+          "title": "Radians, Periodicity & the Limit of sin(x)/x",
+          "status": "not_started",
+          "componentType": "SincLimitGraph",
+          "coreAnalogy": "Radians measure arc length, not degrees of a protractor",
+          "application": "Signal periodicity; the classic AP Calc trig limit"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 3",
+      "moduleName": "Limits & Continuity",
+      "source": "AP Calculus Unit 1",
+      "lessons": [
+        {
+          "id": "3.1",
+          "title": "What Is a Limit? Reading the Approach on a Graph",
+          "status": "not_started",
+          "componentType": "LimitGraphReader",
+          "coreAnalogy": "Secant line sliding toward a tangent",
+          "application": "Frame interpolation in animation"
+        },
+        {
+          "id": "3.2",
+          "title": "Calculating Limits — Algebraic Techniques & Indeterminate Forms",
+          "status": "not_started",
+          "componentType": "LimitAlgebraStep",
+          "coreAnalogy": "Canceling the 'hole' in a function",
+          "application": "Sensor error correction"
+        },
+        {
+          "id": "3.3",
+          "title": "Limits at Infinity & End Behavior",
+          "status": "not_started",
+          "componentType": "EndBehaviorGraph",
+          "coreAnalogy": "Curve flattening toward an asymptote",
+          "application": "Terminal velocity"
+        },
+        {
+          "id": "3.4",
+          "title": "Continuity — Where Curves Don't Break",
+          "status": "not_started",
+          "componentType": "ContinuityChecker",
+          "coreAnalogy": "A curve you can draw without lifting the pen",
+          "application": "Network signal dropouts"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 4",
+      "moduleName": "Derivatives & Rates of Change",
+      "source": "AP Calculus Unit 2-5",
+      "lessons": [
+        {
+          "id": "4.1",
+          "title": "The Derivative as Instantaneous Rate of Change",
+          "status": "not_started",
+          "componentType": "TangentSlopeSlider",
+          "coreAnalogy": "Slope of the tangent at a single instant",
+          "application": "SpaceX launch acceleration"
+        },
+        {
+          "id": "4.2",
+          "title": "Differentiation Rules — Power, Product & Quotient",
+          "status": "not_started",
+          "componentType": "RuleBuilder",
+          "coreAnalogy": "Rules as shortcuts for repeated patterns",
+          "application": "AI loss function derivatives"
+        },
+        {
+          "id": "4.3",
+          "title": "The Chain Rule — Composite Functions as Nested Gears",
+          "status": "not_started",
+          "componentType": "GearChainAnimation",
+          "coreAnalogy": "Nested gears transmitting rates of change",
+          "application": "Backprop through layered functions (preview)"
+        },
+        {
+          "id": "4.4",
+          "title": "Implicit Differentiation & Related Rates",
+          "status": "not_started",
+          "componentType": "RelatedRatesSim",
+          "coreAnalogy": "Two quantities changing together in lockstep",
+          "application": "Ladder sliding down a wall"
+        },
+        {
+          "id": "4.5",
+          "title": "Extrema & the Shape of a Curve",
+          "status": "not_started",
+          "componentType": "CurveShapeExplorer",
+          "coreAnalogy": "Peaks and valleys where slope hits zero",
+          "application": "Stock price local maxima"
+        },
+        {
+          "id": "4.6",
+          "title": "Optimization — Derivatives Solving Real-World Problems",
+          "status": "not_started",
+          "componentType": "OptimizationSandbox",
+          "coreAnalogy": "Finding the best trade-off point",
+          "application": "Minimizing material cost for a container"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 5",
+      "moduleName": "Integration & Accumulation",
+      "source": "AP Calculus Unit 6-8",
+      "lessons": [
+        {
+          "id": "5.1",
+          "title": "Antiderivatives — Undoing the Derivative",
+          "status": "not_started",
+          "componentType": "AntiderivativeStep",
+          "coreAnalogy": "Running the derivative machine backward",
+          "application": "Reconstructing position from velocity"
+        },
+        {
+          "id": "5.2",
+          "title": "The Definite Integral & Riemann Sums",
+          "status": "not_started",
+          "componentType": "RiemannSumBars",
+          "coreAnalogy": "Infinite thin rectangles filling an area",
+          "application": "Autonomous driving mileage estimation"
+        },
+        {
+          "id": "5.3",
+          "title": "The Fundamental Theorem of Calculus",
+          "status": "not_started",
+          "componentType": "FTCVisualizer",
+          "coreAnalogy": "Area-so-far function whose slope is the curve",
+          "application": "Physics engine energy conservation"
+        },
+        {
+          "id": "5.4",
+          "title": "Area Between Curves",
+          "status": "not_started",
+          "componentType": "AreaBetweenCurves",
+          "coreAnalogy": "Stacking two accumulations and subtracting",
+          "application": "Profit margin between revenue/cost curves"
+        },
+        {
+          "id": "5.5",
+          "title": "Volumes of Revolution — Slicing 3D Solids",
+          "status": "not_started",
+          "componentType": "SolidOfRevolution3D",
+          "coreAnalogy": "Spinning a 2D area into a 3D solid",
+          "application": "3D-printed object volume estimation"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 5.5",
+      "moduleName": "Series & Vector-Valued Functions (BC elective)",
+      "source": "AP Calculus BC supplement",
+      "isElective": true,
+      "lessons": [
+        {
+          "id": "5.5.1",
+          "title": "Parametric Equations — Tracing Motion with a Parameter",
+          "status": "not_started",
+          "componentType": "ParametricTracer",
+          "coreAnalogy": "A dot tracing a path as time ticks forward",
+          "application": "Projectile motion trajectory"
+        },
+        {
+          "id": "5.5.2",
+          "title": "Vector-Valued Functions — Position, Velocity & Acceleration",
+          "status": "not_started",
+          "componentType": "VectorValuedMotion",
+          "coreAnalogy": "Vectors updating frame-by-frame like animation",
+          "application": "Bezier curve animation paths"
+        },
+        {
+          "id": "5.5.3",
+          "title": "Sequences & Series — Infinite Sums & Convergence",
+          "status": "not_started",
+          "componentType": "SeriesConvergence",
+          "coreAnalogy": "Adding infinitely many shrinking pieces",
+          "application": "Compound interest approximations"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 6",
+      "moduleName": "Matrix Transformations & High-Dimensional Data",
+      "source": "3Blue1Brown Ch.4-15 / MIT 18.06",
+      "lessons": [
+        {
+          "id": "6.1",
+          "title": "Matrix Multiplication as Composition of Transformations",
+          "status": "not_started",
+          "componentType": "MatrixCompose2D",
+          "coreAnalogy": "Applying one transformation, then another",
+          "application": "Chained CSS/game object transforms"
+        },
+        {
+          "id": "6.2",
+          "title": "The Determinant — Measuring How Space Stretches",
+          "status": "not_started",
+          "componentType": "DeterminantAreaViz",
+          "coreAnalogy": "How much a transformation scales area/volume",
+          "application": "Detecting flipped/degenerate geometry in 3D engines"
+        },
+        {
+          "id": "6.3",
+          "title": "Inverse Matrices, Column Space & Null Space",
+          "status": "not_started",
+          "componentType": "NullSpaceExplorer",
+          "coreAnalogy": "Undoing a transformation, or where it collapses to zero",
+          "application": "Solving systems in circuit analysis"
+        },
+        {
+          "id": "6.4",
+          "title": "Dot Products, Cross Products & Change of Basis",
+          "status": "not_started",
+          "componentType": "BasisChangeViz",
+          "coreAnalogy": "Measuring alignment; switching coordinate 'languages'",
+          "application": "Camera view-space transforms in 3D engines"
+        },
+        {
+          "id": "6.5",
+          "title": "Eigenvectors & Eigenvalues — Directions That Don't Turn",
+          "status": "not_started",
+          "componentType": "EigenvectorField",
+          "coreAnalogy": "The direction a transformation only stretches, never rotates",
+          "application": "PCA principal components"
+        },
+        {
+          "id": "6.6",
+          "title": "Abstract Vector Spaces & High-Dimensional Embeddings",
+          "status": "not_started",
+          "componentType": "HighDimEmbeddingMap",
+          "coreAnalogy": "Vectors beyond 3D, living in 'meaning space'",
+          "application": "LLM 4096-dim word embeddings"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 7",
+      "moduleName": "Gradients & Backpropagation",
+      "source": "MIT 18.02 / Khan Academy Multivariable Calculus",
+      "lessons": [
+        {
+          "id": "7.1",
+          "title": "Partial Derivatives — Slicing Multivariable Functions",
+          "status": "not_started",
+          "componentType": "PartialDerivativeSlice",
+          "coreAnalogy": "Freezing all but one direction to see its slope",
+          "application": "Terrain steepness along one axis"
+        },
+        {
+          "id": "7.2",
+          "title": "The Gradient — Finding the Steepest Direction",
+          "status": "not_started",
+          "componentType": "GradientFieldViz",
+          "coreAnalogy": "An arrow pointing uphill in the steepest direction",
+          "application": "Contour maps / hiking route steepness"
+        },
+        {
+          "id": "7.3",
+          "title": "The Multivariable Chain Rule — How Backpropagation Works",
+          "status": "not_started",
+          "componentType": "BackpropChainViz",
+          "coreAnalogy": "Chain rule threaded through layered gears (multivariable)",
+          "application": "Neural network backpropagation"
+        },
+        {
+          "id": "7.4",
+          "title": "Gradient Descent — Optimization in Neural Networks",
+          "status": "not_started",
+          "componentType": "GradientDescent3D",
+          "coreAnalogy": "Rolling a ball downhill on a loss surface",
+          "application": "Training a neural network live"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 8",
+      "moduleName": "Probability & Statistics Foundations",
+      "source": "Khan Academy Statistics / MIT 18.05",
+      "lessons": [
+        {
+          "id": "8.1",
+          "title": "Probability as a Measure of Belief",
+          "status": "not_started",
+          "componentType": "ProbabilitySpinner",
+          "coreAnalogy": "Probability as area carved out of a whole",
+          "application": "Model confidence scores"
+        },
+        {
+          "id": "8.2",
+          "title": "Random Variables & Distributions",
+          "status": "not_started",
+          "componentType": "DistributionShaper",
+          "coreAnalogy": "A histogram settling into a smooth curve",
+          "application": "Sensor noise modeling"
+        },
+        {
+          "id": "8.3",
+          "title": "Expectation, Variance & the Normal Distribution",
+          "status": "not_started",
+          "componentType": "BellCurveExplorer",
+          "coreAnalogy": "Balancing point and spread of a distribution",
+          "application": "A/B test confidence intervals"
+        },
+        {
+          "id": "8.4",
+          "title": "Bayes' Theorem — Updating Belief With Evidence",
+          "status": "not_started",
+          "componentType": "BayesUpdateViz",
+          "coreAnalogy": "Shrinking the space of possibilities as evidence arrives",
+          "application": "Spam filters; medical test interpretation"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 9",
+      "moduleName": "Constrained Optimization",
+      "source": "MIT 18.02 supplement / convex optimization primers",
+      "lessons": [
+        {
+          "id": "9.1",
+          "title": "Convexity — Why Some Bowls Have Only One Bottom",
+          "status": "not_started",
+          "componentType": "ConvexitySurface",
+          "coreAnalogy": "A convex bowl guarantees gradient descent finds THE minimum",
+          "application": "Why some AI loss functions are easier to train than others"
+        },
+        {
+          "id": "9.2",
+          "title": "Constraints — Optimizing on a Boundary",
+          "status": "not_started",
+          "componentType": "ConstraintBoundaryViz",
+          "coreAnalogy": "Finding the best point while staying on a fence line",
+          "application": "Budget-constrained resource allocation"
+        },
+        {
+          "id": "9.3",
+          "title": "Lagrange Multipliers — Where Gradients Align",
+          "status": "not_started",
+          "componentType": "LagrangeAlignmentViz",
+          "coreAnalogy": "The peak-under-constraint is where two gradient arrows point the same way",
+          "application": "Support Vector Machine margins"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 10",
+      "moduleName": "Differential Equations & Diffusion Models",
+      "source": "MIT 18.03 / diffusion model primers",
+      "lessons": [
+        {
+          "id": "10.1",
+          "title": "What Is a Differential Equation? Rates Describing Themselves",
+          "status": "not_started",
+          "componentType": "SlopeFieldExplorer",
+          "coreAnalogy": "A field of arrows showing how a system wants to change",
+          "application": "Population growth; cooling coffee"
+        },
+        {
+          "id": "10.2",
+          "title": "Solving Simple Differential Equations",
+          "status": "not_started",
+          "componentType": "ODESolverStep",
+          "coreAnalogy": "Reading the arrow field to trace out an actual path",
+          "application": "Predicting a system's future state"
+        },
+        {
+          "id": "10.3",
+          "title": "Forward Diffusion — Turning Signal Into Noise",
+          "status": "not_started",
+          "componentType": "ForwardDiffusionViz",
+          "coreAnalogy": "An image slowly dissolving into static, one small step at a time",
+          "application": "How Stable Diffusion's training data is prepared"
+        },
+        {
+          "id": "10.4",
+          "title": "Reverse Diffusion — Sculpting Noise Back Into Signal",
+          "status": "not_started",
+          "componentType": "ReverseDiffusionViz",
+          "coreAnalogy": "Running the arrow field backward to undo the noise",
+          "application": "How Stable Diffusion / Midjourney generate images"
+        }
+      ]
+    },
+    {
+      "moduleId": "Module 11",
+      "moduleName": "Fourier Transforms & Complex Numbers (elective)",
+      "source": "3Blue1Brown Fourier series / MIT 18.03 supplement",
+      "isElective": true,
+      "lessons": [
+        {
+          "id": "11.1",
+          "title": "Complex Numbers as 2D Rotations",
+          "status": "not_started",
+          "componentType": "ComplexPlaneRotator",
+          "coreAnalogy": "Multiplying by i is just rotating 90 degrees",
+          "application": "Audio signal phase shifts"
+        },
+        {
+          "id": "11.2",
+          "title": "The Fourier Transform — Decomposing Signals Into Frequencies",
+          "status": "not_started",
+          "componentType": "FourierWheelViz",
+          "coreAnalogy": "Any wiggly signal is a sum of simple spinning circles",
+          "application": "Audio equalizers; JPEG compression"
+        }
+      ]
+    }
+  ]
+}
