@@ -1,0 +1,209 @@
+:root {
+  --bg: #0a0e1a;
+  --bg-2: #0d1220;
+  --panel: #0f1526;
+  --panel-2: #101a30;
+  --ink: #e7ebf3;
+  --ink-dim: #9098ae;
+  --ink-faint: #565f78;
+  --cyan: #5fd4e8;
+  --amber: #e8b95f;
+  --green: #7ee0a8;
+  --line: rgba(231, 235, 243, 0.09);
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+body[data-theme="eye"] {
+  --bg: #eef0df;
+  --bg-2: #e7ead8;
+  --panel: #f8f6ea;
+  --panel-2: #eef0df;
+  --ink: #253127;
+  --ink-dim: #657067;
+  --ink-faint: #7c867d;
+  --cyan: #247d75;
+  --amber: #9b6b20;
+  --green: #237552;
+  --line: rgba(58, 77, 58, 0.18);
+}
+
+body[data-font="reader"] {
+  --font-body: "Source Serif 4", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 0%, color-mix(in srgb, var(--cyan) 8%, transparent), transparent 32rem),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+a { color: inherit; }
+button { font: inherit; }
+
+.course-shell {
+  width: min(920px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 86px 0 72px;
+}
+
+.lesson-header {
+  padding: clamp(28px, 5vw, 56px) 0 36px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lesson-kicker {
+  margin: 0 0 12px;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.lesson-header h1 {
+  max-width: 760px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 7vw, 5rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+.lesson-summary {
+  max-width: 680px;
+  margin: 22px 0 0;
+  color: var(--ink-dim);
+  font-size: clamp(1rem, 2.2vw, 1.18rem);
+}
+
+.lesson-section {
+  padding: 44px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.lesson-section h2 {
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -.025em;
+}
+
+.lesson-section h3 {
+  margin: 26px 0 10px;
+  font-family: var(--font-display);
+}
+
+.lesson-section p,
+.lesson-section li {
+  color: var(--ink-dim);
+}
+
+.concept-card,
+.interactive-card,
+.practice-card {
+  margin-top: 22px;
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+}
+
+.interactive-card {
+  border-color: color-mix(in srgb, var(--cyan) 35%, var(--line));
+}
+
+.formula {
+  overflow-x: auto;
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.course-page-nav {
+  position: fixed;
+  z-index: 1000;
+  top: 14px;
+  left: 50%;
+  width: min(1040px, calc(100% - 24px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-2) 90%, transparent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(18px);
+}
+
+.course-page-nav a,
+.course-page-nav button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.course-page-nav a:hover,
+.course-page-nav button:hover,
+.course-page-nav button[aria-pressed="true"] {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+
+.course-nav-spacer { flex: 1; }
+.course-page-nav .nav-primary { color: var(--cyan); }
+.course-page-nav .nav-disabled {
+  opacity: .42;
+  pointer-events: none;
+}
+
+.lesson-footer {
+  padding-top: 32px;
+  color: var(--ink-faint);
+  font-size: .9rem;
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .course-shell {
+    width: min(100% - 24px, 920px);
+    padding-top: 76px;
+  }
+
+  .course-page-nav {
+    top: 8px;
+    overflow-x: auto;
+  }
+
+  .course-page-nav a,
+  .course-page-nav button {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: .82rem;
+  }
+
+  .course-page-nav .nav-label { display: none; }
+  .lesson-section { padding: 34px 0; }
+}
