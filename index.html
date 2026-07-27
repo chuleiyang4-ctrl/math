@@ -109,7 +109,7 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand"><span class="brand-mark">∑</span> Mathematics</div>
-      <nav class="topbar-links" aria-label="Primary"><a href="#courses">Courses</a><a href="#lab">Lab</a></nav>
+      <nav class="topbar-links" aria-label="Primary"><a href="#courses">Courses</a></nav>
       <div class="prefs" aria-label="Display preferences">
         <button class="pref-button" data-theme-choice="dark" type="button" title="Dark background">Dark</button>
         <button class="pref-button" data-theme-choice="eye" type="button" title="Eye-care background">Eye</button>
@@ -122,7 +122,7 @@
   <main class="wrap workspace">
     <section id="courses">
       <div class="workspace-title">
-        <div><h1>Mathematics Courses</h1><p>课程目录与互动学习页面</p></div>
+        <div><h1>Mathematics Courses</h1><p>Course directory and interactive lessons</p></div>
         <div class="mini-stats" aria-label="Course statistics">
           <div class="mini-stat"><strong id="stat-modules">—</strong><span>Modules</span></div>
           <div class="mini-stat"><strong id="stat-lessons">—</strong><span>Lessons</span></div>
@@ -142,30 +142,36 @@
       </div>
     </section>
 
-    <section class="lab-section" id="lab">
-      <div class="lab-head"><div><h2>Math Lab</h2><p>交互工具入口</p></div><p>Tools will be added here as they are ready.</p></div>
-      <div class="lab-grid">
-        <article class="lab-card"><span class="lab-icon">f(x)</span><b>Function Grapher</b><p>绘制函数并观察参数变化。</p><span class="lab-state">Planned</span></article>
-        <article class="lab-card"><span class="lab-icon">→v</span><b>Vector Playground</b><p>向量加法、缩放与坐标实验。</p><span class="lab-state">Planned</span></article>
-        <article class="lab-card"><span class="lab-icon">[A]</span><b>Matrix Transformer</b><p>观察矩阵如何移动二维空间。</p><span class="lab-state">Planned</span></article>
-        <article class="lab-card"><span class="lab-icon">P(x)</span><b>Probability Simulator</b><p>用重复实验理解概率分布。</p><span class="lab-state">Planned</span></article>
-      </div>
-    </section>
   </main>
 
   <footer class="footer"><div class="wrap footer-row"><span>Mathematics Courses</span><a href="#courses">Back to courses ↑</a></div></footer>
 
   <script>
-    const FILES = Object.freeze({
+    const FILES = {
       "0.1":"module-0-1.html",
       "0.2":"module-0-2.html",
       "0.3":"module-0-3.html",
       "1.1":"module-1-1.html"
-    });
+    };
+    const REPOSITORY_CONTENTS="https://api.github.com/repos/chuleiyang4-ctrl/math/contents?ref=main";
     const state={data:null,query:"",filter:"all"};
     const modulesEl=document.querySelector("#modules");
     const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
     const published=lesson=>Boolean(FILES[String(lesson.id)]);
+    const expectedFile=id=>`module-${String(id).toLowerCase().replaceAll(".","-")}.html`;
+    async function discoverPublishedFiles(modules){
+      try{
+        const response=await fetch(REPOSITORY_CONTENTS,{headers:{"Accept":"application/vnd.github+json"},cache:"no-store"});
+        if(!response.ok)throw new Error(`GitHub HTTP ${response.status}`);
+        const entries=await response.json();
+        const names=new Set(entries.filter(entry=>entry.type==="file").map(entry=>entry.name.toLowerCase()));
+        Object.keys(FILES).forEach(key=>delete FILES[key]);
+        modules.flatMap(module=>module.lessons||[]).forEach(lesson=>{
+          const file=expectedFile(lesson.id);
+          if(names.has(file))FILES[String(lesson.id)]=file;
+        });
+      }catch(error){console.warn("Using the built-in published course list.",error)}
+    }
     function renderStats(modules){
       const lessons=modules.flatMap(m=>Array.isArray(m.lessons)?m.lessons:[]);
       const live=lessons.filter(published).length;
@@ -216,7 +222,7 @@
     setTheme(savedTheme);setFont(savedFont);
     fetch("./course-data.json",{cache:"no-store"})
       .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()})
-      .then(data=>{if(!data||!Array.isArray(data.modules))throw new Error("Invalid course data");state.data=data;renderStats(data.modules);render()})
+      .then(async data=>{if(!data||!Array.isArray(data.modules))throw new Error("Invalid course data");await discoverPublishedFiles(data.modules);state.data=data;renderStats(data.modules);render()})
       .catch(error=>{
         console.error("Course data failed to load:",error);
         modulesEl.innerHTML='<div class="error"><strong>Course data could not be loaded.</strong>Keep <code>course-data.json</code> beside <code>index.html</code> and open the folder through a local web server.</div>';
