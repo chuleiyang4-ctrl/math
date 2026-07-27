@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 0.1 — Vectors as Space Arrows</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     DESIGN TOKENS — shared baseline for all 33 lessons.
+     Changing a value here should be the only edit needed
+     to re-skin every lesson page built from this template.
+     ========================================================= */
+  :root{
+    /* color */
+    --bg:        #0a0e1a;
+    --bg-2:      #0d1220;
+    --panel:     #0f1526;
+    --panel-2:   #101a30;
+    --ink:       #e7ebf3;
+    --ink-dim:   #9098ae;
+    --ink-faint: #565f78;
+    --cyan:      #5fd4e8;   /* primary vector / concept accent */
+    --amber:     #e8b95f;   /* secondary vector / highlight accent */
+    --green:     #7ee0a8;   /* result / success accent */
+    --line:      rgba(231,235,243,0.09);
+
+    /* type */
+    --font-display: 'Space Grotesk', sans-serif;   /* headings, badges, labels, UI chrome */
+    --font-body:    'Source Serif 4', Georgia, serif; /* long-form reading text */
+    --font-mono:    'IBM Plex Mono', monospace;       /* symbols, data, HUD readouts */
+
+    /* layout */
+    --radius: 10px;
+    --content-w: 720px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-body); font-size:17px; line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* faint topographic contour texture — ties visual identity to the
+     course's own "elevation" narrative device used on the roadmap */
+  .contours{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.22;
+  }
+
+  .topbar{
+    position:relative; z-index:1;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 28px; border-bottom:1px solid var(--line);
+    font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint);
+  }
+  .topbar .brand{color:var(--ink-dim); letter-spacing:0.04em;}
+  .topbar .brand b{color:var(--ink); font-weight:600;}
+
+  main{position:relative; z-index:1; max-width:var(--content-w); margin:0 auto; padding:48px 24px 110px;}
+
+  .badge{
+    display:inline-block; font-family:var(--font-mono); font-size:11px;
+    letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--amber); background:rgba(232,185,95,0.1);
+    border:1px solid rgba(232,185,95,0.25);
+    padding:5px 12px; border-radius:4px; margin-bottom:20px;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(30px,5vw,42px);
+    margin:0 0 16px; line-height:1.18; letter-spacing:-0.01em;
+  }
+  h1 em{ font-style:normal; color:var(--cyan); }
+  .subtitle{
+    font-family:var(--font-body); color:var(--ink-dim); font-size:18px;
+    max-width:600px; margin:0 0 46px; line-height:1.6;
+  }
+
+  .step{margin-bottom:56px;}
+  .step-head{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .step-num{
+    width:26px; height:26px; border-radius:6px;
+    background:rgba(95,212,232,0.12); border:1px solid rgba(95,212,232,0.3);
+    color:var(--cyan); font-family:var(--font-mono); font-size:13px;
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+  }
+  .step-head h2{
+    font-family:var(--font-display); font-size:19px; font-weight:600; margin:0;
+    letter-spacing:0.01em;
+  }
+  .step-body p{margin:0 0 16px;}
+  .step-body strong{ color:var(--amber); font-weight:600; }
+  .step-body em{ color:var(--cyan); font-style:normal; font-weight:600; }
+
+  .formula-box{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; margin:18px 0; text-align:center; overflow-x:auto;
+  }
+  .formula-box.compact{ padding:16px 20px; }
+
+  .legend{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px 22px;
+    margin-top:16px; font-family:var(--font-display); font-size:13.5px;
+  }
+  @media (max-width:520px){ .legend{grid-template-columns:1fr;} }
+  .legend-item{display:flex; gap:9px; align-items:flex-start;}
+  .legend-sym{ font-family:var(--font-mono); color:var(--cyan); flex:0 0 auto; min-width:38px; }
+  .legend-text{ color:var(--ink-dim); font-family:var(--font-body); font-size:14.5px; line-height:1.5; }
+
+  /* worked example */
+  .callout{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; margin:18px 0;
+  }
+  .worked{ display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+  .worked-visual{
+    flex:0 0 auto; width:140px; height:140px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .worked-steps{flex:1; min-width:220px;}
+  .worked-steps .row{
+    display:flex; justify-content:space-between; gap:12px;
+    padding:8px 0; border-bottom:1px dashed var(--line);
+    font-family:var(--font-mono); font-size:13.5px;
+  }
+  .worked-steps .row:last-child{border-bottom:none;}
+  .worked-steps .row .l{color:var(--ink-dim);}
+  .worked-steps .row .r{color:var(--green);}
+
+  /* embedded interactive — simple, low-risk, kept inline because it
+     directly demonstrates *this* concept (heavier/riskier visuals
+     belong in the separate Lab hub, not in the core lesson) */
+  .interactive{
+    background:var(--panel); border:1px solid rgba(95,212,232,0.22); border-radius:var(--radius);
+    padding:4px; margin:18px 0;
+  }
+  .interactive-top{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:13px 16px 9px; font-family:var(--font-display);
+  }
+  .interactive-title{ font-family:var(--font-mono); font-size:11.5px; color:var(--cyan); letter-spacing:0.05em; }
+  .interactive-hint{ font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono); }
+  canvas{ display:block; width:100%; height:auto; border-radius:6px; touch-action:none; cursor:grab; }
+  .hud{ display:flex; border-top:1px solid var(--line); flex-wrap:wrap; }
+  .hud-cell{ flex:1; min-width:110px; padding:12px 16px; border-right:1px solid var(--line); }
+  .hud-cell:last-child{border-right:none;}
+  .hud-cell .k{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:0.05em; text-transform:uppercase; }
+  .hud-cell .v{ font-family:var(--font-mono); font-size:14.5px; margin-top:3px; }
+  .hud-cell.a .v{color:var(--cyan);}
+  .hud-cell.b .v{color:var(--amber);}
+  .hud-cell.r .v{color:var(--green);}
+
+  .next{
+    margin-top:60px; padding-top:26px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:10px;
+    font-family:var(--font-display);
+  }
+  .next-label{font-size:12.5px; color:var(--ink-faint); font-family:var(--font-mono);}
+  .next-title{font-size:14.5px; color:var(--ink-dim);}
+</style>
+</head>
+<body>
+
+<svg class="contours" preserveAspectRatio="none" viewBox="0 0 400 900">
+  <defs>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fd4e8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e8b95f" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#fade)" stroke-width="1">
+    <path d="M-20,60 Q100,20 200,70 T420,50"/>
+    <path d="M-20,140 Q120,100 200,150 T420,130"/>
+    <path d="M-20,320 Q90,270 210,330 T420,300"/>
+    <path d="M-20,420 Q140,380 220,430 T420,400"/>
+    <path d="M-20,650 Q100,600 200,660 T420,630"/>
+    <path d="M-20,760 Q130,710 210,770 T420,740"/>
+  </g>
+</svg>
+
+<div class="topbar">
+  <span class="brand"><b>STEM LAB</b> · Linear Algebra Series</span>
+  <span>Module 0 · Lesson 1 of 3</span>
+</div>
+
+<main>
+  <span class="badge">Module 0.1</span>
+  <h1>Vectors as <em>Space Arrows</em></h1>
+  <p class="subtitle">Before you learn a single symbol, build the picture in your head: a vector is just an arrow in space, pointing somewhere with some length.</p>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-head"><div class="step-num">1</div><h2>Intuition First</h2></div>
+    <div class="step-body">
+      <p>Imagine standing in an empty, featureless space. If someone tells you to "move 5 units," the instruction is meaningless — 5 units in which direction? A <strong>vector</strong> exists precisely to remove that ambiguity: it's an arrow anchored in space that encodes two pieces of information at once — <strong>magnitude</strong> (how long) and <strong>direction</strong> (which way it points).</p>
+      <p>A <em>scalar</em>, by contrast, is just a lonely number — temperature, mass, price. A vector is an active instruction: a push, a displacement, a velocity. It doesn't just say "how much," it says "which way."</p>
+    </div>
+  </div>
+
+  <!-- STEP 2: concrete example first -->
+  <div class="step">
+    <div class="step-head"><div class="step-num">2</div><h2>Start With a Number You Can Check by Hand</h2></div>
+    <div class="step-body">
+      <p>Before any general formula, look at one concrete arrow: starting at the origin, walk 3 steps right and 4 steps up.</p>
+      <div class="callout">
+        <div class="worked">
+          <div class="worked-visual" id="miniVector"></div>
+          <div class="worked-steps">
+            <div class="row"><span class="l">Vector v</span><span class="r">(3, 4)</span></div>
+            <div class="row"><span class="l">Its length ‖v‖</span><span class="r">√(3² + 4²)</span></div>
+            <div class="row"><span class="l">= √(9 + 16)</span><span class="r">= √25</span></div>
+            <div class="row"><span class="l">‖v‖ =</span><span class="r">5</span></div>
+          </div>
+        </div>
+      </div>
+      <p>That's just the Pythagorean theorem — the arrow's length is the hypotenuse of the right triangle formed by its horizontal and vertical steps. Keep this "3-4-5" picture in mind; the general formula below is just this idea stretched to any number of dimensions.</p>
+    </div>
+  </div>
+
+  <!-- STEP 3: light, low-risk interactive -->
+  <div class="step">
+    <div class="step-head"><div class="step-num">3</div><h2>Try It — Vector Addition</h2></div>
+    <div class="step-body">
+      <p>Drag the tip of either arrow. Watch how they join <em>tip-to-tail</em> to form a new vector, v + w.</p>
+    </div>
+    <div class="interactive">
+      <div class="interactive-top">
+        <span class="interactive-title">◆ VECTOR ADDITION — LIVE</span>
+        <span class="interactive-hint">drag either arrow tip</span>
+      </div>
+      <canvas id="vecCanvas" width="672" height="400"></canvas>
+      <div class="hud">
+        <div class="hud-cell a"><div class="k">Vector v</div><div class="v" id="hudA">(3.0, 4.0)</div></div>
+        <div class="hud-cell b"><div class="k">Vector w</div><div class="v" id="hudB">(2.0, -1.0)</div></div>
+        <div class="hud-cell r"><div class="k">v + w</div><div class="v" id="hudR">(5.0, 3.0)</div></div>
+        <div class="hud-cell"><div class="k">‖v + w‖</div><div class="v" id="hudMag" style="color:var(--ink)">5.83</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: formal definition, symbols explained -->
+  <div class="step">
+    <div class="step-head"><div class="step-num">4</div><h2>Formal Definition</h2></div>
+    <div class="step-body">
+      <p>In an n-dimensional real space <span style="font-family:var(--font-mono)">ℝⁿ</span>, a vector <strong>v</strong> is written as an ordered list of numbers:</p>
+      <div class="formula-box compact" data-tex="v = \begin{bmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{bmatrix}"></div>
+      <p>Its magnitude is exactly the 3-4-5 idea above, generalized — square every component, add them up, take the root:</p>
+      <div class="formula-box compact" data-tex="\|v\| = \sqrt{v_1^2 + v_2^2 + \cdots + v_n^2}"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">ℝⁿ</span><span class="legend-text">n-dimensional real space — "flat plane" or "3D space" generalized to any number of directions</span></div>
+        <div class="legend-item"><span class="legend-sym">v_i</span><span class="legend-text">the component of v along direction i — e.g. v₁ = 3, v₂ = 4</span></div>
+        <div class="legend-item"><span class="legend-sym">Σ / ⋯</span><span class="legend-text">shorthand for "add up every component in sequence" — nothing new, just notation</span></div>
+        <div class="legend-item"><span class="legend-sym">‖v‖</span><span class="legend-text">"the norm of v" — its length, still just the Pythagorean theorem</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next">
+    <span class="next-title">Next — 0.2 Span, Linear Combinations & Basis Vectors</span>
+    <span class="next-label">MODULE 0 · LESSON 2 OF 3</span>
+  </div>
+</main>
+
+<script>
+  document.querySelectorAll('[data-tex]').forEach(el=>{
+    katex.render(el.getAttribute('data-tex'), el, {displayMode:true, throwOnError:false});
+  });
+
+  (function(){
+    const el = document.getElementById('miniVector');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 140 140');
+    svg.innerHTML = `
+      <line x1="20" y1="120" x2="120" y2="120" stroke="#2a3350" stroke-width="1"/>
+      <line x1="20" y1="120" x2="20" y2="20" stroke="#2a3350" stroke-width="1"/>
+      <line x1="20" y1="120" x2="86" y2="52" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="20" y1="120" x2="86" y2="120" stroke="#565f78" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="86" y1="120" x2="86" y2="52" stroke="#565f78" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="48" y="132" fill="#9098ae" font-size="9" font-family="IBM Plex Mono">3</text>
+      <text x="92" y="90" fill="#9098ae" font-size="9" font-family="IBM Plex Mono">4</text>
+      <text x="70" y="78" fill="#e8b95f" font-size="9" font-family="IBM Plex Mono">5</text>
+      <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/></marker></defs>
+    `;
+    el.appendChild(svg);
+  })();
+
+  (function(){
+    const canvas = document.getElementById('vecCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const originX = W/2, originY = H/2;
+    const scale = 30;
+
+    let A = {x:3, y:4};
+    let B = {x:2, y:-1};
+    let dragging = null;
+
+    function toScreen(pt){ return {x: originX + pt.x*scale, y: originY - pt.y*scale}; }
+    function toWorld(px,py){ return {x:(px-originX)/scale, y:-(py-originY)/scale}; }
+
+    function drawArrow(from, to, color, width){
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width;
+      ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
+      const angle = Math.atan2(to.y-from.y, to.x-from.x);
+      const headLen = 10;
+      ctx.beginPath();
+      ctx.moveTo(to.x, to.y);
+      ctx.lineTo(to.x - headLen*Math.cos(angle-0.35), to.y - headLen*Math.sin(angle-0.35));
+      ctx.lineTo(to.x - headLen*Math.cos(angle+0.35), to.y - headLen*Math.sin(angle+0.35));
+      ctx.closePath(); ctx.fill();
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.strokeStyle = 'rgba(231,235,243,0.055)'; ctx.lineWidth = 1;
+      for(let x=0; x<=W; x+=scale){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for(let y=0; y<=H; y+=scale){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+      ctx.strokeStyle = 'rgba(231,235,243,0.2)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(W, originY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, H); ctx.stroke();
+
+      const O = toScreen({x:0,y:0});
+      const Apt = toScreen(A);
+      const Bpt = toScreen(B);
+      const Rpt = toScreen({x:A.x+B.x, y:A.y+B.y});
+      const tailB = toScreen(A);
+
+      ctx.setLineDash([4,4]);
+      drawArrow(tailB, Rpt, 'rgba(232,185,95,0.55)', 1.5);
+      ctx.setLineDash([]);
+
+      drawArrow(O, Apt, '#5fd4e8', 2.5);
+      drawArrow(O, Bpt, '#e8b95f', 2.5);
+      drawArrow(O, Rpt, '#7ee0a8', 3);
+
+      [ [Apt,'#5fd4e8'], [Bpt,'#e8b95f'] ].forEach(([pt,color])=>{
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 7, 0, Math.PI*2);
+        ctx.fillStyle = '#0a0e1a'; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke();
+      });
+
+      updateHUD();
+    }
+
+    function updateHUD(){
+      document.getElementById('hudA').textContent = `(${A.x.toFixed(1)}, ${A.y.toFixed(1)})`;
+      document.getElementById('hudB').textContent = `(${B.x.toFixed(1)}, ${B.y.toFixed(1)})`;
+      const rx = A.x+B.x, ry = A.y+B.y;
+      document.getElementById('hudR').textContent = `(${rx.toFixed(1)}, ${ry.toFixed(1)})`;
+      document.getElementById('hudMag').textContent = Math.sqrt(rx*rx+ry*ry).toFixed(2);
+    }
+
+    function getPos(e){
+      const rect = canvas.getBoundingClientRect();
+      const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      return { x: cx * (W/rect.width), y: cy * (H/rect.height) };
+    }
+
+    function hitTest(pos){
+      const Apt = toScreen(A), Bpt = toScreen(B);
+      if(Math.hypot(pos.x-Apt.x,pos.y-Apt.y) < 14) return 'A';
+      if(Math.hypot(pos.x-Bpt.x,pos.y-Bpt.y) < 14) return 'B';
+      return null;
+    }
+
+    canvas.addEventListener('pointerdown', e=>{
+      const pos = getPos(e);
+      dragging = hitTest(pos);
+      if(dragging) canvas.style.cursor = 'grabbing';
+    });
+    window.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      const pos = getPos(e);
+      const world = toWorld(pos.x, pos.y);
+      const snapped = { x: Math.round(world.x*2)/2, y: Math.round(world.y*2)/2 };
+      if(dragging==='A') A = snapped; else B = snapped;
+      draw();
+    });
+    window.addEventListener('pointerup', ()=>{ dragging=null; canvas.style.cursor='grab'; });
+
+    draw();
+  })();
+</script>
+
+</body>
+</html>

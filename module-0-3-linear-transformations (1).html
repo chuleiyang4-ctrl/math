@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 0.3 — Linear Transformations</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e1a; --bg-2:#0d1220; --panel:#0f1526; --panel-2:#101a30;
+    --ink:#e7ebf3; --ink-dim:#9098ae; --ink-faint:#565f78;
+    --cyan:#5fd4e8; --amber:#e8b95f; --green:#7ee0a8;
+    --line:rgba(231,235,243,0.09);
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Source Serif 4',Georgia,serif;
+    --font-mono:'IBM Plex Mono',monospace;
+    --radius:10px; --content-w:720px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .contours{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.22;}
+  .topbar{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:16px 28px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);}
+  .topbar .brand{color:var(--ink-dim);letter-spacing:0.04em;}
+  .topbar .brand b{color:var(--ink);font-weight:600;}
+  main{position:relative;z-index:1;max-width:var(--content-w);margin:0 auto;padding:48px 24px 110px;}
+  .badge{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);background:rgba(232,185,95,0.1);border:1px solid rgba(232,185,95,0.25);padding:5px 12px;border-radius:4px;margin-bottom:20px;}
+  h1{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,5vw,42px);margin:0 0 16px;line-height:1.18;letter-spacing:-0.01em;}
+  h1 em{font-style:normal;color:var(--cyan);}
+  .subtitle{font-family:var(--font-body);color:var(--ink-dim);font-size:18px;max-width:600px;margin:0 0 46px;line-height:1.6;}
+  .step{margin-bottom:56px;}
+  .step-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .step-num{width:26px;height:26px;border-radius:6px;background:rgba(95,212,232,0.12);border:1px solid rgba(95,212,232,0.3);color:var(--cyan);font-family:var(--font-mono);font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .step-head h2{font-family:var(--font-display);font-size:19px;font-weight:600;margin:0;letter-spacing:0.01em;}
+  .step-body p{margin:0 0 16px;}
+  .step-body strong{color:var(--amber);font-weight:600;}
+  .step-body em{color:var(--cyan);font-style:normal;font-weight:600;}
+  .formula-box{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0;text-align:center;overflow-x:auto;}
+  .formula-box.compact{padding:16px 20px;}
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;margin-top:16px;font-family:var(--font-display);font-size:13.5px;}
+  @media (max-width:520px){.legend{grid-template-columns:1fr;}}
+  .legend-item{display:flex;gap:9px;align-items:flex-start;}
+  .legend-sym{font-family:var(--font-mono);color:var(--cyan);flex:0 0 auto;min-width:38px;}
+  .legend-text{color:var(--ink-dim);font-family:var(--font-body);font-size:14.5px;line-height:1.5;}
+  .callout{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0;}
+  .worked{display:flex;gap:22px;align-items:center;flex-wrap:wrap;}
+  .worked-visual{flex:0 0 auto;width:140px;height:140px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .worked-steps{flex:1;min-width:220px;}
+  .worked-steps .row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-family:var(--font-mono);font-size:13.5px;}
+  .worked-steps .row:last-child{border-bottom:none;}
+  .worked-steps .row .l{color:var(--ink-dim);}
+  .worked-steps .row .r{color:var(--green);}
+  .interactive{background:var(--panel);border:1px solid rgba(95,212,232,0.22);border-radius:var(--radius);padding:4px;margin:18px 0;}
+  .interactive-top{display:flex;justify-content:space-between;align-items:center;padding:13px 16px 9px;font-family:var(--font-display);}
+  .interactive-title{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan);letter-spacing:0.05em;}
+  .interactive-hint{font-size:11.5px;color:var(--ink-faint);font-family:var(--font-mono);}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;}
+  .sliders{padding:14px 16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;}
+  @media (max-width:480px){.sliders{grid-template-columns:1fr;}}
+  .slider-group .lbl{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:12px;margin-bottom:6px;color:var(--ink-dim);}
+  .slider-group .lbl b{color:var(--amber);}
+  input[type=range]{width:100%;accent-color:var(--amber);}
+  .hud{display:flex;border-top:1px solid var(--line);flex-wrap:wrap;}
+  .hud-cell{flex:1;min-width:110px;padding:12px 16px;border-right:1px solid var(--line);}
+  .hud-cell:last-child{border-right:none;}
+  .hud-cell .k{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:0.05em;text-transform:uppercase;}
+  .hud-cell .v{font-family:var(--font-mono);font-size:14.5px;margin-top:3px;}
+  .hud-cell.a .v{color:var(--cyan);}
+  .hud-cell.b .v{color:var(--amber);}
+  .hud-cell.r .v{color:var(--green);}
+  .next{margin-top:60px;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;font-family:var(--font-display);}
+  .next-label{font-size:12.5px;color:var(--ink-faint);font-family:var(--font-mono);}
+  .next-title{font-size:14.5px;color:var(--ink-dim);}
+</style>
+</head>
+<body>
+
+<svg class="contours" preserveAspectRatio="none" viewBox="0 0 400 900">
+  <defs>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fd4e8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e8b95f" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#fade)" stroke-width="1">
+    <path d="M-20,60 Q100,20 200,70 T420,50"/>
+    <path d="M-20,140 Q120,100 200,150 T420,130"/>
+    <path d="M-20,320 Q90,270 210,330 T420,300"/>
+    <path d="M-20,420 Q140,380 220,430 T420,400"/>
+    <path d="M-20,650 Q100,600 200,660 T420,630"/>
+    <path d="M-20,760 Q130,710 210,770 T420,740"/>
+  </g>
+</svg>
+
+<div class="topbar">
+  <span class="brand"><b>STEM LAB</b> · Linear Algebra Series</span>
+  <span>Module 0 · Lesson 3 of 3</span>
+</div>
+
+<main>
+  <span class="badge">Module 0.3</span>
+  <h1>Linear Transformations — Matrices as <em>Moving Space</em></h1>
+  <p class="subtitle">A matrix isn't a static block of numbers. It's an instruction for moving every point in space at once — and it's completely determined by where it sends two arrows.</p>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">1</div><h2>Intuition First</h2></div>
+    <div class="step-body">
+      <p>Instead of picturing a matrix as a grid of numbers, picture it as an action: something that grabs every point in space and moves it somewhere new — stretching, rotating, or shearing the whole plane at once.</p>
+      <p>A transformation is called <strong>linear</strong> if it plays fair: the origin never moves, straight lines stay straight, and evenly spaced grid lines stay evenly spaced everywhere. Once you know where a linear transformation sends <em>just the two basis arrows</em>, i = (1,0) and j = (0,1), you already know where it sends every other point — because every point is some recipe of i and j, the linear combination idea from the last lesson.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">2</div><h2>Start With a Number You Can Check by Hand</h2></div>
+    <div class="step-body">
+      <p>Take the matrix that sends i to (2, 0) and j to (1, 2). Apply it to the point (1, 1):</p>
+      <div class="callout">
+        <div class="worked">
+          <div class="worked-visual" id="miniVisual"></div>
+          <div class="worked-steps">
+            <div class="row"><span class="l">new x = 2·1 + 1·1</span><span class="r">= 3</span></div>
+            <div class="row"><span class="l">new y = 0·1 + 2·1</span><span class="r">= 2</span></div>
+            <div class="row"><span class="l">(1,1) →</span><span class="r">(3, 2)</span></div>
+          </div>
+        </div>
+      </div>
+      <p>Each new coordinate is just a linear combination of the old ones. The sliders below start on this exact matrix.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">3</div><h2>Try It — Warp the Grid</h2></div>
+    <div class="step-body">
+      <p>Move the sliders to change the matrix. Watch the grid stretch and shear, and watch where the test point (1, 1) lands.</p>
+    </div>
+    <div class="interactive">
+      <div class="interactive-top">
+        <span class="interactive-title">◆ LINEAR TRANSFORMATION — LIVE</span>
+        <span class="interactive-hint">drag any slider</span>
+      </div>
+      <canvas id="gridCanvas" width="672" height="420"></canvas>
+      <div class="sliders">
+        <div class="slider-group"><div class="lbl"><span>a</span><b id="aVal">2.0</b></div><input type="range" id="a" min="-3" max="3" step="0.25" value="2"></div>
+        <div class="slider-group"><div class="lbl"><span>b</span><b id="bVal">1.0</b></div><input type="range" id="b" min="-3" max="3" step="0.25" value="1"></div>
+        <div class="slider-group"><div class="lbl"><span>c</span><b id="cVal">0.0</b></div><input type="range" id="c" min="-3" max="3" step="0.25" value="0"></div>
+        <div class="slider-group"><div class="lbl"><span>d</span><b id="dVal">2.0</b></div><input type="range" id="d" min="-3" max="3" step="0.25" value="2"></div>
+      </div>
+      <div class="hud">
+        <div class="hud-cell a"><div class="k">i lands at</div><div class="v" id="hudI">(2.0, 0.0)</div></div>
+        <div class="hud-cell b"><div class="k">j lands at</div><div class="v" id="hudJ">(1.0, 2.0)</div></div>
+        <div class="hud-cell r"><div class="k">(1,1) lands at</div><div class="v" id="hudP">(3.0, 2.0)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">4</div><h2>Formal Definition</h2></div>
+    <div class="step-body">
+      <p>A transformation <strong>T</strong> is linear if it satisfies two properties for all vectors u, v and scalars c:</p>
+      <div class="formula-box compact" data-tex="T(u+v) = T(u) + T(v) \qquad T(cv) = cT(v)"></div>
+      <p>Every linear transformation of the plane can be written as multiplication by a matrix, whose columns are exactly where the basis vectors land:</p>
+      <div class="formula-box compact" data-tex="T\!\begin{pmatrix}x\\y\end{pmatrix} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}\!\begin{bmatrix}x\\y\end{bmatrix} = \begin{bmatrix} ax+by \\ cx+dy \end{bmatrix}"></div>
+      <div class="formula-box compact" data-tex="T(\hat{\imath}) = \begin{bmatrix}a\\c\end{bmatrix} \qquad T(\hat{\jmath}) = \begin{bmatrix}b\\d\end{bmatrix}"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">a, d</span><span class="legend-text">how much i and j stretch along their own direction</span></div>
+        <div class="legend-item"><span class="legend-sym">b, c</span><span class="legend-text">how much i and j lean into each other's direction — the shear</span></div>
+        <div class="legend-item"><span class="legend-sym">T(î)</span><span class="legend-text">where the transformation sends the first basis vector — always the matrix's first column</span></div>
+        <div class="legend-item"><span class="legend-sym">T(ĵ)</span><span class="legend-text">where it sends the second basis vector — always the second column</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next">
+    <span class="next-title">Next — 0.5.1 Functions as Machines (Module 0.5)</span>
+    <span class="next-label">MODULE 0 · COMPLETE</span>
+  </div>
+</main>
+
+<script>
+  document.querySelectorAll('[data-tex]').forEach(el=>{
+    katex.render(el.getAttribute('data-tex'), el, {displayMode:true, throwOnError:false});
+  });
+
+  (function(){
+    const el = document.getElementById('miniVisual');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 140 140');
+    svg.innerHTML = `
+      <line x1="20" y1="120" x2="120" y2="120" stroke="#2a3350" stroke-width="1"/>
+      <line x1="20" y1="120" x2="20" y2="20" stroke="#2a3350" stroke-width="1"/>
+      <line x1="20" y1="120" x2="46" y2="94" stroke="#e8b95f" stroke-width="2" marker-end="url(#arrowBefore)"/>
+      <line x1="20" y1="120" x2="98" y2="64" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#arrowAfter)"/>
+      <text x="26" y="112" fill="#e8b95f" font-size="8" font-family="IBM Plex Mono">(1,1)</text>
+      <text x="100" y="60" fill="#5fd4e8" font-size="8" font-family="IBM Plex Mono">(3,2)</text>
+      <defs>
+        <marker id="arrowBefore" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#e8b95f"/></marker>
+        <marker id="arrowAfter" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#5fd4e8"/></marker>
+      </defs>
+    `;
+    el.appendChild(svg);
+  })();
+
+  (function(){
+    const canvas = document.getElementById('gridCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const originX = W/2, originY = H/2;
+    const scale = 55;
+
+    const sliders = ['a','b','c','d'].map(id => document.getElementById(id));
+    const valEls = ['a','b','c','d'].map(id => document.getElementById(id+'Val'));
+
+    function toScreen(x,y){ return {x: originX + x*scale, y: originY - y*scale}; }
+
+    function drawArrow(fx,fy,tx,ty,color,width){
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width;
+      ctx.beginPath(); ctx.moveTo(fx,fy); ctx.lineTo(tx,ty); ctx.stroke();
+      const ang = Math.atan2(ty-fy, tx-fx);
+      const hl = 9;
+      ctx.beginPath();
+      ctx.moveTo(tx,ty);
+      ctx.lineTo(tx-hl*Math.cos(ang-0.3), ty-hl*Math.sin(ang-0.3));
+      ctx.lineTo(tx-hl*Math.cos(ang+0.3), ty-hl*Math.sin(ang+0.3));
+      ctx.closePath(); ctx.fill();
+    }
+
+    function draw(){
+      const [a,b,c,d] = sliders.map(s=>parseFloat(s.value));
+      valEls.forEach((el,i)=> el.textContent = sliders[i].value);
+
+      ctx.clearRect(0,0,W,H);
+
+      ctx.strokeStyle = 'rgba(231,235,243,0.06)'; ctx.lineWidth = 1;
+      for(let x=-6;x<=6;x++){
+        const p1 = toScreen(x,-6), p2 = toScreen(x,6);
+        ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+      }
+      for(let y=-6;y<=6;y++){
+        const p1 = toScreen(-6,y), p2 = toScreen(6,y);
+        ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(95,212,232,0.35)'; ctx.lineWidth = 1.2;
+      for(let x=-4;x<=4;x++){
+        ctx.beginPath();
+        for(let t=-4; t<=4; t+=0.2){
+          const px = a*x+b*t, py = c*x+d*t;
+          const s = toScreen(px,py);
+          if(t===-4) ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y);
+        }
+        ctx.stroke();
+      }
+      for(let y=-4;y<=4;y++){
+        ctx.beginPath();
+        for(let t=-4; t<=4; t+=0.2){
+          const px = a*t+b*y, py = c*t+d*y;
+          const s = toScreen(px,py);
+          if(t===-4) ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y);
+        }
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(231,235,243,0.2)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(W, originY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, H); ctx.stroke();
+
+      const O = toScreen(0,0);
+      const Ipt = toScreen(a,c);
+      const Jpt = toScreen(b,d);
+      const Ppt = toScreen(a+b, c+d);
+
+      drawArrow(O.x,O.y, Ipt.x,Ipt.y, '#5fd4e8', 2.5);
+      drawArrow(O.x,O.y, Jpt.x,Jpt.y, '#e8b95f', 2.5);
+
+      ctx.beginPath(); ctx.arc(Ppt.x,Ppt.y,5,0,Math.PI*2); ctx.fillStyle='#7ee0a8'; ctx.fill();
+
+      document.getElementById('hudI').textContent = `(${a.toFixed(1)}, ${c.toFixed(1)})`;
+      document.getElementById('hudJ').textContent = `(${b.toFixed(1)}, ${d.toFixed(1)})`;
+      document.getElementById('hudP').textContent = `(${(a+b).toFixed(1)}, ${(c+d).toFixed(1)})`;
+    }
+
+    sliders.forEach(s => s.addEventListener('input', draw));
+    draw();
+  })();
+</script>
+
+</body>
+</html>
