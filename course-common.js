@@ -1,8 +1,6 @@
 (() => {
   "use strict";
 
-  const STORAGE_THEME = "math-theme";
-  const STORAGE_FONT = "math-font";
   const DATA_URL = "course-data.json";
   const REPOSITORY_CONTENTS_URL =
     "https://api.github.com/repos/chuleiyang4-ctrl/math/contents?ref=main";
@@ -10,27 +8,11 @@
   const fileForLesson = (id) =>
     `module-${String(id).trim().toLowerCase().replaceAll(".", "-")}.html`;
 
-  const setPreference = (type, value) => {
-    document.body.dataset[type] = value;
-    localStorage.setItem(type === "theme" ? STORAGE_THEME : STORAGE_FONT, value);
-    document.querySelectorAll(`[data-set-${type}]`).forEach((button) => {
-      button.setAttribute(
-        "aria-pressed",
-        String(button.dataset[`set${type[0].toUpperCase()}${type.slice(1)}`] === value)
-      );
-    });
-  };
-
-  const applySavedPreferences = () => {
-    setPreference("theme", localStorage.getItem(STORAGE_THEME) || "dark");
-    setPreference("font", localStorage.getItem(STORAGE_FONT) || "sans");
-  };
-
   const flattenLessons = (data) =>
     (data.modules || []).flatMap((module) =>
       (module.lessons || []).map((lesson) => ({
         ...lesson,
-        moduleTitle: module.title || module.name || `Module ${module.id || ""}`,
+        moduleTitle: module.moduleName || module.title || module.name || module.moduleId,
         file: fileForLesson(lesson.id)
       }))
     );
@@ -46,63 +28,74 @@
     return null;
   };
 
-  const navLink = (label, href, className = "") => {
+  const addHomeLink = () => {
+    if (document.querySelector(".course-home-link")) return;
     const link = document.createElement("a");
-    link.textContent = label;
-    link.href = href;
-    link.className = className;
+    link.className = "course-home-link";
+    link.href = "index.html";
+    link.setAttribute("aria-label", "Return to course home");
+    link.title = "Course home";
+    link.textContent = "∑";
+    document.body.prepend(link);
+  };
+
+  const navCard = (lesson, direction) => {
+    const link = document.createElement("a");
+    if (!lesson) {
+      link.className = "nav-disabled";
+      link.href = "#";
+      link.innerHTML = `<small>${direction}</small><strong>No published lesson</strong>`;
+      return link;
+    }
+
+    link.href = lesson.file;
+    link.innerHTML =
+      `<small>${direction} · ${lesson.id}</small>` +
+      `<strong>${lesson.title || `Lesson ${lesson.id}`}</strong>`;
     return link;
   };
 
-  const buildNavigation = (previous, next) => {
-    if (document.querySelector(".course-page-nav")) return;
-
+  const addBottomNavigation = (previous, next) => {
+    if (document.querySelector(".lesson-course-nav")) return;
+    const main = document.querySelector("main") || document.body;
+    const footer = main.querySelector(".lesson-footer");
     const nav = document.createElement("nav");
-    nav.className = "course-page-nav";
-    nav.setAttribute("aria-label", "Course navigation");
+    nav.className = "lesson-course-nav";
+    nav.setAttribute("aria-label", "Previous and next lessons");
+    nav.append(navCard(previous, "Previous lesson"));
+    nav.append(navCard(next, "Next lesson"));
+    footer ? main.insertBefore(nav, footer) : main.append(nav);
+  };
 
-    nav.append(navLink("Home", "index.html", "nav-primary"));
-    nav.append(
-      previous
-        ? navLink(`← ${previous.id}`, previous.file)
-        : navLink("← Previous", "#", "nav-disabled")
-    );
-    nav.append(
-      next
-        ? navLink(`${next.id} →`, next.file)
-        : navLink("Curriculum →", "index.html#courses")
-    );
+  const showLessonIdWarning = (lessonId) => {
+    if (document.querySelector(".lesson-id-warning")) return;
+    const main = document.querySelector("main") || document.body;
+    const warning = document.createElement("div");
+    warning.className = "lesson-id-warning";
+    warning.setAttribute("role", "alert");
+    warning.textContent = lessonId
+      ? `Lesson ID "${lessonId}" was not found in course-data.json. Check data-lesson-id before publishing.`
+      : "This page has no data-lesson-id. Add the exact lesson ID from course-data.json before publishing.";
+    main.prepend(warning);
+  };
 
-    const spacer = document.createElement("span");
-    spacer.className = "course-nav-spacer";
-    nav.append(spacer);
-
-    [
-      ["Dark", "theme", "dark"],
-      ["Eye", "theme", "eye"],
-      ["Aa", "font", "sans"],
-      ["Serif", "font", "reader"]
-    ].forEach(([label, type, value]) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = label;
-      button.dataset[`set${type[0].toUpperCase()}${type.slice(1)}`] = value;
-      button.addEventListener("click", () => setPreference(type, value));
-      nav.append(button);
-    });
-
-    document.body.prepend(nav);
-    applySavedPreferences();
+  const renderMath = () => {
+    if (typeof window.renderMathInElement === "function") {
+      window.renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
+    }
   };
 
   const initialize = async () => {
-    applySavedPreferences();
+    addHomeLink();
+    renderMath();
 
     const lessonId = document.body.dataset.lessonId;
-    if (!lessonId) {
-      buildNavigation(null, null);
-      return;
-    }
 
     try {
       const [dataResponse, filesResponse] = await Promise.all([
@@ -120,23 +113,31 @@
       const currentIndex = lessons.findIndex(
         (lesson) => String(lesson.id) === String(lessonId)
       );
-      const remoteFiles = filesResponse.ok ? await filesResponse.json() : [];
-      const files = new Set(
-        Array.isArray(remoteFiles) ? remoteFiles.map((item) => item.name) : []
-      );
 
-      if (currentIndex < 0) {
-        buildNavigation(null, null);
+      if (!lessonId || currentIndex < 0) {
+        showLessonIdWarning(lessonId);
+        addBottomNavigation(null, null);
+        console.error(
+          "Lesson navigation disabled: data-lesson-id must exactly match an id in course-data.json."
+        );
         return;
       }
 
-      buildNavigation(
+      const remoteFiles = filesResponse.ok ? await filesResponse.json() : [];
+      const files = new Set(
+        Array.isArray(remoteFiles)
+          ? remoteFiles.filter((item) => item.type === "file").map((item) => item.name.toLowerCase())
+          : []
+      );
+
+      addBottomNavigation(
         findPublishedNeighbor(lessons, files, currentIndex, -1),
         findPublishedNeighbor(lessons, files, currentIndex, 1)
       );
     } catch (error) {
-      console.warn(error);
-      buildNavigation(null, null);
+      console.error(error);
+      showLessonIdWarning(lessonId);
+      addBottomNavigation(null, null);
     }
   };
 
