@@ -130,6 +130,12 @@ button { font: inherit; }
   background: var(--panel-2);
 }
 
+.worked-visual > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .worked-steps .row {
   display: flex;
   justify-content: space-between;
