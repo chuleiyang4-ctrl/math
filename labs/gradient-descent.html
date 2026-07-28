@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Descent Sandbox — Math Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:       #060911;
+    --panel:    #0b101c;
+    --panel-2:  #0e1420;
+    --ink:      #eef1f8;
+    --ink-dim:  #7d869e;
+    --ink-faint:#454e66;
+    --cyan:     #5fd4e8;
+    --amber:    #e8b95f;
+    --violet:   #b28dff;
+    --green:    #7ee0a8;
+    --line:     rgba(238,241,248,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    -webkit-font-smoothing:antialiased;
+  }
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; border-bottom:1px solid var(--line);
+    font-size:11px; letter-spacing:0.05em; flex-wrap:wrap; gap:6px;
+  }
+  .topbar .brand{ font-family:'Space Grotesk'; font-weight:600; font-size:13.5px; color:var(--ink); }
+  .topbar .brand span{ color:var(--green); }
+  .topbar .tag{ color:var(--ink-faint); text-transform:uppercase; }
+  .topbar a{ color:inherit; text-decoration:none; }
+  .topbar a:hover{ color:var(--cyan); }
+  .lab-nav{ display:flex; align-items:center; gap:14px; }
+
+  /* mobile-first: single column, canvas full width on top */
+  .layout{ display:flex; flex-direction:column; max-width:980px; margin:0 auto; }
+
+  .stage{
+    position:relative; width:100%;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--bg);
+    padding:14px;
+  }
+  canvas{ display:block; width:100%; max-width:640px; height:auto; border-radius:8px; touch-action:none; cursor:crosshair; }
+
+  .panel{ padding:6px 18px 28px; }
+  .section-label{
+    font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);
+    margin:18px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .hint{ font-size:12px; color:var(--ink-dim); line-height:1.6; }
+
+  .controls-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .btn{
+    font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.03em;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    padding:9px 16px; border-radius:6px; cursor:pointer; flex:0 0 auto;
+  }
+  .btn.primary{ background:var(--green); color:#06110d; border-color:var(--green); font-weight:600; }
+  .btn.ghost{ color:var(--ink-dim); }
+
+  .slider-row{ margin-top:14px; }
+  .slider-row .lbl{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-dim); margin-bottom:6px; }
+  .slider-row .lbl b{ color:var(--amber); }
+  input[type=range]{ width:100%; accent-color:var(--amber); }
+
+  .hud{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    margin-top:18px;
+  }
+  .hud-cell{ background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:11px 13px; }
+  .hud-cell .k{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px; }
+  .hud-cell .v{ font-size:13.5px; color:var(--cyan); }
+  .hud-cell.warn .v{ color:var(--amber); }
+
+  .status{
+    margin-top:14px; font-size:12px; padding:10px 13px; border-radius:8px;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim); line-height:1.6;
+  }
+  .status.diverge{ border-color:rgba(232,185,95,0.4); color:var(--amber); }
+  .status.converge{ border-color:rgba(126,224,168,0.4); color:var(--green); }
+
+  .legend-note{ font-size:11px; color:var(--ink-faint); line-height:1.7; margin-top:20px; }
+  .legend-note .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+
+  @media (min-width:760px){
+    .layout{ flex-direction:row; align-items:flex-start; max-width:none; }
+    .stage{ flex:1; }
+    .panel{ width:300px; flex:0 0 auto; border-left:1px solid var(--line); padding:22px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="../index.html"><span>∑</span> Mathematics</a>
+  <div class="lab-nav"><a href="index.html">⚗ Lab</a><div class="tag">Related: Module 7.4</div></div>
+</div>
+
+<div class="layout">
+  <div class="stage">
+    <canvas id="surface" width="640" height="640"></canvas>
+  </div>
+
+  <div class="panel">
+    <p class="hint">Tap anywhere on the surface to drop the ball. It rolls downhill, one gradient step at a time, toward the nearest low point — not always the lowest one.</p>
+
+    <div class="section-label">Controls</div>
+    <div class="controls-row">
+      <button class="btn primary" id="playBtn">▶ Run</button>
+      <button class="btn" id="stepBtn">Step</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="slider-row">
+      <div class="lbl"><span>Learning rate</span><b id="lrVal">0.35</b></div>
+      <input type="range" id="lr" min="0.02" max="1.4" step="0.01" value="0.35">
+    </div>
+
+    <div class="section-label">Live Readout</div>
+    <div class="hud">
+      <div class="hud-cell"><div class="k">Position</div><div class="v" id="hudPos">—</div></div>
+      <div class="hud-cell"><div class="k">Loss f(x,y)</div><div class="v" id="hudLoss">—</div></div>
+      <div class="hud-cell"><div class="k">‖∇f‖</div><div class="v" id="hudGrad">—</div></div>
+      <div class="hud-cell"><div class="k">Step</div><div class="v" id="hudStep">0</div></div>
+    </div>
+
+    <div class="status" id="status">Tap the surface to place the ball.</div>
+
+    <div class="legend-note">
+      <span class="dot" style="background:var(--green)"></span>descent path<br>
+      <span class="dot" style="background:var(--violet)"></span>ball (current position)
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('surface');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const DOMAIN = 3.2; // world coords range [-DOMAIN, DOMAIN]
+
+// ---- closed-form loss surface: convex bowl minus two Gaussian basins ----
+// Exact analytic gradient below — not a numerical approximation.
+const basins = [
+  { cx:-1.2, cy:0.8,  A:1.05, s:0.9 },   // deeper basin (global min region)
+  { cx:1.3,  cy:-1.0, A:0.7,  s:0.75 }   // shallower basin (local min trap)
+];
+
+function f(x,y){
+  let val = 0.15*(x*x + y*y);
+  for(const b of basins){
+    const dx=x-b.cx, dy=y-b.cy;
+    val -= b.A * Math.exp(-(dx*dx+dy*dy)/(2*b.s*b.s));
+  }
+  return val;
+}
+function grad(x,y){
+  let gx = 0.3*x, gy = 0.3*y;
+  for(const b of basins){
+    const dx=x-b.cx, dy=y-b.cy;
+    const e = Math.exp(-(dx*dx+dy*dy)/(2*b.s*b.s));
+    gx += b.A * e * dx / (b.s*b.s);
+    gy += b.A * e * dy / (b.s*b.s);
+  }
+  return {x:gx, y:gy};
+}
+
+function worldToPx(x,y){
+  return { x: (x+DOMAIN)/(2*DOMAIN)*W, y: (DOMAIN-y)/(2*DOMAIN)*H };
+}
+function pxToWorld(px,py){
+  return { x: px/W*(2*DOMAIN)-DOMAIN, y: DOMAIN - py/H*(2*DOMAIN) };
+}
+
+// ---- pre-render heatmap once to an offscreen canvas ----
+const heat = document.createElement('canvas');
+heat.width = W; heat.height = H;
+(function bakeHeatmap(){
+  const hctx = heat.getContext('2d');
+  const res = 140;
+  const cellW = W/res, cellH = H/res;
+  let minV = Infinity, maxV = -Infinity;
+  const vals = new Float32Array(res*res);
+  for(let j=0;j<res;j++){
+    for(let i=0;i<res;i++){
+      const world = pxToWorld((i+0.5)*cellW, (j+0.5)*cellH);
+      const v = f(world.x, world.y);
+      vals[j*res+i] = v;
+      if(v<minV) minV=v; if(v>maxV) maxV=v;
+    }
+  }
+  for(let j=0;j<res;j++){
+    for(let i=0;i<res;i++){
+      const t = (vals[j*res+i]-minV)/(maxV-minV); // 0 = lowest, 1 = highest
+      // deep navy (low) -> teal -> violet-ish (high), stays in family palette
+      const r = Math.round(10 + t*90);
+      const g = Math.round(14 + t*70 + (1-t)*40);
+      const b = Math.round(28 + (1-t)*130 + t*60);
+      hctx.fillStyle = `rgb(${r},${g},${b})`;
+      hctx.fillRect(i*cellW, j*cellH, cellW+1, cellH+1);
+    }
+  }
+})();
+
+// ---- state ----
+let ball = null;       // {x,y} world coords, null until user taps
+let trail = [];
+let running = false;
+let stepCount = 0;
+
+function reset(){
+  ball = null; trail = []; running = false; stepCount = 0;
+  playBtn.textContent = '▶ Run';
+  status.className = 'status';
+  status.textContent = 'Tap the surface to place the ball.';
+  updateHUD();
+  draw();
+}
+
+function doStep(){
+  if(!ball) return;
+  const lr = parseFloat(lrSlider.value);
+  const g = grad(ball.x, ball.y);
+  ball = { x: ball.x - lr*g.x, y: ball.y - lr*g.y };
+  trail.push({...ball});
+  if(trail.length > 400) trail.shift();
+  stepCount++;
+
+  const gmag = Math.hypot(g.x,g.y);
+  const outOfBounds = Math.abs(ball.x) > DOMAIN*1.6 || Math.abs(ball.y) > DOMAIN*1.6;
+  if(outOfBounds){
+    running = false; playBtn.textContent = '▶ Run';
+    status.className = 'status diverge';
+    status.textContent = `Diverged — learning rate ${lr.toFixed(2)} is too large for this slope. The ball overshot past the basin. Try a smaller value.`;
+  } else if(gmag < 0.01 && stepCount > 3){
+    running = false; playBtn.textContent = '▶ Run';
+    status.className = 'status converge';
+    status.textContent = `Converged after ${stepCount} steps. This may be a local minimum, not necessarily the lowest point on the whole surface.`;
+  }
+  updateHUD();
+  draw();
+}
+
+function updateHUD(){
+  if(!ball){
+    hudPos.textContent = '—'; hudLoss.textContent = '—'; hudGrad.textContent = '—'; hudStep.textContent = '0';
+    return;
+  }
+  const g = grad(ball.x, ball.y);
+  hudPos.textContent = `(${ball.x.toFixed(2)}, ${ball.y.toFixed(2)})`;
+  hudLoss.textContent = f(ball.x, ball.y).toFixed(3);
+  hudGrad.textContent = Math.hypot(g.x,g.y).toFixed(3);
+  hudStep.textContent = stepCount;
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(heat, 0, 0);
+
+  // trail
+  if(trail.length > 1){
+    ctx.strokeStyle = 'rgba(126,224,168,0.85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    trail.forEach((p,idx)=>{
+      const s = worldToPx(p.x,p.y);
+      if(idx===0) ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y);
+    });
+    ctx.stroke();
+  }
+
+  // ball
+  if(ball){
+    const s = worldToPx(ball.x, ball.y);
+    ctx.save();
+    ctx.shadowColor = 'rgba(178,141,255,0.9)';
+    ctx.shadowBlur = 16;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 8, 0, Math.PI*2);
+    ctx.fillStyle = '#b28dff'; ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ---- interaction ----
+const playBtn = document.getElementById('playBtn');
+const stepBtn = document.getElementById('stepBtn');
+const resetBtn = document.getElementById('resetBtn');
+const lrSlider = document.getElementById('lr');
+const lrVal = document.getElementById('lrVal');
+const hudPos = document.getElementById('hudPos');
+const hudLoss = document.getElementById('hudLoss');
+const hudGrad = document.getElementById('hudGrad');
+const hudStep = document.getElementById('hudStep');
+const status = document.getElementById('status');
+
+lrSlider.addEventListener('input', ()=> lrVal.textContent = parseFloat(lrSlider.value).toFixed(2));
+
+canvas.addEventListener('pointerdown', e=>{
+  const rect = canvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (W/rect.width);
+  const py = (e.clientY - rect.top) * (H/rect.height);
+  const world = pxToWorld(px,py);
+  ball = { x: Math.max(-DOMAIN, Math.min(DOMAIN, world.x)), y: Math.max(-DOMAIN, Math.min(DOMAIN, world.y)) };
+  trail = [{...ball}];
+  stepCount = 0;
+  running = false; playBtn.textContent = '▶ Run';
+  status.className = 'status';
+  status.textContent = 'Ball placed. Press Run or Step.';
+  updateHUD();
+  draw();
+});
+
+playBtn.addEventListener('click', ()=>{
+  if(!ball){ status.textContent = 'Tap the surface first to place the ball.'; return; }
+  running = !running;
+  playBtn.textContent = running ? '⏸ Pause' : '▶ Run';
+});
+stepBtn.addEventListener('click', ()=>{ running = false; playBtn.textContent = '▶ Run'; doStep(); });
+resetBtn.addEventListener('click', reset);
+
+function loop(){
+  if(running) doStep();
+  requestAnimationFrame(loop);
+}
+let lastTime = 0;
+function throttledLoop(ts){
+  if(running && ts - lastTime > 60){ doStep(); lastTime = ts; }
+  requestAnimationFrame(throttledLoop);
+}
+requestAnimationFrame(throttledLoop);
+
+draw();
+</script>
+
+</body>
+</html>
