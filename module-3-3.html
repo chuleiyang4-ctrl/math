@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Understand limits at infinity and how a curve flattens toward a horizontal asymptote.">
+  <title>Limits at Infinity & End Behavior | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #endBehLab {
+      display: grid;
+      gap: 18px;
+    }
+    #endBehLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #endBehLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #endBehLab input[type="range"] {
+      width: 160px;
+      accent-color: var(--cyan);
+    }
+    #endBehLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 8ch;
+    }
+    #endBehLab .lab-svg-wrap {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    #endBehLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #endBehLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+  </style>
+</head>
+<body data-lesson-id="3.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 3 · Lesson 3.3</p>
+      <h1>Limits at Infinity & End Behavior</h1>
+      <p class="lesson-summary">
+        See how a curve flattens toward a horizontal asymptote as $x$ grows without bound, and read the limiting value that describes that end behavior.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Walk far enough along the positive $x$-axis and many curves stop climbing or
+        falling; they level off. The height they settle toward is a horizontal asymptote.
+        The mathematical statement “the limit as $x$ approaches infinity equals $L$”
+        simply records that eventual flattening.
+      </p>
+      <p>
+        The same picture appears in physics: a skydiver accelerates at first, then air
+        resistance balances gravity and velocity approaches a constant terminal value.
+        The velocity graph flattens exactly the way a rational function approaches its
+        horizontal asymptote.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A limit at infinity describes end behavior. If the $y$-values of a function get
+          arbitrarily close to a number $L$ once $x$ is large enough (positive or negative),
+          we write $\lim_{x\to\infty}f(x)=L$ or $\lim_{x\to-\infty}f(x)=L$. Graphically the
+          curve is flattening toward the horizontal line $y=L$.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <line x1="12" y1="95" x2="130" y2="95" stroke="#565f78" stroke-width="1"/>
+            <line x1="12" y1="95" x2="12" y2="12" stroke="#565f78" stroke-width="1"/>
+            <!-- asymptote y=2 -->
+            <line x1="12" y1="42" x2="130" y2="42" stroke="#7ee0a8" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="116" y="38" fill="#7ee0a8" font-size="8" font-family="monospace">y=2</text>
+            <!-- curve approaching from below -->
+            <path d="M 20 88 Q 40 70 55 55 Q 75 42 95 40 Q 115 39 128 38.5" fill="none" stroke="#5fd4e8" stroke-width="2"/>
+            <text x="70" y="78" fill="#9098ae" font-size="8" font-family="monospace">f(x)</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Function</span><span class="r">$f(x)=\dfrac{2x}{x+1}$</span></div>
+          <div class="row"><span class="l">At $x=1$</span><span class="r">$f=1$</span></div>
+          <div class="row"><span class="l">At $x=10$</span><span class="r">$f\approx 1.818$</span></div>
+          <div class="row"><span class="l">At $x=100$</span><span class="r">$f\approx 1.980$</span></div>
+          <div class="row"><span class="l">As $x\to\infty$</span><span class="r">$f\to 2$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide $x$ farther to the right. Watch the curve approach the green horizontal
+        asymptote and read how the function value settles toward 2.
+      </p>
+      <div class="interactive-card" id="endBehLab">
+        <div class="lab-controls">
+          <label>
+            $x$ value
+            <input type="range" id="xSlider" min="0.5" max="40" step="0.5" value="4">
+            <span class="readout" id="xValue">4.0</span>
+          </label>
+          <span>$f(x)$: <span class="readout" id="fValue">1.600</span></span>
+          <span>Gap to 2: <span class="readout" id="gapValue">0.400</span></span>
+        </div>
+        <div class="lab-svg-wrap">
+          <svg id="endSvg" viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rational function approaching horizontal asymptote">
+            <g stroke="#1a2238" stroke-width="1">
+              <line x1="40" y1="30" x2="40" y2="240"/>
+              <line x1="40" y1="240" x2="400" y2="240"/>
+            </g>
+            <text x="390" y="255" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">x</text>
+            <text x="22" y="40" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">y</text>
+            <!-- horizontal asymptote -->
+            <line id="asymp" stroke="#7ee0a8" stroke-width="2" stroke-dasharray="6 4"/>
+            <text id="asympLabel" fill="#7ee0a8" font-size="11" font-family="IBM Plex Mono, monospace">y = 2</text>
+            <!-- curve -->
+            <path id="curvePath" fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <!-- moving point -->
+            <circle id="movePt" r="5" fill="#e8b95f"/>
+            <text id="moveLabel" fill="#9098ae" font-size="11" font-family="IBM Plex Mono, monospace"></text>
+          </svg>
+        </div>
+        <p class="lab-note">
+          Function $f(x)=\frac{2x}{x+1}$. As $x$ grows, the $+1$ in the denominator becomes
+          negligible, so $f(x)$ behaves like $\frac{2x}{x}=2$. The green dashed line is the
+          horizontal asymptote that the curve never quite reaches.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \lim_{x \to \infty} f(x) = L $$</div>
+      <p>
+        The statement means that for any tolerance $\varepsilon>0$ there exists a large
+        enough $M$ such that once $x>M$, the distance $|f(x)-L|$ is smaller than
+        $\varepsilon$. In practice we often divide numerator and denominator by the highest
+        power of $x$ that appears; the dominant terms reveal the constant $L$ that the
+        function approaches. The same idea works for $x\to-\infty$.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$x\to\infty$</span><span class="legend-text">$x$ grows without bound in the positive direction</span></div>
+        <div class="legend-item"><span class="legend-sym">$L$</span><span class="legend-text">The limiting height the curve approaches (horizontal asymptote $y=L$)</span></div>
+        <div class="legend-item"><span class="legend-sym">$f(x)$</span><span class="legend-text">The function whose end behavior we are reading</span></div>
+        <div class="legend-item"><span class="legend-sym">$|f(x)-L|$</span><span class="legend-text">The vertical gap that shrinks as $x$ becomes large</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why can a curve approach a horizontal asymptote yet never actually touch it?</li>
+          <li>In the terminal-velocity example, what physical quantity plays the role of the horizontal asymptote $L$?</li>
+          <li>If the degrees of the numerator and denominator of a rational function are equal, what is the horizontal asymptote in terms of the leading coefficients?</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const slider = document.getElementById('xSlider');
+    const xValue = document.getElementById('xValue');
+    const fValue = document.getElementById('fValue');
+    const gapValue = document.getElementById('gapValue');
+    const curvePath = document.getElementById('curvePath');
+    const asymp = document.getElementById('asymp');
+    const asympLabel = document.getElementById('asympLabel');
+    const movePt = document.getElementById('movePt');
+    const moveLabel = document.getElementById('moveLabel');
+
+    // x domain for drawing: 0 to 42
+    // y domain: 0 to 2.4
+    const xMin = 0, xMax = 42;
+    const yMin = 0, yMax = 2.4;
+    const svgX0 = 40, svgX1 = 400;
+    const svgY0 = 240, svgY1 = 30;
+
+    function toSvgX(x) {
+      return svgX0 + (x - xMin) / (xMax - xMin) * (svgX1 - svgX0);
+    }
+    function toSvgY(y) {
+      return svgY0 + (y - yMin) / (yMax - yMin) * (svgY1 - svgY0);
+    }
+
+    function f(x) {
+      return (2 * x) / (x + 1);
+    }
+
+    // draw curve
+    let d = '';
+    for (let i = 0; i <= 120; i++) {
+      const x = 0.2 + (i / 120) * (xMax - 0.2);
+      const y = f(x);
+      const sx = toSvgX(x);
+      const sy = toSvgY(y);
+      d += (i === 0 ? 'M' : 'L') + sx + ' ' + sy;
+    }
+    curvePath.setAttribute('d', d);
+
+    // asymptote at y=2
+    const ay = toSvgY(2);
+    asymp.setAttribute('x1', svgX0);
+    asymp.setAttribute('y1', ay);
+    asymp.setAttribute('x2', svgX1);
+    asymp.setAttribute('y2', ay);
+    asympLabel.setAttribute('x', svgX1 - 50);
+    asympLabel.setAttribute('y', ay - 8);
+
+    function update() {
+      const x = parseFloat(slider.value);
+      const y = f(x);
+      const gap = Math.abs(y - 2);
+
+      xValue.textContent = x.toFixed(1);
+      fValue.textContent = y.toFixed(3);
+      gapValue.textContent = gap.toFixed(3);
+
+      const sx = toSvgX(x);
+      const sy = toSvgY(y);
+      movePt.setAttribute('cx', sx);
+      movePt.setAttribute('cy', sy);
+      moveLabel.setAttribute('x', sx + 8);
+      moveLabel.setAttribute('y', sy - 10);
+      moveLabel.textContent = '';
+    }
+
+    slider.addEventListener('input', update);
+    update();
+  })();
+  </script>
+</body>
+</html>
