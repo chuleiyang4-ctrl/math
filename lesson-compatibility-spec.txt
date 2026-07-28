@@ -1,0 +1,169 @@
+COMPATIBILITY SPEC V2 — paste this before any lesson-writing request
+(Claude, ChatGPT, Gemini, or any other tool)
+=====================================================================
+
+You are writing ONE complete lesson page for an existing static course
+website. The finished HTML file must be ready to upload directly to the
+repository root without a build step.
+
+Return one complete HTML document only. Do not include explanations,
+Markdown fences, or notes outside the HTML.
+
+1. REQUIRED DOCUMENT SHELL
+
+Use this exact head structure. Replace the title and description, but do
+not remove or duplicate the shared files or KaTeX files.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="One-sentence lesson description">
+  <title>Lesson Title | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+
+Do not add theme or font controls. Do not create a top navigation bar.
+course-common.js automatically adds the home icon and bottom navigation.
+
+2. REQUIRED BODY STRUCTURE
+
+Use this exact section order and these shared classes:
+
+<body data-lesson-id="X.X">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module X · Lesson X.X</p>
+      <h1>Lesson Title</h1>
+      <p class="lesson-summary">One sentence describing what the learner will understand.</p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>...</p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>...</p>
+      </div>
+
+      <!-- REQUIRED: one concrete, hand-checkable numeric example.
+           It must appear before the general formula. -->
+      <div class="concept-card worked-example">
+        <div class="worked-visual"><!-- small inline SVG or simple visual --></div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Step label</span><span class="r">Value</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Value</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>...</p>
+      <div class="interactive-card">
+        <!-- canvas, SVG, slider, or drag interaction -->
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ ... $$</div>
+      <p>...</p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">x</span><span class="legend-text">Meaning in plain language</span></div>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <!-- lesson-specific interactive script may appear here -->
+</body>
+</html>
+
+Do not add a Practice, quiz, or exercises section.
+
+3. MATHEMATICS AND KATEX
+
+Write formulas as plain LaTeX inside $...$ for inline math or $$...$$
+for display math. The shared script auto-renders both forms.
+
+Do not call katex.render() or renderMathInElement() yourself.
+Do not use data-tex attributes.
+Never use a bare "&" outside
+\begin{aligned}...\end{aligned}; it causes a KaTeX parse error.
+Every symbol in the main formula must have one .legend-item explaining
+its meaning in plain language.
+
+4. PEDAGOGICAL ORDER
+
+Always follow this order:
+
+plain-language intuition
+→ one concrete worked numeric example
+→ one simple interactive
+→ general formula and symbol legend
+
+Never show the general formula before the worked example.
+
+5. LESSON ID — REQUIRED PRE-PUBLISH CHECK
+
+Before producing the final HTML, find the target lesson in the supplied
+course-data.json and copy its "id" exactly into data-lesson-id.
+
+Examples:
+  course-data.json id "2.2"   → <body data-lesson-id="2.2">
+  course-data.json id "5.5.1" → <body data-lesson-id="5.5.1">
+  course-data.json id "B1.3"  → <body data-lesson-id="B1.3">
+
+The value is case-sensitive and punctuation-sensitive. Do not infer or
+renumber it. If the requested lesson is missing from course-data.json,
+stop and report the missing ID instead of inventing one.
+
+The filename must use the same ID in lowercase, replacing dots with
+hyphens:
+
+  2.2   → module-2-2.html
+  5.5.1 → module-5-5-1.html
+  B1.3  → module-b1-3.html
+
+An incorrect data-lesson-id disables automatic navigation. The shared
+script now shows a visible warning when the ID is missing or invalid,
+but the error must still be corrected before upload.
+
+6. INTERACTIVE ELEMENTS
+
+Keep the interaction simple and low-risk: drag one point, move a slider,
+toggle a small option, or read a live number. WebGL, physics engines,
+large libraries, heavy particles, and complex 3D effects belong in the
+separate Lab hub and must not be added to a lesson page.
+
+Place the visual inside .interactive-card.
+Scope lesson-specific CSS under one unique id, such as #vecCanvas.
+Never redefine shared classes such as .formula, .concept-card,
+.interactive-card, .legend, .lesson-footer, or navigation classes.
+
+Place lesson-specific JavaScript at the end of body, wrap it in an IIFE,
+and do not duplicate or reference navigation code from course-common.js.
+
+7. FINAL SELF-CHECK BEFORE OUTPUT
+
+- Complete HTML document, not a fragment
+- English only
+- data-lesson-id exactly matches course-data.json
+- Filename follows module-{id-with-hyphens}.html
+- KaTeX CSS, core script, and auto-render script are present once
+- course-common.css and course-common.js are present once
+- Intuition → worked example → interactive → formula + legend
+- No top navigation, theme switcher, font switcher, or Practice section
+- No duplicated shared class definitions
+- Interactive CSS uses a unique id
+- Interactive script is wrapped in an IIFE
