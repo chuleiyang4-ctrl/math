@@ -1,0 +1,18 @@
+{
+  "labs": [
+    {
+      "id": "eigenvector-field",
+      "title": "Eigenvector Field Explorer",
+      "description": "Transform a vector field and discover the directions that do not turn.",
+      "relatedLesson": "6.5",
+      "file": "eigenvector-field.html"
+    },
+    {
+      "id": "gradient-descent",
+      "title": "Gradient Descent Sandbox",
+      "description": "Drop a point on a loss surface and explore how step size changes its path.",
+      "relatedLesson": "7.4",
+      "file": "gradient-descent.html"
+    }
+  ]
+}
