@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See how sine and cosine are simply the unit circle's shadow cast on two axes.">
+  <title>Sine & Cosine — Reading Height and Width Off the Circle | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="2.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 2 · Lesson 2.2</p>
+      <h1>Sine & Cosine — Reading Height and Width Off the Circle</h1>
+      <p class="lesson-summary">
+        Sine and cosine aren't separate formulas to memorize — they're just the shadow the rotating
+        point on a unit circle casts onto the vertical and horizontal axes.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Shine a light straight down onto the unit circle point from above, and its shadow falls
+        somewhere on the horizontal axis — that shadow's position is the cosine of the angle. Shine a
+        light from the side instead, and the shadow falls on the vertical axis — that's the sine.
+      </p>
+      <p>
+        As the point sweeps around the circle, both shadows slide back and forth smoothly and
+        repeatedly. Plot either shadow's position against the angle over time, and you get the familiar
+        rolling wave shape — the same shape behind audio waveforms and any back-and-forth oscillation.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Sine and cosine are just the circle's shadow on two axes. Cosine tracks the point's
+          left-right shadow (its width from center); sine tracks its up-down shadow (its height from
+          center). Neither needs a triangle to be drawn — they fall directly out of the rotation.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 160" role="img" aria-label="Unit circle with shadows at 45 degrees">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="20" y1="80" x2="140" y2="80" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="80" y1="20" x2="80" y2="140" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="80" y1="80" x2="122" y2="38" stroke="var(--cyan)" stroke-width="2"></line>
+            <line x1="122" y1="38" x2="122" y2="80" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <line x1="122" y1="38" x2="80" y2="38" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <circle cx="122" cy="38" r="4" fill="var(--green)"></circle>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Angle</span><span class="r">45°</span></div>
+          <div class="row"><span class="l">x = cos 45° (width shadow)</span><span class="r">≈ 0.707</span></div>
+          <div class="row"><span class="l">y = sin 45° (height shadow)</span><span class="r">≈ 0.707</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Point at (0.707, 0.707)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>Drag the slider to rotate the point and watch its two shadows trace out sine and cosine waves.</p>
+      <div class="interactive-card">
+        <div id="scLab">
+          <svg id="scSvg" viewBox="0 0 520 240" role="img" aria-label="Circle with shadow lines next to sine and cosine wave graphs">
+            <circle cx="120" cy="120" r="90" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="20" y1="120" x2="220" y2="120" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="120" y1="20" x2="120" y2="220" stroke="var(--line)" stroke-width="1"></line>
+            <line id="scShadowX" x1="120" y1="120" x2="120" y2="120" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <line id="scShadowY" x1="120" y1="120" x2="120" y2="120" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <line id="scRadius" x1="120" y1="120" x2="210" y2="120" stroke="var(--cyan)" stroke-width="2"></line>
+            <circle id="scPoint" cx="210" cy="120" r="6" fill="var(--ink)"></circle>
+
+            <line x1="250" y1="120" x2="500" y2="120" stroke="var(--line)" stroke-width="1"></line>
+            <path id="scSinPath" fill="none" stroke="var(--green)" stroke-width="2"></path>
+            <path id="scCosPath" fill="none" stroke="var(--amber)" stroke-width="2"></path>
+            <circle id="scSinDot" cx="250" cy="120" r="4.5" fill="var(--green)"></circle>
+            <circle id="scCosDot" cx="250" cy="120" r="4.5" fill="var(--amber)"></circle>
+          </svg>
+          <input id="scSlider" type="range" min="0" max="360" value="0" step="1" style="width:100%; margin-top:14px;">
+          <div class="worked-steps">
+            <div class="row"><span class="l">Angle (θ)</span><span class="r" id="scAngle">0°</span></div>
+            <div class="row"><span class="l">sin θ (green, height shadow)</span><span class="r" id="scSin">0.000</span></div>
+            <div class="row"><span class="l">cos θ (amber, width shadow)</span><span class="r" id="scCos">1.000</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ x(\theta) = \cos\theta, \qquad y(\theta) = \sin\theta $$</div>
+      <p>
+        As $\theta$ increases, $x(\theta)$ and $y(\theta)$ trace out the horizontal and vertical
+        shadows of the rotating point. Plotted against $\theta$, each shadow becomes a smooth,
+        repeating wave — the same wave shape you'd see on an oscilloscope reading an audio signal or
+        any steady back-and-forth oscillation.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\theta$</span><span class="legend-text">The rotation angle of the point around the circle</span></div>
+        <div class="legend-item"><span class="legend-sym">$x(\theta)$</span><span class="legend-text">The point's horizontal shadow — equals $\cos\theta$</span></div>
+        <div class="legend-item"><span class="legend-sym">$y(\theta)$</span><span class="legend-text">The point's vertical shadow — equals $\sin\theta$</span></div>
+        <div class="legend-item"><span class="legend-sym">$\cos\theta$</span><span class="legend-text">Width of the shadow from the center line</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sin\theta$</span><span class="legend-text">Height of the shadow from the center line</span></div>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var cx = 120, cy = 120, r = 90;
+      var waveX0 = 250, waveX1 = 500, waveMid = 120, waveAmp = 90;
+
+      var radius = document.getElementById('scRadius');
+      var point = document.getElementById('scPoint');
+      var shadowX = document.getElementById('scShadowX');
+      var shadowY = document.getElementById('scShadowY');
+      var sinPath = document.getElementById('scSinPath');
+      var cosPath = document.getElementById('scCosPath');
+      var sinDot = document.getElementById('scSinDot');
+      var cosDot = document.getElementById('scCosDot');
+      var slider = document.getElementById('scSlider');
+      var angleOut = document.getElementById('scAngle');
+      var sinOut = document.getElementById('scSin');
+      var cosOut = document.getElementById('scCos');
+
+      function buildStaticPath(fn) {
+        var d = '';
+        for (var deg = 0; deg <= 360; deg += 4) {
+          var t = deg * Math.PI / 180;
+          var wx = waveX0 + (deg / 360) * (waveX1 - waveX0);
+          var wy = waveMid - waveAmp * fn(t);
+          d += (deg === 0 ? 'M ' : 'L ') + wx.toFixed(1) + ' ' + wy.toFixed(1) + ' ';
+        }
+        return d;
+      }
+
+      sinPath.setAttribute('d', buildStaticPath(Math.sin));
+      cosPath.setAttribute('d', buildStaticPath(Math.cos));
+
+      function update(deg) {
+        var rad = deg * Math.PI / 180;
+        var px = cx + r * Math.cos(rad);
+        var py = cy - r * Math.sin(rad);
+
+        radius.setAttribute('x2', px);
+        radius.setAttribute('y2', py);
+        point.setAttribute('cx', px);
+        point.setAttribute('cy', py);
+
+        shadowX.setAttribute('x1', px);
+        shadowX.setAttribute('y1', py);
+        shadowX.setAttribute('x2', px);
+        shadowX.setAttribute('y2', cy);
+
+        shadowY.setAttribute('x1', px);
+        shadowY.setAttribute('y1', py);
+        shadowY.setAttribute('x2', cx);
+        shadowY.setAttribute('y2', py);
+
+        var wx = waveX0 + (deg / 360) * (waveX1 - waveX0);
+        var sinY = waveMid - waveAmp * Math.sin(rad);
+        var cosY = waveMid - waveAmp * Math.cos(rad);
+        sinDot.setAttribute('cx', wx);
+        sinDot.setAttribute('cy', sinY);
+        cosDot.setAttribute('cx', wx);
+        cosDot.setAttribute('cy', cosY);
+
+        angleOut.textContent = deg + '°';
+        sinOut.textContent = Math.sin(rad).toFixed(3);
+        cosOut.textContent = Math.cos(rad).toFixed(3);
+      }
+
+      slider.addEventListener('input', function () {
+        update(parseInt(slider.value, 10));
+      });
+
+      update(0);
+    })();
+  </script>
+</body>
+</html>
