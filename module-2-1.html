@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover how an angle is really just how far a unit-length arrow has rotated around a circle.">
+  <title>The Unit Circle — Angles as Rotation, Not Just Triangles | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="2.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 2 · Lesson 2.1</p>
+      <h1>The Unit Circle — Angles as Rotation, Not Just Triangles</h1>
+      <p class="lesson-summary">
+        An angle isn't just a corner of a triangle — it's how far a unit-length arrow has rotated around a circle.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Picture an arrow exactly one unit long, pinned at the center of a circle and pointing straight
+        along the positive x-axis. Now spin it. The angle it has swept through, measured from its
+        starting position, is all an "angle" really is — a rotation, not a fixed shape drawn on paper.
+      </p>
+      <p>
+        As the arrow spins, its tip traces the unit circle, and its tip's coordinates change smoothly.
+        Those coordinates are exactly what cosine and sine measure: how far right (or left) and how far
+        up (or down) the tip has moved for a given amount of rotation.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          An angle is how far a unit vector has rotated. The horizontal position of the rotated tip is
+          its cosine; the vertical position is its sine. This is the same idea used to spin a character
+          or a camera in a game engine — the engine just tracks how far a direction arrow has turned.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 160" role="img" aria-label="Unit circle with a point at 60 degrees">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="20" y1="80" x2="140" y2="80" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="80" y1="20" x2="80" y2="140" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="80" y1="80" x2="110" y2="28" stroke="var(--cyan)" stroke-width="2"></line>
+            <path d="M 104 80 A 24 24 0 0 0 92 57" fill="none" stroke="var(--amber)" stroke-width="1.5"></path>
+            <circle cx="110" cy="28" r="4" fill="var(--green)"></circle>
+            <circle cx="80" cy="80" r="2.5" fill="var(--ink-dim)"></circle>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Angle</span><span class="r">60°</span></div>
+          <div class="row"><span class="l">x = cos 60°</span><span class="r">0.5</span></div>
+          <div class="row"><span class="l">y = sin 60°</span><span class="r">≈ 0.866</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Tip at (0.5, 0.866)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>Drag the point around the circle and watch the angle and coordinates update live.</p>
+      <div class="interactive-card">
+        <div id="unitCircleLab">
+          <svg id="ucSvg" viewBox="0 0 300 300" role="img" aria-label="Draggable unit circle">
+            <circle cx="150" cy="150" r="110" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="30" y1="150" x2="270" y2="150" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="150" y1="30" x2="150" y2="270" stroke="var(--line)" stroke-width="1"></line>
+            <line id="ucRadius" x1="150" y1="150" x2="260" y2="150" stroke="var(--cyan)" stroke-width="2.5"></line>
+            <circle id="ucHandle" cx="260" cy="150" r="9" fill="var(--green)" style="cursor:grab"></circle>
+          </svg>
+          <div id="ucReadout" class="worked-steps">
+            <div class="row"><span class="l">Angle (θ)</span><span class="r" id="ucAngle">0°</span></div>
+            <div class="row"><span class="l">x = cos θ</span><span class="r" id="ucCos">1.000</span></div>
+            <div class="row"><span class="l">y = sin θ</span><span class="r" id="ucSin">0.000</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ (x, y) = (\cos\theta, \sin\theta) $$</div>
+      <p>
+        For any angle $\theta$ measured from the positive x-axis, the tip of a unit-length arrow rotated
+        by $\theta$ lands at the point $(\cos\theta, \sin\theta)$ on the unit circle. Because the arrow
+        never changes length, its horizontal and vertical parts always satisfy
+        $\cos^2\theta + \sin^2\theta = 1$.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\theta$</span><span class="legend-text">The rotation angle, measured from the positive x-axis</span></div>
+        <div class="legend-item"><span class="legend-sym">$x$</span><span class="legend-text">Horizontal position of the rotated tip</span></div>
+        <div class="legend-item"><span class="legend-sym">$y$</span><span class="legend-text">Vertical position of the rotated tip</span></div>
+        <div class="legend-item"><span class="legend-sym">$\cos\theta$</span><span class="legend-text">How far right the tip has moved</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sin\theta$</span><span class="legend-text">How far up the tip has moved</span></div>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var svg = document.getElementById('ucSvg');
+      var radiusLine = document.getElementById('ucRadius');
+      var handle = document.getElementById('ucHandle');
+      var angleOut = document.getElementById('ucAngle');
+      var cosOut = document.getElementById('ucCos');
+      var sinOut = document.getElementById('ucSin');
+
+      var cx = 150, cy = 150, r = 110;
+      var dragging = false;
+
+      function svgPoint(evt) {
+        var pt = svg.createSVGPoint();
+        var t = (evt.touches && evt.touches[0]) ? evt.touches[0] : evt;
+        pt.x = t.clientX;
+        pt.y = t.clientY;
+        var ctm = svg.getScreenCTM();
+        return pt.matrixTransform(ctm.inverse());
+      }
+
+      function updateFromAngleRad(angleRad) {
+        var hx = cx + r * Math.cos(angleRad);
+        var hy = cy - r * Math.sin(angleRad);
+        radiusLine.setAttribute('x2', hx);
+        radiusLine.setAttribute('y2', hy);
+        handle.setAttribute('cx', hx);
+        handle.setAttribute('cy', hy);
+
+        var deg = ((angleRad * 180 / Math.PI) + 360) % 360;
+        angleOut.textContent = deg.toFixed(0) + '°';
+        cosOut.textContent = Math.cos(angleRad).toFixed(3);
+        sinOut.textContent = Math.sin(angleRad).toFixed(3);
+      }
+
+      function angleFromPoint(p) {
+        return Math.atan2(-(p.y - cy), p.x - cx);
+      }
+
+      function onMove(evt) {
+        if (!dragging) return;
+        evt.preventDefault();
+        var p = svgPoint(evt);
+        updateFromAngleRad(angleFromPoint(p));
+      }
+
+      function onDown(evt) {
+        dragging = true;
+        handle.style.cursor = 'grabbing';
+        onMove(evt);
+      }
+
+      function onUp() {
+        dragging = false;
+        handle.style.cursor = 'grab';
+      }
+
+      handle.addEventListener('mousedown', onDown);
+      handle.addEventListener('touchstart', onDown, { passive: false });
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchmove', onMove, { passive: false });
+      window.addEventListener('mouseup', onUp);
+      window.addEventListener('touchend', onUp);
+
+      updateFromAngleRad(0);
+    })();
+  </script>
+</body>
+</html>
