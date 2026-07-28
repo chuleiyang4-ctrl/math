@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Understand the chain rule as nested gears that transmit rates of change through composite functions.">
+  <title>The Chain Rule — Composite Functions as Nested Gears | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #chainLab {
+      display: grid;
+      gap: 18px;
+    }
+    #chainLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #chainLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #chainLab input[type="range"] {
+      width: 140px;
+      accent-color: var(--cyan);
+    }
+    #chainLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 7ch;
+    }
+    #chainLab .gear-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+    #chainLab .gear-card {
+      flex: 1 1 120px;
+      max-width: 160px;
+      padding: 14px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      color: var(--ink-dim);
+    }
+    #chainLab .gear-card .label {
+      color: var(--cyan);
+      font-size: .75rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    #chainLab .gear-card .val {
+      color: var(--green);
+      font-size: 1.05rem;
+    }
+    #chainLab .arrow {
+      color: var(--ink-faint);
+      font-size: 1.4rem;
+    }
+    #chainLab .result-box {
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    #chainLab .result-box .hl { color: var(--cyan); }
+    #chainLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+  </style>
+</head>
+<body data-lesson-id="4.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 4 · Lesson 4.3</p>
+      <h1>The Chain Rule — Composite Functions as Nested Gears</h1>
+      <p class="lesson-summary">
+        See the chain rule as nested gears that multiply rates of change, letting a derivative travel through every layer of a composition.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        When one function feeds into another, a small change at the input is scaled once
+        by the inner function and again by the outer function. The overall rate is the
+        product of the two individual rates—exactly the way nested gears multiply their
+        angular speeds.
+      </p>
+      <p>
+        The same multiplication appears in backpropagation: each layer of a neural
+        network is a function of the previous layer. The chain rule threads the gradient
+        backward through every gear, producing the update signal for every weight.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          If $y=f(g(x))$, then a tiny change $dx$ first becomes $g'(x)\,dx$ and then is
+          multiplied by $f'(g(x))$. The composite derivative is therefore the product
+          $f'(g(x))\cdot g'(x)$.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <!-- simple gear icons -->
+            <circle cx="40" cy="55" r="22" fill="none" stroke="#5fd4e8" stroke-width="2"/>
+            <circle cx="40" cy="55" r="8" fill="#5fd4e8"/>
+            <circle cx="95" cy="55" r="28" fill="none" stroke="#7ee0a8" stroke-width="2"/>
+            <circle cx="95" cy="55" r="10" fill="#7ee0a8"/>
+            <text x="28" y="90" fill="#9098ae" font-size="9" font-family="monospace">g</text>
+            <text x="85" y="95" fill="#9098ae" font-size="9" font-family="monospace">f</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Inner</span><span class="r">$g(x)=x^{2}$, $g'=2x$</span></div>
+          <div class="row"><span class="l">Outer</span><span class="r">$f(u)=u^{3}$, $f'=3u^{2}$</span></div>
+          <div class="row"><span class="l">Composite</span><span class="r">$y=(x^{2})^{3}=x^{6}$</span></div>
+          <div class="row"><span class="l">At $x=1$</span><span class="r">$f'(g)\cdot g'=3\cdot 2=6$</span></div>
+          <div class="row"><span class="l">Check</span><span class="r">$(x^{6})'=6x^{5}=6$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Adjust the input $x$ and the two exponents. Watch each “gear” report its local
+        rate; their product is the composite derivative.
+      </p>
+      <div class="interactive-card" id="chainLab">
+        <div class="lab-controls">
+          <label>
+            Input $x$
+            <input type="range" id="xSlider" min="0.5" max="2.5" step="0.05" value="1.2">
+            <span class="readout" id="xValue">1.20</span>
+          </label>
+          <label>
+            Inner power $m$
+            <input type="range" id="mSlider" min="1" max="4" step="1" value="2">
+            <span class="readout" id="mValue">2</span>
+          </label>
+          <label>
+            Outer power $n$
+            <input type="range" id="nSlider" min="1" max="4" step="1" value="3">
+            <span class="readout" id="nValue">3</span>
+          </label>
+        </div>
+        <div class="gear-row">
+          <div class="gear-card">
+            <div class="label">Inner g</div>
+            <div>$g=x^{m}$</div>
+            <div class="val" id="gVal">—</div>
+            <div>$g'$ = <span class="val" id="gpVal">—</span></div>
+          </div>
+          <span class="arrow">→</span>
+          <div class="gear-card">
+            <div class="label">Outer f</div>
+            <div>$f=u^{n}$</div>
+            <div class="val" id="fVal">—</div>
+            <div>$f'$ = <span class="val" id="fpVal">—</span></div>
+          </div>
+          <span class="arrow">→</span>
+          <div class="gear-card">
+            <div class="label">Product</div>
+            <div>$f'\cdot g'$</div>
+            <div class="val" id="prodVal">—</div>
+          </div>
+        </div>
+        <div class="result-box" id="resultBox">
+          Composite $y=(x^{m})^{n}=x^{mn}$<br>
+          Chain-rule derivative at current $x$: —
+        </div>
+        <p class="lab-note">
+          Each card is one gear. The final product is exactly what backpropagation
+          multiplies when a gradient travels through two successive layers.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \frac{dy}{dx} = \frac{dy}{du}\cdot\frac{du}{dx} $$</div>
+      <p>
+        Let $u=g(x)$ and $y=f(u)$. The first factor $\frac{dy}{du}$ is the outer
+        derivative evaluated at the current inner value; the second factor
+        $\frac{du}{dx}$ is the inner derivative. Their product is the rate at which $y$
+        changes with respect to $x$. The same pattern extends to any number of nested
+        functions, which is why the chain rule is the engine of backpropagation.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$u=g(x)$</span><span class="legend-text">Inner function (first gear)</span></div>
+        <div class="legend-item"><span class="legend-sym">$y=f(u)$</span><span class="legend-text">Outer function (second gear)</span></div>
+        <div class="legend-item"><span class="legend-sym">$\frac{dy}{du}$</span><span class="legend-text">Outer rate evaluated at the current $u$</span></div>
+        <div class="legend-item"><span class="legend-sym">$\frac{du}{dx}$</span><span class="legend-text">Inner rate at the current $x$</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why is the outer derivative evaluated at $g(x)$ rather than at $x$?</li>
+          <li>If a network has three layers, how many multiplications does the chain rule perform to obtain the gradient of the loss with respect to the first layer’s weights?</li>
+          <li>What happens to the composite derivative when one of the intermediate gears has derivative zero at the current point?</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const xSlider = document.getElementById('xSlider');
+    const mSlider = document.getElementById('mSlider');
+    const nSlider = document.getElementById('nSlider');
+    const xValue = document.getElementById('xValue');
+    const mValue = document.getElementById('mValue');
+    const nValue = document.getElementById('nValue');
+    const gVal = document.getElementById('gVal');
+    const gpVal = document.getElementById('gpVal');
+    const fVal = document.getElementById('fVal');
+    const fpVal = document.getElementById('fpVal');
+    const prodVal = document.getElementById('prodVal');
+    const resultBox = document.getElementById('resultBox');
+
+    function update() {
+      const x = parseFloat(xSlider.value);
+      const m = parseInt(mSlider.value, 10);
+      const n = parseInt(nSlider.value, 10);
+      xValue.textContent = x.toFixed(2);
+      mValue.textContent = m;
+      nValue.textContent = n;
+
+      // g(x) = x^m, g' = m x^{m-1}
+      const g = Math.pow(x, m);
+      const gp = m * Math.pow(x, m - 1);
+      // f(u) = u^n, f' = n u^{n-1}
+      const f = Math.pow(g, n);
+      const fp = n * Math.pow(g, n - 1);
+      const prod = fp * gp;
+
+      gVal.textContent = g.toFixed(3);
+      gpVal.textContent = gp.toFixed(3);
+      fVal.textContent = f.toFixed(3);
+      fpVal.textContent = fp.toFixed(3);
+      prodVal.textContent = prod.toFixed(3);
+
+      const mn = m * n;
+      // direct check: (x^{mn})' = mn x^{mn-1}
+      const direct = mn * Math.pow(x, mn - 1);
+
+      resultBox.innerHTML =
+        'Composite y = (x<sup>' + m + '</sup>)<sup>' + n + '</sup> = x<sup>' + mn + '</sup><br>' +
+        '<span class="hl">Chain-rule product f′·g′ = ' + prod.toFixed(3) + '</span><br>' +
+        'Direct power rule gives ' + direct.toFixed(3) + ' (match)';
+    }
+
+    xSlider.addEventListener('input', update);
+    mSlider.addEventListener('input', update);
+    nSlider.addEventListener('input', update);
+    update();
+  })();
+  </script>
+</body>
+</html>

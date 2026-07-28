@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn the power, product, and quotient rules as algebraic shortcuts that replace repeated limit calculations.">
+  <title>Differentiation Rules — Power, Product & Quotient | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #ruleLab {
+      display: grid;
+      gap: 18px;
+    }
+    #ruleLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #ruleLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #ruleLab select {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-family: var(--font-display);
+      font-size: .88rem;
+    }
+    #ruleLab input[type="range"] {
+      width: 120px;
+      accent-color: var(--cyan);
+    }
+    #ruleLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 6ch;
+    }
+    #ruleLab .formula-box {
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    #ruleLab .formula-box .hl {
+      color: var(--cyan);
+    }
+    #ruleLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+  </style>
+</head>
+<body data-lesson-id="4.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 4 · Lesson 4.2</p>
+      <h1>Differentiation Rules — Power, Product & Quotient</h1>
+      <p class="lesson-summary">
+        Use the power, product, and quotient rules as ready-made shortcuts that replace writing out the limit definition every time.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Computing a derivative from the limit definition works, but it quickly becomes
+        tedious. The same algebraic patterns keep appearing: powers drop an exponent,
+        products split into two terms, quotients follow a fixed four-piece recipe.
+        Those recurring patterns are turned into named rules so you never have to
+        re-derive them.
+      </p>
+      <p>
+        In machine learning the loss function is almost always a complicated combination
+        of powers, products, and quotients. Automatic differentiation engines apply
+        exactly these rules under the hood to obtain the gradient that updates the
+        network weights.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Differentiation rules are algebraic shortcuts. Once you recognize the form of
+          an expression—pure power, product of two functions, or quotient of two
+          functions—you apply the matching formula and obtain the derivative without
+          returning to the limit definition.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <text x="20" y="32" fill="#5fd4e8" font-size="11" font-family="IBM Plex Mono, monospace">power</text>
+            <text x="20" y="48" fill="#9098ae" font-size="10" font-family="IBM Plex Mono, monospace">xⁿ → n xⁿ⁻¹</text>
+            <text x="20" y="70" fill="#5fd4e8" font-size="11" font-family="IBM Plex Mono, monospace">product</text>
+            <text x="20" y="86" fill="#9098ae" font-size="10" font-family="IBM Plex Mono, monospace">(uv)' = u'v + uv'</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">$f(x)=x^{3}$</span><span class="r">$f'=3x^{2}$</span></div>
+          <div class="row"><span class="l">At $x=2$</span><span class="r">$f'(2)=12$</span></div>
+          <div class="row"><span class="l">$g=x^{2}\cdot x$</span><span class="r">same as $x^{3}$</span></div>
+          <div class="row"><span class="l">Product rule</span><span class="r">$2x\cdot x+x^{2}\cdot 1=3x^{2}$</span></div>
+          <div class="row"><span class="l">Check</span><span class="r">matches power rule</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Pick a rule, adjust the parameters, and watch the symbolic derivative and its
+        numeric value at a chosen point update instantly.
+      </p>
+      <div class="interactive-card" id="ruleLab">
+        <div class="lab-controls">
+          <label>
+            Rule
+            <select id="ruleSelect">
+              <option value="power">Power rule</option>
+              <option value="product">Product rule</option>
+              <option value="quotient">Quotient rule</option>
+            </select>
+          </label>
+          <label>
+            $n$ / coeff
+            <input type="range" id="nSlider" min="1" max="6" step="1" value="3">
+            <span class="readout" id="nValue">3</span>
+          </label>
+          <label>
+            Evaluate at $x$
+            <input type="range" id="xSlider" min="0.5" max="4" step="0.1" value="2">
+            <span class="readout" id="xValue">2.0</span>
+          </label>
+        </div>
+        <div class="formula-box" id="formulaBox">
+          $f(x)=x^{3}$<br>
+          $f'(x)=3x^{2}$<br>
+          At $x=2$: $f'=12$
+        </div>
+        <p class="lab-note">
+          Change the rule or the parameters. The box shows both the symbolic derivative
+          produced by the rule and its numeric value at the chosen $x$. These are the
+          same shortcuts an autodiff engine applies when differentiating a loss function.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$
+      \begin{aligned}
+      (x^{n})' &= n\,x^{n-1} \\[6pt]
+      (uv)' &= u'v + uv' \\[6pt]
+      \Bigl(\frac{u}{v}\Bigr)' &= \frac{u'v - uv'}{v^{2}}
+      \end{aligned}
+      $$</div>
+      <p>
+        The power rule drops the exponent and multiplies by the old power. The product
+        rule splits a product into two terms, each differentiating one factor while
+        leaving the other alone. The quotient rule follows the analogous pattern for a
+        fraction, with a minus sign and a squared denominator. Together they let you
+        differentiate any rational combination of powers without returning to limits.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$n$</span><span class="legend-text">The exponent in a pure power $x^{n}$</span></div>
+        <div class="legend-item"><span class="legend-sym">$u,v$</span><span class="legend-text">Differentiable functions being multiplied or divided</span></div>
+        <div class="legend-item"><span class="legend-sym">$u',v'$</span><span class="legend-text">The derivatives of those functions</span></div>
+        <div class="legend-item"><span class="legend-sym">$v^{2}$</span><span class="legend-text">Squared denominator that appears in the quotient rule</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does the product rule contain two terms instead of simply $u'v'$?</li>
+          <li>When an AI framework computes the gradient of a loss that contains a soft-max, which of these three rules is applied most often?</li>
+          <li>Show that the quotient rule can be derived from the product rule by writing $\frac{u}{v}=u\cdot v^{-1}$ and using the power rule on $v^{-1}$.</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const ruleSelect = document.getElementById('ruleSelect');
+    const nSlider = document.getElementById('nSlider');
+    const xSlider = document.getElementById('xSlider');
+    const nValue = document.getElementById('nValue');
+    const xValue = document.getElementById('xValue');
+    const formulaBox = document.getElementById('formulaBox');
+
+    function update() {
+      const rule = ruleSelect.value;
+      const n = parseInt(nSlider.value, 10);
+      const x = parseFloat(xSlider.value);
+      nValue.textContent = n;
+      xValue.textContent = x.toFixed(1);
+
+      let html = '';
+      if (rule === 'power') {
+        const derivVal = n * Math.pow(x, n - 1);
+        html =
+          'Power rule<br>' +
+          '<span class="hl">f(x) = x<sup>' + n + '</sup></span><br>' +
+          '<span class="hl">f\'(x) = ' + n + ' x<sup>' + (n - 1) + '</sup></span><br>' +
+          'At x = ' + x.toFixed(1) + ': f\' = ' + derivVal.toFixed(3);
+      } else if (rule === 'product') {
+        // u = x^n, v = x  →  uv = x^{n+1}
+        // (uv)' = n x^{n-1} * x + x^n * 1 = (n+1) x^n
+        const derivVal = (n + 1) * Math.pow(x, n);
+        html =
+          'Product rule with u = x<sup>' + n + '</sup>, v = x<br>' +
+          '<span class="hl">(uv)\' = u\'v + uv\' = ' + n + 'x<sup>' + (n - 1) + '</sup>·x + x<sup>' + n + '</sup>·1</span><br>' +
+          '<span class="hl">= ' + (n + 1) + ' x<sup>' + n + '</sup></span><br>' +
+          'At x = ' + x.toFixed(1) + ': (uv)\' = ' + derivVal.toFixed(3);
+      } else {
+        // u = x^n, v = x+1
+        // (u/v)' = (n x^{n-1}(x+1) - x^n * 1) / (x+1)^2
+        const num = n * Math.pow(x, n - 1) * (x + 1) - Math.pow(x, n);
+        const den = (x + 1) * (x + 1);
+        const derivVal = num / den;
+        html =
+          'Quotient rule with u = x<sup>' + n + '</sup>, v = x+1<br>' +
+          '<span class="hl">(u/v)\' = (u\'v − uv\') / v²</span><br>' +
+          '<span class="hl">= (' + n + 'x<sup>' + (n - 1) + '</sup>(x+1) − x<sup>' + n + '</sup>) / (x+1)²</span><br>' +
+          'At x = ' + x.toFixed(1) + ': (u/v)\' = ' + derivVal.toFixed(3);
+      }
+      formulaBox.innerHTML = html;
+    }
+
+    ruleSelect.addEventListener('change', update);
+    nSlider.addEventListener('input', update);
+    xSlider.addEventListener('input', update);
+    update();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Understand the derivative as the instantaneous rate of change given by the slope of the tangent line at a single point.">
+  <title>The Derivative as Instantaneous Rate of Change | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #derivLab {
+      display: grid;
+      gap: 18px;
+    }
+    #derivLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #derivLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #derivLab input[type="range"] {
+      width: 150px;
+      accent-color: var(--cyan);
+    }
+    #derivLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 7ch;
+    }
+    #derivLab .lab-svg-wrap {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    #derivLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #derivLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+  </style>
+</head>
+<body data-lesson-id="4.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 4 · Lesson 4.1</p>
+      <h1>The Derivative as Instantaneous Rate of Change</h1>
+      <p class="lesson-summary">
+        See the derivative as the slope of the tangent line at a single instant—the limiting value of secant slopes as the time gap shrinks to zero.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Average speed over an interval is easy: distance divided by time. But what is the
+        speed at one exact moment? That is the instantaneous rate of change. On a graph
+        it is the slope of the unique line that just grazes the curve at that single point—the
+        tangent line.
+      </p>
+      <p>
+        During a rocket launch the velocity changes every fraction of a second. The
+        derivative of the altitude function at a chosen instant is precisely the acceleration
+        the vehicle feels at that moment, the number engineers read from the telemetry.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          The derivative $f'(a)$ is the slope of the tangent to $y=f(x)$ at $x=a$. It is
+          obtained by letting the gap $h$ in the difference quotient shrink to zero, so the
+          secant becomes the tangent and the average rate becomes the instantaneous rate.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <line x1="16" y1="95" x2="128" y2="95" stroke="#565f78" stroke-width="1"/>
+            <line x1="16" y1="95" x2="16" y2="14" stroke="#565f78" stroke-width="1"/>
+            <!-- parabola -->
+            <path d="M 25 88 Q 50 60 70 35 Q 90 18 115 10" fill="none" stroke="#5fd4e8" stroke-width="2"/>
+            <!-- tangent at approx x=1 -->
+            <line x1="30" y1="78" x2="100" y2="28" stroke="#7ee0a8" stroke-width="2"/>
+            <circle cx="55" cy="58" r="3.5" fill="#e8b95f"/>
+            <text x="60" y="54" fill="#9098ae" font-size="8" font-family="monospace">P</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Function</span><span class="r">$f(x)=x^{2}$ at $x=1$</span></div>
+          <div class="row"><span class="l">Secant $h=0.1$</span><span class="r">slope $=2.1$</span></div>
+          <div class="row"><span class="l">Secant $h=0.01$</span><span class="r">slope $=2.01$</span></div>
+          <div class="row"><span class="l">As $h\to 0$</span><span class="r">slope $\to 2$</span></div>
+          <div class="row"><span class="l">Derivative</span><span class="r">$f'(1)=2$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide the gap $h$. The amber secant tilts toward the green tangent; the live
+        slope readout approaches the true instantaneous rate $f'(a)=2a$.
+      </p>
+      <div class="interactive-card" id="derivLab">
+        <div class="lab-controls">
+          <label>
+            Point $a$
+            <input type="range" id="aSlider" min="0.4" max="2.2" step="0.05" value="1.0">
+            <span class="readout" id="aValue">1.00</span>
+          </label>
+          <label>
+            Gap $h$
+            <input type="range" id="hSlider" min="0.05" max="1.0" step="0.01" value="0.5">
+            <span class="readout" id="hValue">0.50</span>
+          </label>
+          <span>Secant slope: <span class="readout" id="secSlope">2.50</span></span>
+          <span>True $f'(a)$: <span class="readout" id="trueDeriv">2.00</span></span>
+        </div>
+        <div class="lab-svg-wrap">
+          <svg id="derivSvg" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Parabola with secant approaching tangent">
+            <g stroke="#1a2238" stroke-width="1">
+              <line x1="40" y1="30" x2="40" y2="240"/>
+              <line x1="40" y1="240" x2="370" y2="240"/>
+            </g>
+            <text x="360" y="255" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">x</text>
+            <text x="22" y="40" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">y</text>
+            <path id="curvePath" fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <line id="tangentLine" stroke="#7ee0a8" stroke-width="2.5" opacity="0.9"/>
+            <line id="secantLine" stroke="#e8b95f" stroke-width="2"/>
+            <circle id="pointP" r="5" fill="#7ee0a8"/>
+            <circle id="pointQ" r="5" fill="#e8b95f"/>
+          </svg>
+        </div>
+        <p class="lab-note">
+          Function $f(x)=x^{2}$. The green line is the true tangent whose slope equals
+          $2a$. Shrink $h$ and the amber secant collapses onto that tangent—the geometric
+          picture of the derivative.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ f'(a) = \lim_{h \to 0} \frac{f(a+h)-f(a)}{h} $$</div>
+      <p>
+        The difference quotient is the slope of the secant between $x=a$ and $x=a+h$.
+        Taking the limit as $h$ approaches zero turns that average rate into the
+        instantaneous rate $f'(a)$, which is also the slope of the tangent line at the
+        single point $(a,f(a))$.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$f'(a)$</span><span class="legend-text">The derivative (instantaneous rate) at $x=a$</span></div>
+        <div class="legend-item"><span class="legend-sym">$a$</span><span class="legend-text">The fixed instant or $x$-value of interest</span></div>
+        <div class="legend-item"><span class="legend-sym">$h$</span><span class="legend-text">The vanishing gap between the two points on the curve</span></div>
+        <div class="legend-item"><span class="legend-sym">$\dfrac{f(a+h)-f(a)}{h}$</span><span class="legend-text">Secant slope (average rate over the interval)</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why must we take a limit rather than simply plug $h=0$ into the difference quotient?</li>
+          <li>In a rocket launch, if altitude is $s(t)$, what physical quantity is $s'(t)$ at the moment of max-Q?</li>
+          <li>If the tangent line is horizontal at a point, what does that tell you about the instantaneous rate of change there?</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const aSlider = document.getElementById('aSlider');
+    const hSlider = document.getElementById('hSlider');
+    const aValue = document.getElementById('aValue');
+    const hValue = document.getElementById('hValue');
+    const secSlope = document.getElementById('secSlope');
+    const trueDeriv = document.getElementById('trueDeriv');
+    const curvePath = document.getElementById('curvePath');
+    const tangentLine = document.getElementById('tangentLine');
+    const secantLine = document.getElementById('secantLine');
+    const pointP = document.getElementById('pointP');
+    const pointQ = document.getElementById('pointQ');
+
+    const xMin = 0, xMax = 3.2;
+    const yMin = 0, yMax = 11;
+    const svgX0 = 40, svgX1 = 370;
+    const svgY0 = 240, svgY1 = 30;
+
+    function toSvgX(x) {
+      return svgX0 + (x - xMin) / (xMax - xMin) * (svgX1 - svgX0);
+    }
+    function toSvgY(y) {
+      return svgY0 + (y - yMin) / (yMax - yMin) * (svgY1 - svgY0);
+    }
+
+    function f(x) { return x * x; }
+    function fp(x) { return 2 * x; }
+
+    // draw parabola
+    let d = '';
+    for (let i = 0; i <= 80; i++) {
+      const x = 0.05 + (i / 80) * (xMax - 0.05);
+      const y = f(x);
+      const sx = toSvgX(x);
+      const sy = toSvgY(y);
+      d += (i === 0 ? 'M' : 'L') + sx + ' ' + sy;
+    }
+    curvePath.setAttribute('d', d);
+
+    function update() {
+      const a = parseFloat(aSlider.value);
+      const h = parseFloat(hSlider.value);
+      aValue.textContent = a.toFixed(2);
+      hValue.textContent = h.toFixed(2);
+
+      const fa = f(a);
+      const fq = f(a + h);
+      const slope = (fq - fa) / h;
+      const deriv = fp(a);
+
+      secSlope.textContent = slope.toFixed(3);
+      trueDeriv.textContent = deriv.toFixed(2);
+
+      // point P
+      const px = toSvgX(a);
+      const py = toSvgY(fa);
+      pointP.setAttribute('cx', px);
+      pointP.setAttribute('cy', py);
+
+      // point Q
+      const qx = toSvgX(a + h);
+      const qy = toSvgY(fq);
+      pointQ.setAttribute('cx', qx);
+      pointQ.setAttribute('cy', qy);
+
+      // tangent: y - fa = deriv*(x - a)
+      const tX1 = Math.max(xMin, a - 1.2);
+      const tX2 = Math.min(xMax, a + 1.2);
+      const tY1 = fa + deriv * (tX1 - a);
+      const tY2 = fa + deriv * (tX2 - a);
+      tangentLine.setAttribute('x1', toSvgX(tX1));
+      tangentLine.setAttribute('y1', toSvgY(tY1));
+      tangentLine.setAttribute('x2', toSvgX(tX2));
+      tangentLine.setAttribute('y2', toSvgY(tY2));
+
+      // secant extended
+      const extend = 0.4;
+      const sX1 = a - extend;
+      const sY1 = fa - slope * extend;
+      const sX2 = a + h + extend;
+      const sY2 = fq + slope * extend;
+      secantLine.setAttribute('x1', toSvgX(sX1));
+      secantLine.setAttribute('y1', toSvgY(sY1));
+      secantLine.setAttribute('x2', toSvgX(sX2));
+      secantLine.setAttribute('y2', toSvgY(sY2));
+    }
+
+    aSlider.addEventListener('input', update);
+    hSlider.addEventListener('input', update);
+    update();
+  })();
+  </script>
+</body>
+</html>
