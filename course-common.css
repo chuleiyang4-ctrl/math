@@ -28,6 +28,10 @@ body {
   line-height: 1.7;
 }
 
+body.has-course-topbar {
+  padding-top: 64px;
+}
+
 a { color: inherit; }
 button { font: inherit; }
 
@@ -165,31 +169,163 @@ button { font: inherit; }
 }
 .legend-text { color: var(--ink-dim); }
 
-.course-home-link {
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.course-topbar {
   position: fixed;
-  z-index: 1000;
-  top: 16px;
-  left: 16px;
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--bg-2) 90%, transparent);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+  z-index: 1200;
+  inset: 0 0 auto;
+  height: 64px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(18px);
-  color: var(--cyan);
+}
+
+.course-topbar-inner {
+  width: min(1180px, calc(100% - 28px));
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  color: var(--ink);
   font-family: var(--font-display);
-  font-size: 1.05rem;
   font-weight: 700;
   text-decoration: none;
 }
 
-.course-home-link:hover {
+.course-brand-mark {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--cyan) 32%, var(--line));
+  border-radius: 11px;
+  background: var(--panel);
+  color: var(--cyan);
+}
+
+.course-brand:hover,
+.course-tool-button:hover,
+.course-profile-button:hover {
   color: var(--ink);
   border-color: color-mix(in srgb, var(--cyan) 45%, var(--line));
 }
+
+.course-tool-button,
+.course-profile-button,
+.math-ai-close {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--ink-dim);
+  padding: 0 13px;
+  font-family: var(--font-display);
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.course-search {
+  flex: 1 1 360px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.course-search input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 0 14px;
+  outline: none;
+  font-family: var(--font-display);
+}
+
+.course-search input:focus {
+  border-color: color-mix(in srgb, var(--cyan) 55%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 10%, transparent);
+}
+
+.course-profile-button {
+  color: var(--cyan);
+}
+
+.math-ai-panel {
+  position: fixed;
+  z-index: 1300;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  width: min(390px, 100%);
+  padding: 20px;
+  border-left: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg-2) 96%, transparent);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, .28);
+  transform: translateX(105%);
+  transition: transform .22s ease;
+}
+
+.math-ai-panel.is-open { transform: translateX(0); }
+.math-ai-head { display: flex; align-items: center; justify-content: space-between; }
+.math-ai-head small {
+  display: block;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .12em;
+}
+.math-ai-head strong { display: block; font-family: var(--font-display); font-size: 1.25rem; }
+.math-ai-close { width: 36px; padding: 0; font-size: 1.25rem; }
+.math-ai-body { padding-top: 28px; color: var(--ink-dim); }
+.math-ai-placeholder {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  font-family: var(--font-display);
+  font-size: .85rem;
+}
+
+.course-toast {
+  position: fixed;
+  z-index: 1400;
+  left: 50%;
+  bottom: 24px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: .82rem;
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  pointer-events: none;
+  transition: .2s ease;
+}
+.course-toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
 .lesson-course-nav {
   display: grid;
@@ -256,7 +392,13 @@ button { font: inherit; }
     padding-top: 52px;
   }
 
-  .course-home-link { top: 10px; left: 10px; }
+  .course-topbar-inner { width: calc(100% - 16px); gap: 6px; }
+  .course-brand-name,
+  .course-notebook-button { display: none; }
+  .course-tool-button,
+  .course-profile-button { padding: 0 9px; }
+  .course-search { min-width: 0; }
+  .course-search input { padding: 0 10px; }
   .worked-example,
   .legend,
   .lesson-course-nav { grid-template-columns: 1fr; }
