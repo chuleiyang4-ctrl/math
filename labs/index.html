@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Interactive mathematics experiments.">
+  <title>Math Lab | Mathematics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#070914;--panel:#0d1120;--panel-2:#12182a;--line:rgba(159,174,255,.16);
+      --text:#f5f7ff;--muted:#929bb5;--violet:#8b5cf6;--cyan:#23d5e8;--green:#51e3a4
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 75% 0%,rgba(139,92,246,.14),transparent 28rem),var(--bg);color:var(--text);font:15px/1.6 "Space Grotesk",system-ui,sans-serif}
+    a{color:inherit}
+    .topbar{height:64px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);background:rgba(7,9,20,.88);backdrop-filter:blur(16px)}
+    .topbar-inner{width:min(1100px,calc(100% - 32px));height:100%;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none}
+    .mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(35,213,232,.32);border-radius:11px;background:var(--panel);color:var(--cyan)}
+    .home-link{color:var(--muted);text-decoration:none;font-size:13px}.home-link:hover{color:var(--text)}
+    main{width:min(1100px,calc(100% - 32px));margin:auto;padding:54px 0 72px}
+    .kicker{margin:0;color:var(--cyan);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase}
+    h1{margin:10px 0 8px;font-size:clamp(34px,6vw,62px);line-height:1;letter-spacing:-.05em}
+    .intro{max-width:620px;margin:0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:38px}
+    .lab-card{min-height:210px;display:flex;flex-direction:column;padding:24px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(18,24,42,.9),rgba(13,17,32,.78));text-decoration:none;transition:.18s ease}
+    .lab-card:hover{transform:translateY(-2px);border-color:rgba(35,213,232,.38)}
+    .lab-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:rgba(35,213,232,.08);color:var(--cyan);font-size:20px}
+    .lab-card h2{margin:20px 0 7px;font-size:21px}.lab-card p{margin:0;color:var(--muted)}
+    .meta{margin-top:auto;padding-top:20px;color:var(--green);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase}
+    .empty{padding:28px;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}
+    @media(max-width:680px){.grid{grid-template-columns:1fr}main{padding-top:36px}.brand span:last-child{display:none}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="mark">∑</span><span>Mathematics</span></a>
+      <a class="home-link" href="../index.html">Courses</a>
+    </div>
+  </header>
+  <main>
+    <p class="kicker">⚗ Math Lab</p>
+    <h1>Interactive experiments</h1>
+    <p class="intro">Explore mathematical ideas by changing parameters, testing behavior, and observing the result.</p>
+    <div class="grid" id="lab-grid"><div class="empty">Loading experiments…</div></div>
+  </main>
+  <script>
+    const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+    fetch("lab-data.json",{cache:"no-store"})
+      .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()})
+      .then(data=>{
+        const labs=Array.isArray(data.labs)?data.labs:[];
+        document.querySelector("#lab-grid").innerHTML=labs.length?labs.map(lab=>`
+          <a class="lab-card" href="${encodeURI(lab.file)}">
+            <span class="lab-icon">⚗</span>
+            <h2>${escapeHTML(lab.title)}</h2>
+            <p>${escapeHTML(lab.description)}</p>
+            <span class="meta">Related lesson ${escapeHTML(lab.relatedLesson)}</span>
+          </a>`).join(""):'<div class="empty">No experiments have been published yet.</div>';
+      })
+      .catch(()=>{document.querySelector("#lab-grid").innerHTML='<div class="empty">The Lab catalog could not be loaded.</div>'});
+  </script>
+</body>
+</html>
