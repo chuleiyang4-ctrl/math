@@ -28,15 +28,86 @@
     return null;
   };
 
-  const addHomeLink = () => {
-    if (document.querySelector(".course-home-link")) return;
-    const link = document.createElement("a");
-    link.className = "course-home-link";
-    link.href = "index.html";
-    link.setAttribute("aria-label", "Return to course home");
-    link.title = "Course home";
-    link.textContent = "∑";
-    document.body.prepend(link);
+  const showComingSoon = (label) => {
+    let toast = document.querySelector(".course-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.className = "course-toast";
+      toast.setAttribute("role", "status");
+      document.body.append(toast);
+    }
+    toast.textContent = `${label} is coming soon.`;
+    toast.classList.add("is-visible");
+    window.clearTimeout(showComingSoon.timer);
+    showComingSoon.timer = window.setTimeout(
+      () => toast.classList.remove("is-visible"),
+      2200
+    );
+  };
+
+  const addCourseTopbar = () => {
+    if (document.querySelector(".course-topbar")) return;
+
+    document.querySelectorAll(".topbar").forEach((element) => element.remove());
+    document.querySelectorAll(".course-home-link").forEach((element) => element.remove());
+    document.body.classList.add("has-course-topbar");
+
+    const header = document.createElement("header");
+    header.className = "course-topbar";
+    header.innerHTML = `
+      <div class="course-topbar-inner">
+        <a class="course-brand" href="index.html" aria-label="Mathematics home">
+          <span class="course-brand-mark">∑</span>
+          <span class="course-brand-name">Mathematics</span>
+        </a>
+        <button class="course-tool-button" type="button" data-coming-soon="Lab">Lab</button>
+        <form class="course-search" role="search">
+          <label class="sr-only" for="course-search-input">Search courses</label>
+          <input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off">
+        </form>
+        <button class="course-tool-button course-notebook-button" type="button" data-coming-soon="Notebook">Notebook</button>
+        <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel">Math AI</button>
+        <button class="course-profile-button" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
+      </div>`;
+
+    const panel = document.createElement("aside");
+    panel.id = "math-ai-panel";
+    panel.className = "math-ai-panel";
+    panel.setAttribute("aria-hidden", "true");
+    panel.innerHTML = `
+      <div class="math-ai-head">
+        <div><small>ASSISTANT</small><strong>Math AI</strong></div>
+        <button type="button" class="math-ai-close" aria-label="Close Math AI">×</button>
+      </div>
+      <div class="math-ai-body">
+        <p>Ask questions about the lesson, request another explanation, or work through a problem.</p>
+        <div class="math-ai-placeholder">Math AI will be connected here in a future update.</div>
+      </div>`;
+
+    document.body.prepend(header);
+    document.body.append(panel);
+
+    header.querySelector(".course-search").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = header.querySelector("#course-search-input").value.trim();
+      window.location.href = query
+        ? `index.html?q=${encodeURIComponent(query)}#courses`
+        : "index.html#courses";
+    });
+
+    header.querySelectorAll("[data-coming-soon]").forEach((button) => {
+      button.addEventListener("click", () => showComingSoon(button.dataset.comingSoon));
+    });
+
+    const aiButton = header.querySelector(".course-ai-button");
+    const closeButton = panel.querySelector(".math-ai-close");
+    const setPanel = (open) => {
+      panel.classList.toggle("is-open", open);
+      panel.setAttribute("aria-hidden", String(!open));
+      aiButton.setAttribute("aria-expanded", String(open));
+    };
+    aiButton.addEventListener("click", () => setPanel(!panel.classList.contains("is-open")));
+    closeButton.addEventListener("click", () => setPanel(false));
   };
 
   const navCard = (lesson, direction) => {
@@ -92,7 +163,7 @@
   };
 
   const initialize = async () => {
-    addHomeLink();
+    addCourseTopbar();
     renderMath();
 
     const lessonId = document.body.dataset.lessonId;
