@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See tangent as the slope of a spinning radius, and meet its reciprocal functions.">
+  <title>Tangent & the Reciprocal Functions | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="2.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 2 · Lesson 2.3</p>
+      <h1>Tangent & the Reciprocal Functions</h1>
+      <p class="lesson-summary">
+        Tangent isn't a separate mystery ratio — it's simply the slope of the radius as it spins
+        around the unit circle.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Draw the radius from the center of the unit circle out to the rotating point. That line has
+        a slope — rise over run — just like any other line. Tangent is exactly that slope: how steep
+        the radius is at a given angle.
+      </p>
+      <p>
+        Near 0°, the radius is nearly flat, so its slope is small. As the angle climbs toward 90°, the
+        radius swings closer to vertical and its slope shoots toward infinity. This is exactly the
+        calculation behind a line-of-sight or slope check in a physics engine — how steep is the line
+        from one point to another?
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Since the point on the circle sits at $(\cos\theta, \sin\theta)$, the slope of the radius
+          reaching it is rise over run: $\sin\theta$ over $\cos\theta$. That ratio is the tangent.
+          Three more functions — cosecant, secant, and cotangent — are simply the reciprocals of sine,
+          cosine, and tangent, useful whenever a calculation is easier upside down.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 160" role="img" aria-label="Unit circle showing the tangent segment at 45 degrees">
+            <circle cx="70" cy="90" r="55" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="15" y1="90" x2="140" y2="90" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="70" y1="30" x2="70" y2="150" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="125" y1="35" x2="125" y2="145" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 3"></line>
+            <line x1="70" y1="90" x2="109" y2="51" stroke="var(--cyan)" stroke-width="2"></line>
+            <line x1="125" y1="90" x2="125" y2="35" stroke="var(--amber)" stroke-width="2.5"></line>
+            <circle cx="109" cy="51" r="3.5" fill="var(--green)"></circle>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Angle</span><span class="r">45°</span></div>
+          <div class="row"><span class="l">sin 45° / cos 45°</span><span class="r">0.707 / 0.707</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">tan 45° = 1 (slope of 1)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Drag the slider to spin the radius. The amber segment is the classic "tangent" line — its
+        length is the tangent value, and it grows fast as the angle steepens.
+      </p>
+      <div class="interactive-card">
+        <div id="tanLab">
+          <svg id="tanSvg" viewBox="0 0 300 260" role="img" aria-label="Unit circle with a live tangent segment">
+            <circle cx="120" cy="130" r="80" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="20" y1="130" x2="280" y2="130" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="120" y1="20" x2="120" y2="240" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="200" y1="20" x2="200" y2="240" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 3"></line>
+            <line id="tanRadius" x1="120" y1="130" x2="200" y2="130" stroke="var(--cyan)" stroke-width="2.5"></line>
+            <line id="tanSegment" x1="200" y1="130" x2="200" y2="130" stroke="var(--amber)" stroke-width="3"></line>
+            <circle id="tanPoint" cx="200" cy="130" r="6" fill="var(--green)"></circle>
+          </svg>
+          <input id="tanSlider" type="range" min="-50" max="50" value="0" step="1" style="width:100%; margin-top:14px;">
+          <div class="worked-steps">
+            <div class="row"><span class="l">Angle (θ)</span><span class="r" id="tanAngle">0°</span></div>
+            <div class="row"><span class="l">sin θ</span><span class="r" id="tanSin">0.000</span></div>
+            <div class="row"><span class="l">cos θ</span><span class="r" id="tanCos">1.000</span></div>
+            <div class="row"><span class="l">tan θ (slope)</span><span class="r" id="tanTan">0.000</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \tan\theta = \frac{\sin\theta}{\cos\theta} \qquad \cot\theta = \frac{1}{\tan\theta} \qquad \sec\theta = \frac{1}{\cos\theta} \qquad \csc\theta = \frac{1}{\sin\theta} $$</div>
+      <p>
+        Tangent is the slope of the spinning radius: rise ($\sin\theta$) over run ($\cos\theta$). The
+        other three functions are simply reciprocals — cotangent flips tangent, secant flips cosine,
+        and cosecant flips sine. Each becomes undefined exactly where its denominator hits zero.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\theta$</span><span class="legend-text">The rotation angle of the radius</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sin\theta$</span><span class="legend-text">Rise of the radius (vertical shadow)</span></div>
+        <div class="legend-item"><span class="legend-sym">$\cos\theta$</span><span class="legend-text">Run of the radius (horizontal shadow)</span></div>
+        <div class="legend-item"><span class="legend-sym">$\tan\theta$</span><span class="legend-text">Slope of the radius — rise over run</span></div>
+        <div class="legend-item"><span class="legend-sym">$\cot\theta$</span><span class="legend-text">Reciprocal of tangent — run over rise</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sec\theta$</span><span class="legend-text">Reciprocal of cosine</span></div>
+        <div class="legend-item"><span class="legend-sym">$\csc\theta$</span><span class="legend-text">Reciprocal of sine</span></div>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var cx = 120, cy = 130, r = 80;
+
+      var radius = document.getElementById('tanRadius');
+      var segment = document.getElementById('tanSegment');
+      var point = document.getElementById('tanPoint');
+      var slider = document.getElementById('tanSlider');
+      var angleOut = document.getElementById('tanAngle');
+      var sinOut = document.getElementById('tanSin');
+      var cosOut = document.getElementById('tanCos');
+      var tanOut = document.getElementById('tanTan');
+
+      function update(deg) {
+        var rad = deg * Math.PI / 180;
+        var sinV = Math.sin(rad);
+        var cosV = Math.cos(rad);
+        var tanV = sinV / cosV;
+
+        var px = cx + r * cosV;
+        var py = cy - r * sinV;
+        radius.setAttribute('x2', px);
+        radius.setAttribute('y2', py);
+        point.setAttribute('cx', px);
+        point.setAttribute('cy', py);
+
+        var tanX = cx + r;
+        var tanY = cy - r * tanV;
+        segment.setAttribute('x1', tanX);
+        segment.setAttribute('y1', cy);
+        segment.setAttribute('x2', tanX);
+        segment.setAttribute('y2', tanY);
+
+        angleOut.textContent = deg + '°';
+        sinOut.textContent = sinV.toFixed(3);
+        cosOut.textContent = cosV.toFixed(3);
+        tanOut.textContent = tanV.toFixed(3);
+      }
+
+      slider.addEventListener('input', function () {
+        update(parseInt(slider.value, 10));
+      });
+
+      update(0);
+    })();
+  </script>
+</body>
+</html>
