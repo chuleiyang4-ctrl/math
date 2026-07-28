@@ -60,13 +60,13 @@
           <span class="course-brand-mark">∑</span>
           <span class="course-brand-name">Mathematics</span>
         </a>
-        <button class="course-tool-button" type="button" data-coming-soon="Lab">Lab</button>
+        <a class="course-tool-button" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
         <form class="course-search" role="search">
           <label class="sr-only" for="course-search-input">Search courses</label>
           <input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off">
         </form>
-        <button class="course-tool-button course-notebook-button" type="button" data-coming-soon="Notebook">Notebook</button>
-        <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel">Math AI</button>
+        <button class="course-tool-button course-notebook-button" type="button" data-coming-soon="Notebook"><span aria-hidden="true">▤</span> Notebook</button>
+        <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
         <button class="course-profile-button" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
       </div>`;
 
