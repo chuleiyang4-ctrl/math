@@ -162,26 +162,10 @@
   .next-title{font-size:14.5px; color:var(--ink-dim);}
 </style>
 
-  <style>
-    .course-page-nav{position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;padding:7px;background:rgba(10,13,24,.88);border:1px solid rgba(150,170,255,.22);border-radius:13px;backdrop-filter:blur(14px);box-shadow:0 12px 35px rgba(0,0,0,.28)}
-    .course-page-nav a{color:#dce5ff;text-decoration:none;font:600 12px/1 system-ui,sans-serif;padding:9px 11px;border-radius:8px;border:1px solid rgba(150,170,255,.14)}
-    .course-page-nav a:hover{color:#fff;background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45)}
-    @media(max-width:640px){.course-page-nav{top:auto;right:10px;left:10px;bottom:10px;justify-content:center}.course-page-nav a{flex:1;text-align:center}}
-  </style>
-
-<style id="course-theme-style">
-  body[data-theme="eye"]{--bg:#eef0df;--bg-2:#e7ead8;--panel:#f8f6ea;--panel-2:#eef0df;--ink:#253127;--ink-dim:#657067;--ink-faint:#7c867d;--cyan:#247d75;--amber:#9b6b20;--green:#237552;--line:rgba(58,77,58,.18);background:#eef0df;color:var(--ink)}
-  body[data-font="sans"]{--font-body:'Space Grotesk',Arial,sans-serif}
-  body[data-font="reader"]{--font-body:'Source Serif 4',Georgia,serif}
-  .course-page-nav button{color:#dce5ff;background:transparent;font:600 12px/1 system-ui,sans-serif;padding:9px 10px;border-radius:8px;border:1px solid rgba(150,170,255,.14);cursor:pointer}
-  .course-page-nav button:hover,.course-page-nav button.active{color:#fff;background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45)}
-  body[data-theme="eye"] .course-page-nav{background:rgba(247,245,233,.92)}
-  body[data-theme="eye"] .course-page-nav a,body[data-theme="eye"] .course-page-nav button{color:#425047}
-</style>
+    <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
 </head>
-<body>
-<nav class="course-page-nav" aria-label="Course navigation"><a href="index.html">⌂ Home</a><a href="module-0-2.html">Next →</a><button type="button" data-course-theme="dark">Dark</button><button type="button" data-course-theme="eye">Eye</button><button type="button" data-course-font="sans">Aa</button><button type="button" data-course-font="reader">Serif</button></nav>
-
+<body data-lesson-id="0.1">
 <svg class="contours" preserveAspectRatio="none" viewBox="0 0 400 900">
   <defs>
     <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
@@ -276,11 +260,7 @@
     </div>
   </div>
 
-  <a class="next" href="module-0-2.html">
-    <span class="next-title">Next — 0.2 Span, Linear Combinations & Basis Vectors</span>
-    <span class="next-label">MODULE 0 · LESSON 2 OF 3</span>
-  </a>
-</main>
+  </main>
 
 <script>
   document.querySelectorAll('[data-tex]').forEach(el=>{
@@ -404,6 +384,5 @@
   })();
 </script>
 
-<script id="course-theme-script">(()=>{const setTheme=value=>{document.body.dataset.theme=value;localStorage.setItem('math-theme',value);document.querySelectorAll('[data-course-theme]').forEach(button=>button.classList.toggle('active',button.dataset.courseTheme===value))};const setFont=value=>{document.body.dataset.font=value;localStorage.setItem('math-font',value);document.querySelectorAll('[data-course-font]').forEach(button=>button.classList.toggle('active',button.dataset.courseFont===value))};document.querySelectorAll('[data-course-theme]').forEach(button=>button.addEventListener('click',()=>setTheme(button.dataset.courseTheme)));document.querySelectorAll('[data-course-font]').forEach(button=>button.addEventListener('click',()=>setFont(button.dataset.courseFont)));setTheme(localStorage.getItem('math-theme')||'dark');setFont(localStorage.getItem('math-font')||'reader')})();</script>
 </body>
 </html>
