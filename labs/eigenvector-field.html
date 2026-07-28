@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eigenvector Field Explorer — Math Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:       #060911;
+    --panel:    #0b101c;
+    --panel-2:  #0e1420;
+    --ink:      #eef1f8;
+    --ink-dim:  #7d869e;
+    --ink-faint:#454e66;
+    --cyan:     #5fd4e8;
+    --amber:    #e8b95f;
+    --violet:   #b28dff;
+    --line:     rgba(238,241,248,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    -webkit-font-smoothing:antialiased;
+    height:100vh; overflow:hidden;
+  }
+  @media (max-width:720px){
+    body{ height:auto; overflow-y:auto; }
+  }
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 22px; border-bottom:1px solid var(--line);
+    font-size:11px; letter-spacing:0.06em;
+  }
+  .topbar .brand{ font-family:'Space Grotesk'; font-weight:600; font-size:13.5px; color:var(--ink); }
+  .topbar .brand span{ color:var(--violet); }
+  .topbar .tag{ color:var(--ink-faint); text-transform:uppercase; }
+  .topbar a{ color:inherit; text-decoration:none; }
+  .topbar a:hover{ color:var(--cyan); }
+  .lab-nav{ display:flex; align-items:center; gap:14px; }
+
+  .layout{ display:flex; height:calc(100vh - 47px); }
+
+  .stage{
+    flex:1; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(178,141,255,0.05), transparent 55%),
+      var(--bg);
+  }
+  canvas{ display:block; max-width:100%; height:auto; }
+
+  .panel{
+    width:300px; flex:0 0 auto;
+    border-left:1px solid var(--line);
+    background:var(--panel);
+    padding:22px 20px;
+    overflow-y:auto;
+  }
+
+  @media (max-width:720px){
+    .layout{ flex-direction:column; height:auto; }
+    .stage{ padding:12px; }
+    .panel{
+      width:100%; border-left:none; border-top:1px solid var(--line);
+      max-height:none; overflow-y:visible;
+    }
+  }
+  .panel h1{
+    font-family:'Space Grotesk'; font-size:16px; font-weight:600; margin:0 0 6px;
+    letter-spacing:0.01em;
+  }
+  .panel .desc{ font-size:12px; color:var(--ink-dim); line-height:1.6; margin-bottom:26px; }
+
+  .section-label{
+    font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);
+    margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+
+  .matrix-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    margin-bottom:8px;
+  }
+  .entry{ background:var(--panel-2); border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
+  .entry .lbl{ font-size:10.5px; color:var(--ink-faint); display:flex; justify-content:space-between; margin-bottom:6px; }
+  .entry .lbl b{ color:var(--amber); font-weight:600; }
+  input[type=range]{ width:100%; accent-color:var(--amber); }
+
+  .presets{ display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 26px; }
+  .preset-btn{
+    font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--ink-dim);
+    background:var(--panel-2); border:1px solid var(--line); border-radius:5px;
+    padding:6px 10px; cursor:pointer;
+  }
+  .preset-btn:hover{ color:var(--ink); border-color:var(--ink-faint); }
+
+  .readout{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .readout .k{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px; }
+  .readout .v{ font-size:13.5px; color:var(--violet); }
+  .readout.dim .v{ color:var(--ink-dim); font-size:12px; line-height:1.6; }
+
+  .legend-note{ font-size:11px; color:var(--ink-faint); line-height:1.6; margin-top:20px; }
+  .legend-note .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="../index.html"><span>∑</span> Mathematics</a>
+  <div class="lab-nav"><a href="index.html">⚗ Lab</a><div class="tag">Related: Module 6.5</div></div>
+</div>
+
+<div class="layout">
+  <div class="stage">
+    <canvas id="field" width="900" height="900"></canvas>
+  </div>
+
+  <div class="panel">
+    <h1>The Directions That Don't Turn</h1>
+    <p class="desc">Every arrow in the field gets pushed by the matrix below. Most of them rotate to a new heading. A special few — the eigenvectors — only stretch or flip. They never turn.</p>
+
+    <div class="section-label">Transformation Matrix A</div>
+    <div class="matrix-grid">
+      <div class="entry"><div class="lbl"><span>a</span><b id="aVal">1.00</b></div><input type="range" id="a" min="-3" max="3" step="0.05" value="1"></div>
+      <div class="entry"><div class="lbl"><span>b</span><b id="bVal">0.60</b></div><input type="range" id="b" min="-3" max="3" step="0.05" value="0.6"></div>
+      <div class="entry"><div class="lbl"><span>c</span><b id="cVal">0.30</b></div><input type="range" id="c" min="-3" max="3" step="0.05" value="0.3"></div>
+      <div class="entry"><div class="lbl"><span>d</span><b id="dVal">1.20</b></div><input type="range" id="d" min="-3" max="3" step="0.05" value="1.2"></div>
+    </div>
+
+    <div class="presets">
+      <button class="preset-btn" data-m="1,0,0,1">Identity</button>
+      <button class="preset-btn" data-m="2,0,0,0.5">Stretch</button>
+      <button class="preset-btn" data-m="1,1,0,1">Shear</button>
+      <button class="preset-btn" data-m="1,0,0,-1">Reflect</button>
+      <button class="preset-btn" data-m="0.87,-0.5,0.5,0.87">Rotate 30°</button>
+      <button class="preset-btn" data-m="1.5,0.6,0.3,1.2">Custom</button>
+    </div>
+
+    <div class="section-label">Eigen Decomposition</div>
+    <div id="eigenReadout"></div>
+
+    <div class="legend-note">
+      <span class="dot" style="background:var(--cyan)"></span>field vectors (rotate + scale)<br>
+      <span class="dot" style="background:var(--violet)"></span>eigenvector directions (scale only)
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('field');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const cx = W/2, cy = H/2;
+const scale = 90;
+
+const sliders = ['a','b','c','d'].map(id => document.getElementById(id));
+const valEls = ['a','b','c','d'].map(id => document.getElementById(id+'Val'));
+
+function getMatrix(){
+  return sliders.map(s => parseFloat(s.value));
+}
+
+// ---- exact closed-form 2x2 eigen decomposition ----
+function eigen2x2(a,b,c,d){
+  const trace = a + d;
+  const det = a*d - b*c;
+  const disc = trace*trace - 4*det;
+  if(disc < 0){
+    return { real:false, trace, det, disc };
+  }
+  const sq = Math.sqrt(disc);
+  const l1 = (trace + sq)/2;
+  const l2 = (trace - sq)/2;
+  function eigenvectorFor(lambda){
+    // solve (A - lambda I) v = 0
+    let vx, vy;
+    if(Math.abs(b) > 1e-9){ vx = b; vy = lambda - a; }
+    else if(Math.abs(c) > 1e-9){ vx = lambda - d; vy = c; }
+    else { vx = (Math.abs(a-lambda) < 1e-6) ? 1 : 0; vy = 1 - vx; }
+    const len = Math.hypot(vx,vy) || 1;
+    return { x: vx/len, y: vy/len };
+  }
+  return { real:true, l1, l2, v1: eigenvectorFor(l1), v2: eigenvectorFor(l2), trace, det };
+}
+
+function drawArrow(fx,fy,tx,ty,color,width){
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width;
+  ctx.beginPath(); ctx.moveTo(fx,fy); ctx.lineTo(tx,ty); ctx.stroke();
+  const ang = Math.atan2(ty-fy, tx-fx);
+  const hl = 9;
+  ctx.beginPath();
+  ctx.moveTo(tx,ty);
+  ctx.lineTo(tx-hl*Math.cos(ang-0.3), ty-hl*Math.sin(ang-0.3));
+  ctx.lineTo(tx-hl*Math.cos(ang+0.3), ty-hl*Math.sin(ang+0.3));
+  ctx.closePath(); ctx.fill();
+}
+
+function render(){
+  const [a,b,c,d] = getMatrix();
+  valEls.forEach((el,i)=> el.textContent = getMatrix()[i].toFixed(2));
+
+  ctx.clearRect(0,0,W,H);
+
+  // faint grid
+  ctx.strokeStyle = 'rgba(238,241,248,0.045)'; ctx.lineWidth = 1;
+  for(let x=0;x<=W;x+=scale/2){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y=0;y<=H;y+=scale/2){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(238,241,248,0.14)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+  const eig = eigen2x2(a,b,c,d);
+
+  // eigenvector beams — drawn first, behind field, full-bleed lines
+  if(eig.real){
+    [ [eig.v1, eig.l1], [eig.v2, eig.l2] ].forEach(([v, lam])=>{
+      const len = Math.max(W,H);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(178,141,255,0.5)';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = 'rgba(178,141,255,0.9)';
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.moveTo(cx - v.x*len, cy + v.y*len);
+      ctx.lineTo(cx + v.x*len, cy - v.y*len);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  // field of unit vectors around a circle, transformed by A
+  const N = 40;
+  for(let k=0;k<N;k++){
+    const theta = (k/N) * Math.PI*2;
+    const vx = Math.cos(theta), vy = Math.sin(theta);
+    const tx = a*vx + b*vy;
+    const ty = c*vx + d*vy;
+    const fromX = cx + vx*scale*0.35, fromY = cy - vy*scale*0.35;
+    const toX = cx + tx*scale*0.9, toY = cy - ty*scale*0.9;
+    drawArrow(fromX, fromY, toX, toY, 'rgba(95,212,232,0.65)', 1.6);
+  }
+
+  // origin marker
+  ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2); ctx.fillStyle = '#eef1f8'; ctx.fill();
+
+  renderReadout(eig, a,b,c,d);
+}
+
+function renderReadout(eig,a,b,c,d){
+  const box = document.getElementById('eigenReadout');
+  if(!eig.real){
+    box.innerHTML = `
+      <div class="readout dim">
+        <div class="k">No Real Eigenvectors</div>
+        <div class="v">This matrix rotates every direction — discriminant = ${eig.disc.toFixed(2)} &lt; 0. There is no arrow that only stretches; the transformation is a pure rotation (+ scale).</div>
+      </div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="readout">
+      <div class="k">λ₁</div>
+      <div class="v">${eig.l1.toFixed(3)} &nbsp; along (${eig.v1.x.toFixed(2)}, ${eig.v1.y.toFixed(2)})</div>
+    </div>
+    <div class="readout">
+      <div class="k">λ₂</div>
+      <div class="v">${eig.l2.toFixed(3)} &nbsp; along (${eig.v2.x.toFixed(2)}, ${eig.v2.y.toFixed(2)})</div>
+    </div>
+    <div class="readout dim">
+      <div class="k">trace / det</div>
+      <div class="v">tr(A) = ${eig.trace.toFixed(2)} &nbsp; det(A) = ${eig.det.toFixed(2)}</div>
+    </div>`;
+}
+
+sliders.forEach(s => s.addEventListener('input', render));
+document.querySelectorAll('.preset-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const [a,b,c,d] = btn.dataset.m.split(',').map(Number);
+    sliders[0].value=a; sliders[1].value=b; sliders[2].value=c; sliders[3].value=d;
+    render();
+  });
+});
+
+render();
+</script>
+
+</body>
+</html>
