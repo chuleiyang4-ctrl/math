@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See radians as arc length, sine as periodic, and why sin(x)/x approaches 1 near zero.">
+  <title>Radians, Periodicity & the Limit of sin(x)/x | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="2.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 2 · Lesson 2.4</p>
+      <h1>Radians, Periodicity & the Limit of sin(x)/x</h1>
+      <p class="lesson-summary">
+        A radian isn't a protractor tick mark — it's a length. And as that length shrinks toward zero,
+        sin(x)/x settles on one of calculus's most famous limits.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Forget degrees for a moment. Take the circle's own radius and lay it along the circle's edge,
+        like measuring a curved road with a straight ruler. The angle you sweep out while walking that
+        one radius-length of arc is, by definition, one radian.
+      </p>
+      <p>
+        Because the full circumference is $2\pi$ radius-lengths around, one full trip around the circle
+        is exactly $2\pi$ radians — and any trip that's a whole number of $2\pi$'s lands back on the same
+        point. That's why sine and cosine repeat forever, which is exactly the repeating pattern behind
+        a periodic signal.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Radians measure arc length, not degrees of a protractor. One radian is the angle where the
+          arc walked equals the radius used to walk it. This natural unit is also what makes a famous
+          limit work out cleanly: as an angle $x$ (in radians) shrinks toward zero, the straight-line
+          rise $\sin x$ and the arc length $x$ become almost indistinguishable, so their ratio settles
+          near 1.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 160" role="img" aria-label="Arc length equal to the radius marking one radian">
+            <circle cx="80" cy="90" r="55" fill="none" stroke="var(--line)" stroke-width="1.5"></circle>
+            <line x1="80" y1="90" x2="135" y2="90" stroke="var(--ink-faint)" stroke-width="1"></line>
+            <line x1="80" y1="90" x2="93" y2="37" stroke="var(--cyan)" stroke-width="2"></line>
+            <path d="M 135 90 A 55 55 0 0 0 93 37" fill="none" stroke="var(--green)" stroke-width="3"></path>
+            <circle cx="93" cy="37" r="3.5" fill="var(--green)"></circle>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Radius</span><span class="r">r = 1</span></div>
+          <div class="row"><span class="l">Arc length walked</span><span class="r">s = 1</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">1 radian ≈ 57.3°</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>Drag the slider to move x toward zero and watch sin(x)/x close in on 1.</p>
+      <div class="interactive-card">
+        <div id="sincLab">
+          <svg id="sincSvg" viewBox="0 0 520 220" role="img" aria-label="Graph of sin(x)/x with a movable point">
+            <line x1="40" y1="140" x2="480" y2="140" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="260" y1="20" x2="260" y2="200" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="40" y1="50" x2="480" y2="50" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 4"></line>
+            <path id="sincPath" fill="none" stroke="var(--cyan)" stroke-width="2"></path>
+            <circle id="sincDot" cx="260" cy="50" r="6" fill="var(--green)"></circle>
+          </svg>
+          <input id="sincSlider" type="range" min="-600" max="600" value="300" step="1" style="width:100%; margin-top:14px;">
+          <div class="worked-steps">
+            <div class="row"><span class="l">x (radians)</span><span class="r" id="sincX">3.000</span></div>
+            <div class="row"><span class="l">sin x</span><span class="r" id="sincSin">0.141</span></div>
+            <div class="row"><span class="l">sin x / x</span><span class="r" id="sincRatio">0.047</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \lim_{x \to 0} \frac{\sin x}{x} = 1 \qquad \sin(x + 2\pi) = \sin x $$</div>
+      <p>
+        The first statement says that as $x$ shrinks toward zero, the ratio of $\sin x$ to $x$ gets
+        arbitrarily close to 1 — the arc and its straight-line rise become nearly the same tiny
+        length. The second statement says sine never truly changes once you've walked a full $2\pi$
+        radians around the circle; it just repeats.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$x$</span><span class="legend-text">An angle measured in radians (arc length on a unit circle)</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sin x$</span><span class="legend-text">The vertical shadow of the point at angle $x$</span></div>
+        <div class="legend-item"><span class="legend-sym">$\lim_{x\to0}$</span><span class="legend-text">The value an expression approaches as $x$ gets arbitrarily close to zero</span></div>
+        <div class="legend-item"><span class="legend-sym">$2\pi$</span><span class="legend-text">One full revolution around the circle, about 6.283 radians</span></div>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var x0 = 40, x1 = 480, tMin = -6, tMax = 6;
+      var y0 = 140, amp = 90;
+
+      var path = document.getElementById('sincPath');
+      var dot = document.getElementById('sincDot');
+      var slider = document.getElementById('sincSlider');
+      var xOut = document.getElementById('sincX');
+      var sinOut = document.getElementById('sincSin');
+      var ratioOut = document.getElementById('sincRatio');
+
+      function sinc(t) {
+        return t === 0 ? 1 : Math.sin(t) / t;
+      }
+
+      function toPx(t) {
+        return x0 + (t - tMin) / (tMax - tMin) * (x1 - x0);
+      }
+
+      function toPy(v) {
+        return y0 - v * amp;
+      }
+
+      function buildPath() {
+        var d = '';
+        for (var i = 0; i <= 600; i++) {
+          var t = tMin + (i / 600) * (tMax - tMin);
+          if (Math.abs(t) < 1e-6) t = 1e-6;
+          var v = sinc(t);
+          var px = toPx(t);
+          var py = toPy(v);
+          d += (i === 0 ? 'M ' : 'L ') + px.toFixed(1) + ' ' + py.toFixed(1) + ' ';
+        }
+        return d;
+      }
+
+      path.setAttribute('d', buildPath());
+
+      function update(raw) {
+        var t = raw / 100;
+        var v = sinc(t);
+        dot.setAttribute('cx', toPx(t));
+        dot.setAttribute('cy', toPy(v));
+
+        xOut.textContent = t.toFixed(3);
+        sinOut.textContent = Math.sin(t).toFixed(3);
+        ratioOut.textContent = v.toFixed(3);
+      }
+
+      slider.addEventListener('input', function () {
+        update(parseInt(slider.value, 10));
+      });
+
+      update(300);
+    })();
+  </script>
+</body>
+</html>
