@@ -32,7 +32,8 @@ not remove or duplicate the shared files or KaTeX files.
 </head>
 
 Do not add theme or font controls. Do not create a top navigation bar.
-course-common.js automatically adds the home icon and bottom navigation.
+course-common.js automatically adds the shared course top bar, home link,
+search, Lab, Notebook, Math AI, Profile controls, and bottom navigation.
 
 2. REQUIRED BODY STRUCTURE
 
@@ -89,7 +90,11 @@ Use this exact section order and these shared classes:
 </body>
 </html>
 
-Do not add a Practice, quiz, or exercises section.
+An optional "Think Further" section may appear after Key Idea. Keep it
+short: two to four high-quality questions that invite reasoning, transfer,
+or prediction. Do not add answer keys, repetitive drills, scores, timers,
+grading, or a large exercise bank. The Math AI assistant will provide
+guided help later.
 
 3. MATHEMATICS AND KATEX
 
@@ -163,7 +168,8 @@ and do not duplicate or reference navigation code from course-common.js.
 - KaTeX CSS, core script, and auto-render script are present once
 - course-common.css and course-common.js are present once
 - Intuition → worked example → interactive → formula + legend
-- No top navigation, theme switcher, font switcher, or Practice section
+- No lesson-authored top navigation, theme switcher, or font switcher
+- Optional Think Further section contains only 2-4 reasoning questions
 - No duplicated shared class definitions
 - Interactive CSS uses a unique id
 - Interactive script is wrapped in an IIFE
