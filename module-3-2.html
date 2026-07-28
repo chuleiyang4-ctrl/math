@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn algebraic techniques for calculating limits, including canceling holes that produce indeterminate forms.">
+  <title>Calculating Limits — Algebraic Techniques & Indeterminate Forms | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #limitAlgLab {
+      display: grid;
+      gap: 18px;
+    }
+    #limitAlgLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #limitAlgLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #limitAlgLab input[type="range"] {
+      width: 150px;
+      accent-color: var(--cyan);
+    }
+    #limitAlgLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 7ch;
+    }
+    #limitAlgLab .lab-svg-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    #limitAlgLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #limitAlgLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+    #limitAlgLab .step-panel {
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      line-height: 1.55;
+      color: var(--ink-dim);
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+    }
+    #limitAlgLab .step-panel .hl {
+      color: var(--cyan);
+    }
+  </style>
+</head>
+<body data-lesson-id="3.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 3 · Lesson 3.2</p>
+      <h1>Calculating Limits — Algebraic Techniques & Indeterminate Forms</h1>
+      <p class="lesson-summary">
+        Learn how to cancel the algebraic “hole” that produces an indeterminate form so a limit can be evaluated by direct substitution.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Sometimes plugging the target value straight into a function gives $\frac{0}{0}$.
+        That is an indeterminate form—not “undefined forever,” just a signal that the
+        expression is hiding a removable discontinuity, a hole you can cancel with algebra.
+      </p>
+      <p>
+        Factor the numerator and denominator, cancel the common factor that is zero at
+        the target, and the remaining simplified expression is continuous there. Its value
+        is the limit. The same cleaning step appears in sensor-error correction: raw
+        readings that look singular become usable once the shared error term is removed.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Canceling the hole means rewriting the original expression so that the factor
+          causing both numerator and denominator to vanish is removed. After cancellation
+          the limit equals the value of the simplified function at the target point.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <!-- axes -->
+            <line x1="18" y1="95" x2="128" y2="95" stroke="#565f78" stroke-width="1"/>
+            <line x1="18" y1="95" x2="18" y2="14" stroke="#565f78" stroke-width="1"/>
+            <!-- line y = x+2 after cancel, with open circle at x=2 -->
+            <line x1="30" y1="78" x2="110" y2="28" stroke="#5fd4e8" stroke-width="2"/>
+            <circle cx="58" cy="60" r="5" fill="#101a30" stroke="#e8b95f" stroke-width="2"/>
+            <text x="64" y="52" fill="#9098ae" font-size="9" font-family="monospace">hole</text>
+            <text x="72" y="88" fill="#565f78" font-size="8" font-family="monospace">x=2</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Expression</span><span class="r">$\dfrac{x^{2}-4}{x-2}$</span></div>
+          <div class="row"><span class="l">At $x=2$</span><span class="r">$\dfrac{0}{0}$ (indeterminate)</span></div>
+          <div class="row"><span class="l">Factor</span><span class="r">$\dfrac{(x-2)(x+2)}{x-2}$</span></div>
+          <div class="row"><span class="l">Cancel</span><span class="r">$x+2$ ($x\neq 2$)</span></div>
+          <div class="row"><span class="l">Limit</span><span class="r">$2+2=4$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Move $x$ toward 2. The original rational expression is undefined at the hole, yet
+        its values approach 4. Toggle the simplified form to see the continuous line that
+        fills the gap.
+      </p>
+      <div class="interactive-card" id="limitAlgLab">
+        <div class="lab-controls">
+          <label>
+            $x$ near 2
+            <input type="range" id="xSlider" min="0.5" max="3.5" step="0.02" value="2.4">
+            <span class="readout" id="xValue">2.40</span>
+          </label>
+          <label>
+            <input type="checkbox" id="showSimplified">
+            Show simplified $x+2$
+          </label>
+          <span>Value: <span class="readout" id="fValue">—</span></span>
+        </div>
+        <div class="lab-svg-wrap">
+          <svg id="algSvg" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Graph of rational function with removable discontinuity">
+            <g stroke="#1a2238" stroke-width="1">
+              <line x1="40" y1="30" x2="40" y2="220"/>
+              <line x1="40" y1="220" x2="370" y2="220"/>
+            </g>
+            <text x="360" y="235" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">x</text>
+            <text x="22" y="40" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">y</text>
+            <!-- original curve (two pieces) -->
+            <path id="leftCurve" fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <path id="rightCurve" fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <!-- simplified line (hidden until toggled) -->
+            <line id="simpLine" stroke="#7ee0a8" stroke-width="2" stroke-dasharray="6 4" opacity="0"/>
+            <!-- hole marker -->
+            <circle id="holeMark" r="6" fill="#0f1526" stroke="#e8b95f" stroke-width="2"/>
+            <!-- moving point -->
+            <circle id="movePt" r="5" fill="#e8b95f"/>
+            <text id="moveLabel" fill="#9098ae" font-size="11" font-family="IBM Plex Mono, monospace"></text>
+          </svg>
+        </div>
+        <div class="step-panel" id="algSteps">
+          Original: <span class="hl">(x² − 4)/(x − 2)</span><br>
+          At current x the value is shown above. Slide toward 2 to watch the approach.
+        </div>
+        <p class="lab-note">
+          The amber open circle marks the removable discontinuity. After canceling the
+          common factor the green dashed line is continuous everywhere, including at $x=2$.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \lim_{x \to a} \frac{f(x)}{g(x)} = \lim_{x \to a} \frac{f^{*}(x)}{g^{*}(x)} $$</div>
+      <p>
+        When direct substitution yields $\frac{0}{0}$, factor and cancel the common zero
+        factor. The starred functions are the simplified versions that agree with the
+        original expression everywhere except at the single canceled point. The limit is
+        then obtained by ordinary substitution into the simplified expression.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a$</span><span class="legend-text">The target value that produces the indeterminate form</span></div>
+        <div class="legend-item"><span class="legend-sym">$f,g$</span><span class="legend-text">Original numerator and denominator (both zero at $a$)</span></div>
+        <div class="legend-item"><span class="legend-sym">$f^{*},g^{*}$</span><span class="legend-text">Simplified numerator and denominator after canceling the common factor</span></div>
+        <div class="legend-item"><span class="legend-sym">$\frac{0}{0}$</span><span class="legend-text">Indeterminate form that signals a removable discontinuity</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does canceling a common factor change the function at only one point, yet leave the limit unchanged?</li>
+          <li>If a sensor returns a reading that algebraically looks like $\frac{0}{0}$, what practical step mirrors the cancellation we performed?</li>
+          <li>Can every indeterminate form of type $\frac{0}{0}$ be resolved by simple factoring, or are there cases that need other algebraic tricks?</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const slider = document.getElementById('xSlider');
+    const xValue = document.getElementById('xValue');
+    const fValue = document.getElementById('fValue');
+    const showSimplified = document.getElementById('showSimplified');
+    const leftCurve = document.getElementById('leftCurve');
+    const rightCurve = document.getElementById('rightCurve');
+    const simpLine = document.getElementById('simpLine');
+    const holeMark = document.getElementById('holeMark');
+    const movePt = document.getElementById('movePt');
+    const moveLabel = document.getElementById('moveLabel');
+    const algSteps = document.getElementById('algSteps');
+
+    // domain x in [0.2, 3.8] -> svg [40, 370]
+    // y in [-1, 7] -> svg [220, 30]
+    const xMin = 0.2, xMax = 3.8;
+    const yMin = -1, yMax = 7;
+    const svgX0 = 40, svgX1 = 370;
+    const svgY0 = 220, svgY1 = 30;
+
+    function toSvgX(x) {
+      return svgX0 + (x - xMin) / (xMax - xMin) * (svgX1 - svgX0);
+    }
+    function toSvgY(y) {
+      return svgY0 + (y - yMin) / (yMax - yMin) * (svgY1 - svgY0);
+    }
+
+    function orig(x) {
+      if (Math.abs(x - 2) < 1e-9) return NaN;
+      return (x * x - 4) / (x - 2);
+    }
+    function simp(x) { return x + 2; }
+
+    // draw left and right pieces of original
+    function buildPiece(from, to, pathEl) {
+      let d = '';
+      const steps = 40;
+      for (let i = 0; i <= steps; i++) {
+        const x = from + (i / steps) * (to - from);
+        const y = orig(x);
+        if (isNaN(y)) continue;
+        const sx = toSvgX(x);
+        const sy = toSvgY(y);
+        d += (d === '' ? 'M' : 'L') + sx + ' ' + sy;
+      }
+      pathEl.setAttribute('d', d);
+    }
+    buildPiece(0.3, 1.97, leftCurve);
+    buildPiece(2.03, 3.7, rightCurve);
+
+    // hole position
+    const hx = toSvgX(2);
+    const hy = toSvgY(4);
+    holeMark.setAttribute('cx', hx);
+    holeMark.setAttribute('cy', hy);
+
+    // simplified line endpoints
+    simpLine.setAttribute('x1', toSvgX(0.4));
+    simpLine.setAttribute('y1', toSvgY(simp(0.4)));
+    simpLine.setAttribute('x2', toSvgX(3.6));
+    simpLine.setAttribute('y2', toSvgY(simp(3.6)));
+
+    function update() {
+      const x = parseFloat(slider.value);
+      xValue.textContent = x.toFixed(2);
+
+      const yOrig = orig(x);
+      const ySimp = simp(x);
+      if (isNaN(yOrig)) {
+        fValue.textContent = 'undefined';
+      } else {
+        fValue.textContent = yOrig.toFixed(3);
+      }
+
+      const sx = toSvgX(x);
+      const sy = toSvgY(isNaN(yOrig) ? ySimp : yOrig);
+      movePt.setAttribute('cx', sx);
+      movePt.setAttribute('cy', sy);
+      moveLabel.setAttribute('x', sx + 8);
+      moveLabel.setAttribute('y', sy - 10);
+      moveLabel.textContent = isNaN(yOrig) ? 'hole' : '';
+
+      const show = showSimplified.checked;
+      simpLine.setAttribute('opacity', show ? '0.95' : '0');
+
+      if (Math.abs(x - 2) < 0.04) {
+        algSteps.innerHTML =
+          'Original: <span class="hl">(x² − 4)/(x − 2)</span> → 0/0<br>' +
+          'Factor: <span class="hl">(x − 2)(x + 2)/(x − 2)</span><br>' +
+          'Cancel → <span class="hl">x + 2</span> → limit = 4';
+      } else {
+        algSteps.innerHTML =
+          'Original: <span class="hl">(x² − 4)/(x − 2)</span> = ' +
+          (isNaN(yOrig) ? 'undefined' : yOrig.toFixed(3)) + '<br>' +
+          'Simplified would give: <span class="hl">' + ySimp.toFixed(3) + '</span>';
+      }
+    }
+
+    slider.addEventListener('input', update);
+    showSimplified.addEventListener('change', update);
+    update();
+  })();
+  </script>
+</body>
+</html>
