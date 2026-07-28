@@ -78,8 +78,13 @@
     @media(max-width:620px){.wrap{width:min(100% - 24px,1160px)}.topnav{display:none}.hero{padding:35px 0 70px;gap:25px}.hero h1{font-size:50px}.hero-copy{font-size:16px}.orbital{width:88%}section{padding:67px 0}.stats{grid-template-columns:1fr 1fr}.stat{padding:18px}.stat strong{font-size:26px}.section-head{display:block}.section-head p{margin-top:14px}.path{grid-template-columns:1fr}.path-step{min-height:auto}.catalog-tools{display:block}.filter{margin-top:12px;overflow-x:auto}.module summary{grid-template-columns:1fr 20px;gap:7px;padding:19px}.module-id{grid-column:1}.module-title{grid-column:1}.chevron{grid-column:2;grid-row:1/3}.lesson{grid-template-columns:52px 1fr}.status{grid-column:2;justify-self:start}.lesson-meta{display:none}.footer-row{display:block}}
     /* Compact course workspace */
     .topbar{height:64px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(15px)}
-    .topbar-inner{width:min(1160px,calc(100% - 40px));margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .topbar-links{display:flex;align-items:center;gap:18px}.topbar-links a{color:var(--muted);text-decoration:none;font-size:13px}.topbar-links a:hover{color:var(--text)}
+    .topbar-inner{width:min(1160px,calc(100% - 40px));margin:auto;display:flex;align-items:center;gap:10px}
+    .brand{color:var(--text);text-decoration:none;white-space:nowrap}.brand:hover{color:#fff}
+    .top-tool,.profile-tool{height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);padding:0 13px;font:650 12px Inter,system-ui,sans-serif;cursor:pointer}
+    .top-tool:hover,.profile-tool:hover{color:var(--text);border-color:rgba(35,213,232,.42)}.profile-tool{color:var(--cyan)}
+    .top-search{flex:1;max-width:520px;margin:0 auto}.top-search input{width:100%;height:38px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text);padding:0 14px;outline:none}.top-search input:focus{border-color:rgba(35,213,232,.55);box-shadow:0 0 0 3px rgba(35,213,232,.08)}
+    .ai-panel{position:fixed;z-index:50;top:64px;right:0;bottom:0;width:min(390px,100%);padding:20px;border-left:1px solid var(--line);background:rgba(7,9,20,.97);box-shadow:-24px 0 60px rgba(0,0,0,.28);transform:translateX(105%);transition:transform .22s ease}.ai-panel.open{transform:translateX(0)}.ai-head{display:flex;align-items:center;justify-content:space-between}.ai-head strong{font-size:20px}.ai-head small{display:block;color:var(--cyan);font-size:10px;letter-spacing:.12em}.ai-close{width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font-size:20px;cursor:pointer}.ai-body{padding-top:28px;color:var(--muted)}.ai-placeholder{margin-top:18px;padding:18px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);font-size:13px}
+    .site-toast{position:fixed;z-index:60;left:50%;bottom:24px;padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:13px;opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:.2s}.site-toast.show{opacity:1;transform:translate(-50%,0)}
     .workspace{padding:34px 0 65px}.workspace section{padding:0}.workspace-title{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}
     .workspace-title h1{font-size:clamp(28px,4vw,42px);letter-spacing:-.04em;line-height:1.05;margin:0 0 7px}.workspace-title p{color:var(--muted);margin:0}
     .mini-stats{display:flex;gap:8px;flex-wrap:wrap}.mini-stat{border:1px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--surface);white-space:nowrap}.mini-stat strong{font-size:16px}.mini-stat span{color:var(--muted);font-size:11px;margin-left:4px}
@@ -87,17 +92,26 @@
     .lab-section{padding:34px 0 0;margin-top:44px;border-top:1px solid var(--line)}.lab-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}.lab-head h2{font-size:25px;margin:0}.lab-head p{color:var(--muted);margin:0;font-size:13px}
     .lab-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.lab-card{border:1px solid var(--line);background:rgba(13,17,32,.78);border-radius:15px;padding:17px;min-height:122px}.lab-card b{display:block;margin:8px 0 4px}.lab-card p{color:var(--muted);font-size:12px;margin:0}.lab-icon{color:var(--cyan);font:700 18px ui-monospace,monospace}.lab-state{display:inline-block;margin-top:12px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
     .footer{padding:26px 0}.footer-row{align-items:center}
-    @media(max-width:760px){.topbar-links{display:none}.workspace-title{display:block}.mini-stats{margin-top:16px}.lab-grid{grid-template-columns:1fr 1fr}.catalog-tools{display:block}.filter{margin-top:10px;overflow-x:auto}}
+    @media(max-width:760px){.brand span:last-child,.notebook-tool{display:none}.topbar-inner{width:calc(100% - 16px);gap:6px}.top-tool,.profile-tool{padding:0 9px}.top-search{min-width:0}.top-search input{padding:0 10px}.workspace-title{display:block}.mini-stats{margin-top:16px}.lab-grid{grid-template-columns:1fr 1fr}.catalog-tools{display:block}.filter{margin-top:10px;overflow-x:auto}}
     @media(max-width:480px){.topbar-inner{width:calc(100% - 24px)}.workspace{padding-top:24px}.lab-grid{grid-template-columns:1fr}.mini-stat{flex:1;text-align:center}.module summary{padding:15px}.workspace-title h1{font-size:30px}}
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand"><span class="brand-mark">∑</span> Mathematics</div>
-      <nav class="topbar-links" aria-label="Primary"><a href="#courses">Courses</a></nav>
+      <a class="brand" href="index.html" aria-label="Mathematics home"><span class="brand-mark">∑</span><span>Mathematics</span></a>
+      <button class="top-tool" type="button" data-coming-soon="Lab">Lab</button>
+      <form class="top-search" role="search"><input id="top-search" type="search" placeholder="Search courses" aria-label="Search courses" autocomplete="off"></form>
+      <button class="top-tool notebook-tool" type="button" data-coming-soon="Notebook">Notebook</button>
+      <button class="top-tool ai-tool" type="button" aria-expanded="false" aria-controls="home-ai-panel">Math AI</button>
+      <button class="profile-tool" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
     </div>
   </header>
+  <aside class="ai-panel" id="home-ai-panel" aria-hidden="true">
+    <div class="ai-head"><div><small>ASSISTANT</small><strong>Math AI</strong></div><button class="ai-close" type="button" aria-label="Close Math AI">×</button></div>
+    <div class="ai-body"><p>Ask questions, request another explanation, or work through a problem.</p><div class="ai-placeholder">Math AI will be connected here in a future update.</div></div>
+  </aside>
+  <div class="site-toast" role="status"></div>
 
   <main class="wrap workspace">
     <section id="courses">
@@ -176,11 +190,21 @@
       if(!modules.length){modulesEl.innerHTML='<div class="empty">No lessons match your search.</div>';return}
       modulesEl.innerHTML=modules.map((module,index)=>{
         const live=module.lessons.filter(published).length;
-        const open=state.query||state.filter!=="all"||index===1?" open":"";
-        return `<details class="module"${open}><summary><span class="module-id">${escapeHTML(module.moduleId)}</span><span class="module-title"><strong>${escapeHTML(module.moduleName)}</strong><small>${escapeHTML(module.source||"Unified course")}${module.isElective?" · Elective":""}</small></span><span class="module-count">${live} published · ${module.lessons.length} lessons</span><i class="chevron" aria-hidden="true"></i></summary><div class="lessons">${module.lessons.map(lessonHTML).join("")}</div></details>`;
+        const open=state.query||state.filter!=="all"?" open":"";
+        return `<details class="module"${open}><summary><span class="module-id">${escapeHTML(module.moduleId)}</span><span class="module-title"><strong>${escapeHTML(module.moduleName)}</strong></span><span class="module-count">${live} published · ${module.lessons.length} lessons</span><i class="chevron" aria-hidden="true"></i></summary><div class="lessons">${module.lessons.map(lessonHTML).join("")}</div></details>`;
       }).join("");
     }
+    const initialQuery=new URLSearchParams(location.search).get("q")||"";
+    if(initialQuery){state.query=initialQuery.trim().toLowerCase();document.querySelector("#search").value=initialQuery;document.querySelector("#top-search").value=initialQuery}
     document.querySelector("#search").addEventListener("input",event=>{state.query=event.target.value.trim().toLowerCase();render()});
+    document.querySelector(".top-search").addEventListener("submit",event=>{event.preventDefault();const value=document.querySelector("#top-search").value.trim();state.query=value.toLowerCase();document.querySelector("#search").value=value;render();document.querySelector("#courses").scrollIntoView({behavior:"smooth"})});
+    let toastTimer;
+    const toast=document.querySelector(".site-toast");
+    document.querySelectorAll("[data-coming-soon]").forEach(button=>button.addEventListener("click",()=>{toast.textContent=`${button.dataset.comingSoon} is coming soon.`;toast.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("show"),2200)}));
+    const aiPanel=document.querySelector(".ai-panel"),aiButton=document.querySelector(".ai-tool");
+    const setAI=open=>{aiPanel.classList.toggle("open",open);aiPanel.setAttribute("aria-hidden",String(!open));aiButton.setAttribute("aria-expanded",String(open))};
+    aiButton.addEventListener("click",()=>setAI(!aiPanel.classList.contains("open")));
+    document.querySelector(".ai-close").addEventListener("click",()=>setAI(false));
     document.querySelectorAll("[data-filter]").forEach(button=>button.addEventListener("click",()=>{
       document.querySelectorAll("[data-filter]").forEach(b=>b.classList.toggle("active",b===button));
       state.filter=button.dataset.filter;render();
