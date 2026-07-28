@@ -80,7 +80,7 @@
     .topbar{height:64px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(15px)}
     .topbar-inner{width:min(1160px,calc(100% - 40px));margin:auto;display:flex;align-items:center;gap:10px}
     .brand{color:var(--text);text-decoration:none;white-space:nowrap}.brand:hover{color:#fff}
-    .top-tool,.profile-tool{height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);padding:0 13px;font:650 12px Inter,system-ui,sans-serif;cursor:pointer}
+    .top-tool,.profile-tool{height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);padding:0 13px;font:650 12px Inter,system-ui,sans-serif;cursor:pointer}.top-tool{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}.top-tool span[aria-hidden="true"]{min-width:14px;color:var(--cyan);font-family:ui-monospace,monospace;text-align:center}
     .top-tool:hover,.profile-tool:hover{color:var(--text);border-color:rgba(35,213,232,.42)}.profile-tool{color:var(--cyan)}
     .top-search{flex:1;max-width:520px;margin:0 auto}.top-search input{width:100%;height:38px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text);padding:0 14px;outline:none}.top-search input:focus{border-color:rgba(35,213,232,.55);box-shadow:0 0 0 3px rgba(35,213,232,.08)}
     .ai-panel{position:fixed;z-index:50;top:64px;right:0;bottom:0;width:min(390px,100%);padding:20px;border-left:1px solid var(--line);background:rgba(7,9,20,.97);box-shadow:-24px 0 60px rgba(0,0,0,.28);transform:translateX(105%);transition:transform .22s ease}.ai-panel.open{transform:translateX(0)}.ai-head{display:flex;align-items:center;justify-content:space-between}.ai-head strong{font-size:20px}.ai-head small{display:block;color:var(--cyan);font-size:10px;letter-spacing:.12em}.ai-close{width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font-size:20px;cursor:pointer}.ai-body{padding-top:28px;color:var(--muted)}.ai-placeholder{margin-top:18px;padding:18px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);font-size:13px}
@@ -100,10 +100,10 @@
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="index.html" aria-label="Mathematics home"><span class="brand-mark">∑</span><span>Mathematics</span></a>
-      <button class="top-tool" type="button" data-coming-soon="Lab">Lab</button>
+      <a class="top-tool" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
       <form class="top-search" role="search"><input id="top-search" type="search" placeholder="Search courses" aria-label="Search courses" autocomplete="off"></form>
-      <button class="top-tool notebook-tool" type="button" data-coming-soon="Notebook">Notebook</button>
-      <button class="top-tool ai-tool" type="button" aria-expanded="false" aria-controls="home-ai-panel">Math AI</button>
+      <button class="top-tool notebook-tool" type="button" data-coming-soon="Notebook"><span aria-hidden="true">▤</span> Notebook</button>
+      <button class="top-tool ai-tool" type="button" aria-expanded="false" aria-controls="home-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
       <button class="profile-tool" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
     </div>
   </header>
