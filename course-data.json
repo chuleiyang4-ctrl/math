@@ -4,7 +4,7 @@
     {
       "moduleId": "Module B1",
       "moduleName": "Foundations — The Number Line & the Coordinate Grid",
-      "source": "Khan Academy Pre-algebra / Algebra Basics",
+      "source": "Khan Academy Pre-algebra, Negative numbers: absolute value & ordering unit (number line basics)",
       "lessons": [
         {
           "id": "B1.1",
@@ -17,7 +17,7 @@
         {
           "id": "B1.2",
           "title": "Negative Numbers — Walking the Other Direction",
-          "status": "not_started",
+          "status": "done",
           "componentType": "NegativeDirectionWalker",
           "coreAnalogy": "A negative number is the same number of steps, just walked the other way",
           "application": "Bank account debt; elevation below sea level"
@@ -25,7 +25,7 @@
         {
           "id": "B1.3",
           "title": "The Coordinate Plane — Locating Points With Two Numbers at Once",
-          "status": "not_started",
+          "status": "done",
           "componentType": "CoordinatePlaneLocator",
           "coreAnalogy": "A coordinate is a street address — one number for each direction",
           "application": "GPS coordinates; pixel grid in an image"
@@ -33,7 +33,7 @@
         {
           "id": "B1.4",
           "title": "Variables & Multiplication as Scaling",
-          "status": "not_started",
+          "status": "done",
           "componentType": "VariableScalingKnob",
           "coreAnalogy": "A variable is an empty box waiting for a number; multiplying is a dial that stretches or shrinks it",
           "application": "Doubling a recipe; unit price times quantity"
@@ -43,7 +43,7 @@
     {
       "moduleId": "Module 0",
       "moduleName": "Vectors as Space Arrows",
-      "source": "3Blue1Brown Ch.1-3",
+      "source": "3Blue1Brown Essence of Linear Algebra, Ch.1",
       "lessons": [
         {
           "id": "0.1",
@@ -74,12 +74,12 @@
     {
       "moduleId": "Module 1",
       "moduleName": "From Algebra to Calculus",
-      "source": "Khan Academy Precalculus",
+      "source": "Khan Academy Algebra 2, Functions unit",
       "lessons": [
         {
           "id": "1.1",
           "title": "Functions as Machines — Input, Output & Composition",
-          "status": "done",
+          "status": "not_started",
           "componentType": "FunctionMachine",
           "coreAnalogy": "Function as an input-output machine",
           "application": "Audio signal chains"
@@ -97,7 +97,7 @@
     {
       "moduleId": "Module 2",
       "moduleName": "Trigonometry & the Unit Circle",
-      "source": "Khan Academy Trigonometry / AP Calc prereq",
+      "source": "Khan Academy Trigonometry, Unit circle intro",
       "lessons": [
         {
           "id": "2.1",
@@ -175,7 +175,7 @@
     {
       "moduleId": "Module 4",
       "moduleName": "Derivatives & Rates of Change",
-      "source": "AP Calculus Unit 2-5",
+      "source": "AP Calculus Unit 2",
       "lessons": [
         {
           "id": "4.1",
@@ -230,7 +230,7 @@
     {
       "moduleId": "Module 5",
       "moduleName": "Integration & Accumulation",
-      "source": "AP Calculus Unit 6-8",
+      "source": "AP Calculus Unit 6",
       "lessons": [
         {
           "id": "5.1",
@@ -309,7 +309,7 @@
     {
       "moduleId": "Module 6",
       "moduleName": "Matrix Transformations & High-Dimensional Data",
-      "source": "3Blue1Brown Ch.4-15 / MIT 18.06",
+      "source": "3Blue1Brown Essence of Linear Algebra, Ch.4",
       "lessons": [
         {
           "id": "6.1",
@@ -403,7 +403,7 @@
     {
       "moduleId": "Module 8",
       "moduleName": "Probability & Statistics Foundations",
-      "source": "Khan Academy Statistics / MIT 18.05",
+      "source": "Khan Academy Statistics & Probability, Probability unit",
       "lessons": [
         {
           "id": "8.1",
@@ -442,7 +442,7 @@
     {
       "moduleId": "Module 9",
       "moduleName": "Constrained Optimization",
-      "source": "MIT 18.02 supplement / convex optimization primers",
+      "source": "Boyd & Vandenberghe, Convex Optimization Ch.2-3 (primer level)",
       "lessons": [
         {
           "id": "9.1",
@@ -473,7 +473,7 @@
     {
       "moduleId": "Module 10",
       "moduleName": "Differential Equations & Diffusion Models",
-      "source": "MIT 18.03 / diffusion model primers",
+      "source": "MIT 18.03 Unit I, Direction/slope fields",
       "lessons": [
         {
           "id": "10.1",
@@ -512,7 +512,7 @@
     {
       "moduleId": "Module 11",
       "moduleName": "Fourier Transforms & Complex Numbers (elective)",
-      "source": "3Blue1Brown Fourier series / MIT 18.03 supplement",
+      "source": "3Blue1Brown, 'Complex number fundamentals'",
       "isElective": true,
       "lessons": [
         {
