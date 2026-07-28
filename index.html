@@ -77,23 +77,9 @@
     @media(max-width:900px){.hero{grid-template-columns:1fr;min-height:auto}.orbital{width:min(520px,90%);margin:auto}.stats{grid-template-columns:repeat(2,1fr)}.path{grid-template-columns:1fr 1fr}.path:before{display:none}.module summary{grid-template-columns:90px 1fr auto}.module-count{display:none}}
     @media(max-width:620px){.wrap{width:min(100% - 24px,1160px)}.topnav{display:none}.hero{padding:35px 0 70px;gap:25px}.hero h1{font-size:50px}.hero-copy{font-size:16px}.orbital{width:88%}section{padding:67px 0}.stats{grid-template-columns:1fr 1fr}.stat{padding:18px}.stat strong{font-size:26px}.section-head{display:block}.section-head p{margin-top:14px}.path{grid-template-columns:1fr}.path-step{min-height:auto}.catalog-tools{display:block}.filter{margin-top:12px;overflow-x:auto}.module summary{grid-template-columns:1fr 20px;gap:7px;padding:19px}.module-id{grid-column:1}.module-title{grid-column:1}.chevron{grid-column:2;grid-row:1/3}.lesson{grid-template-columns:52px 1fr}.status{grid-column:2;justify-self:start}.lesson-meta{display:none}.footer-row{display:block}}
     /* Compact course workspace */
-    body{transition:background-color .2s,color .2s}
-    body[data-font="reader"]{font-family:Georgia,"Noto Serif SC","Songti SC",serif}
-    body[data-theme="eye"]{
-      --bg:#eef0df;--surface:#f7f5e9;--surface-2:#e7ead8;--line:rgba(58,77,58,.18);
-      --text:#253127;--muted:#657067;--cyan:#247d75;--violet:#6556a5;--green:#237552;
-      background:linear-gradient(145deg,#f3f1e3,#e7ecd9);color:var(--text)
-    }
-    body[data-theme="eye"]:before{opacity:.08}
-    body[data-theme="eye"] .module,body[data-theme="eye"] .search input,body[data-theme="eye"] .lab-card{background:rgba(250,249,239,.92);color:var(--text)}
-    body[data-theme="eye"] .lesson-title,body[data-theme="eye"] .module-title strong,body[data-theme="eye"] .workspace-title h1{color:var(--text)}
-    body[data-theme="eye"] .filter button,body[data-theme="eye"] .pref-button{color:var(--muted)}
-    body[data-theme="eye"] .search input{color:var(--text)}
     .topbar{height:64px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(15px)}
     .topbar-inner{width:min(1160px,calc(100% - 40px));margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
     .topbar-links{display:flex;align-items:center;gap:18px}.topbar-links a{color:var(--muted);text-decoration:none;font-size:13px}.topbar-links a:hover{color:var(--text)}
-    .prefs{display:flex;align-items:center;gap:6px}.pref-button{border:1px solid var(--line);background:var(--surface);color:var(--muted);height:34px;padding:0 10px;border-radius:9px;cursor:pointer;font:inherit;font-size:12px}
-    .pref-button.active{color:var(--text);border-color:rgba(35,213,232,.42);background:rgba(35,213,232,.09)}
     .workspace{padding:34px 0 65px}.workspace section{padding:0}.workspace-title{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}
     .workspace-title h1{font-size:clamp(28px,4vw,42px);letter-spacing:-.04em;line-height:1.05;margin:0 0 7px}.workspace-title p{color:var(--muted);margin:0}
     .mini-stats{display:flex;gap:8px;flex-wrap:wrap}.mini-stat{border:1px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--surface);white-space:nowrap}.mini-stat strong{font-size:16px}.mini-stat span{color:var(--muted);font-size:11px;margin-left:4px}
@@ -101,7 +87,7 @@
     .lab-section{padding:34px 0 0;margin-top:44px;border-top:1px solid var(--line)}.lab-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}.lab-head h2{font-size:25px;margin:0}.lab-head p{color:var(--muted);margin:0;font-size:13px}
     .lab-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.lab-card{border:1px solid var(--line);background:rgba(13,17,32,.78);border-radius:15px;padding:17px;min-height:122px}.lab-card b{display:block;margin:8px 0 4px}.lab-card p{color:var(--muted);font-size:12px;margin:0}.lab-icon{color:var(--cyan);font:700 18px ui-monospace,monospace}.lab-state{display:inline-block;margin-top:12px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
     .footer{padding:26px 0}.footer-row{align-items:center}
-    @media(max-width:760px){.topbar-links{display:none}.workspace-title{display:block}.mini-stats{margin-top:16px}.lab-grid{grid-template-columns:1fr 1fr}.catalog-tools{display:block}.filter{margin-top:10px;overflow-x:auto}.prefs .pref-button span{display:none}}
+    @media(max-width:760px){.topbar-links{display:none}.workspace-title{display:block}.mini-stats{margin-top:16px}.lab-grid{grid-template-columns:1fr 1fr}.catalog-tools{display:block}.filter{margin-top:10px;overflow-x:auto}}
     @media(max-width:480px){.topbar-inner{width:calc(100% - 24px)}.workspace{padding-top:24px}.lab-grid{grid-template-columns:1fr}.mini-stat{flex:1;text-align:center}.module summary{padding:15px}.workspace-title h1{font-size:30px}}
   </style>
 </head>
@@ -110,12 +96,6 @@
     <div class="topbar-inner">
       <div class="brand"><span class="brand-mark">∑</span> Mathematics</div>
       <nav class="topbar-links" aria-label="Primary"><a href="#courses">Courses</a></nav>
-      <div class="prefs" aria-label="Display preferences">
-        <button class="pref-button" data-theme-choice="dark" type="button" title="Dark background">Dark</button>
-        <button class="pref-button" data-theme-choice="eye" type="button" title="Eye-care background">Eye</button>
-        <button class="pref-button" data-font-choice="sans" type="button" title="Sans-serif font"><span>Sans</span> Aa</button>
-        <button class="pref-button" data-font-choice="reader" type="button" title="Reading font"><span>Reader</span> 文</button>
-      </div>
     </div>
   </header>
 
@@ -205,21 +185,6 @@
       document.querySelectorAll("[data-filter]").forEach(b=>b.classList.toggle("active",b===button));
       state.filter=button.dataset.filter;render();
     }));
-    const savedTheme=localStorage.getItem("math-theme")||"dark";
-    const savedFont=localStorage.getItem("math-font")||"sans";
-    function setTheme(value){
-      document.body.dataset.theme=value;
-      localStorage.setItem("math-theme",value);
-      document.querySelectorAll("[data-theme-choice]").forEach(button=>button.classList.toggle("active",button.dataset.themeChoice===value));
-    }
-    function setFont(value){
-      document.body.dataset.font=value;
-      localStorage.setItem("math-font",value);
-      document.querySelectorAll("[data-font-choice]").forEach(button=>button.classList.toggle("active",button.dataset.fontChoice===value));
-    }
-    document.querySelectorAll("[data-theme-choice]").forEach(button=>button.addEventListener("click",()=>setTheme(button.dataset.themeChoice)));
-    document.querySelectorAll("[data-font-choice]").forEach(button=>button.addEventListener("click",()=>setFont(button.dataset.fontChoice)));
-    setTheme(savedTheme);setFont(savedFont);
     fetch("./course-data.json",{cache:"no-store"})
       .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()})
       .then(async data=>{if(!data||!Array.isArray(data.modules))throw new Error("Invalid course data");await discoverPublishedFiles(data.modules);state.data=data;renderStats(data.modules);render()})
