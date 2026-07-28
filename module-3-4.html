@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Understand continuity as a curve you can draw without lifting the pen, and check the three conditions that guarantee it.">
+  <title>Continuity — Where Curves Don't Break | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #contLab {
+      display: grid;
+      gap: 18px;
+    }
+    #contLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #contLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #contLab select {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-family: var(--font-display);
+      font-size: .88rem;
+    }
+    #contLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+    }
+    #contLab .status {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+    #contLab .status.ok {
+      color: var(--green);
+      border-color: color-mix(in srgb, var(--green) 40%, var(--line));
+    }
+    #contLab .status.break {
+      color: var(--amber);
+      border-color: color-mix(in srgb, var(--amber) 40%, var(--line));
+    }
+    #contLab .lab-svg-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    #contLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #contLab .check-list {
+      display: grid;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #contLab .check-list .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #contLab .check-list .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--ink-faint);
+      flex-shrink: 0;
+    }
+    #contLab .check-list .dot.pass { background: var(--green); }
+    #contLab .check-list .dot.fail { background: var(--amber); }
+    #contLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+  </style>
+</head>
+<body data-lesson-id="3.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 3 · Lesson 3.4</p>
+      <h1>Continuity — Where Curves Don't Break</h1>
+      <p class="lesson-summary">
+        Recognize continuity as a curve you can draw without lifting the pen, and check the three conditions that guarantee a function is continuous at a point.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Imagine tracing a graph with a pen. If you never have to lift the tip, the curve
+        is continuous. A jump, a hole, or a vertical asymptote forces you to lift the pen;
+        those are the classic discontinuities.
+      </p>
+      <p>
+        The same idea appears in network signals: a continuous stream of packets arrives
+        without dropout. A sudden gap or an undefined reading is a discontinuity in the
+        transmission. Continuity is the mathematical guarantee that nothing “breaks”
+        at the point you care about.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A function is continuous at $x=a$ when three things hold at once: the function
+          is defined there, the limit exists there, and the limit equals the function
+          value. Fail any one of those and the pen has to lift.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <line x1="14" y1="95" x2="130" y2="95" stroke="#565f78" stroke-width="1"/>
+            <line x1="14" y1="95" x2="14" y2="12" stroke="#565f78" stroke-width="1"/>
+            <!-- continuous piece -->
+            <path d="M 20 80 Q 40 50 55 45 Q 70 42 85 55" fill="none" stroke="#5fd4e8" stroke-width="2"/>
+            <!-- jump discontinuity -->
+            <path d="M 85 30 Q 100 25 120 40" fill="none" stroke="#5fd4e8" stroke-width="2"/>
+            <!-- open / closed markers at jump -->
+            <circle cx="85" cy="55" r="4" fill="#101a30" stroke="#e8b95f" stroke-width="2"/>
+            <circle cx="85" cy="30" r="4" fill="#7ee0a8"/>
+            <text x="90" y="70" fill="#9098ae" font-size="8" font-family="monospace">jump</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Point</span><span class="r">$x=2$</span></div>
+          <div class="row"><span class="l">$f(2)$ defined?</span><span class="r">Yes, $f(2)=3$</span></div>
+          <div class="row"><span class="l">$\lim_{x\to 2}f(x)$</span><span class="r">Exists, $=3$</span></div>
+          <div class="row"><span class="l">Limit $=f(2)$?</span><span class="r">Yes</span></div>
+          <div class="row"><span class="l">Verdict</span><span class="r">Continuous at $2$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Choose a function type and watch the three continuity checks update live. The
+        graph shows whether the curve is unbroken at the marked point.
+      </p>
+      <div class="interactive-card" id="contLab">
+        <div class="lab-controls">
+          <label>
+            Scenario
+            <select id="scenario">
+              <option value="cont">Continuous polynomial</option>
+              <option value="hole">Removable hole</option>
+              <option value="jump">Jump discontinuity</option>
+              <option value="asymp">Vertical asymptote</option>
+            </select>
+          </label>
+          <span class="status" id="verdict">Continuous</span>
+        </div>
+        <div class="lab-svg-wrap">
+          <svg id="contSvg" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Graph illustrating continuity or discontinuity">
+            <g stroke="#1a2238" stroke-width="1">
+              <line x1="40" y1="30" x2="40" y2="220"/>
+              <line x1="40" y1="220" x2="370" y2="220"/>
+            </g>
+            <text x="360" y="235" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">x</text>
+            <text x="22" y="40" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">y</text>
+            <path id="curveA" fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <path id="curveB" fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <circle id="openMark" r="6" fill="#0f1526" stroke="#e8b95f" stroke-width="2" opacity="0"/>
+            <circle id="closedMark" r="5" fill="#7ee0a8" opacity="0"/>
+            <line id="asympLine" stroke="#e8b95f" stroke-width="1.5" stroke-dasharray="5 4" opacity="0"/>
+          </svg>
+        </div>
+        <div class="check-list" id="checks">
+          <div class="item"><span class="dot" id="dot1"></span><span id="txt1">$f(a)$ is defined</span></div>
+          <div class="item"><span class="dot" id="dot2"></span><span id="txt2">$\lim_{x\to a}f(x)$ exists</span></div>
+          <div class="item"><span class="dot" id="dot3"></span><span id="txt3">$\lim_{x\to a}f(x)=f(a)$</span></div>
+        </div>
+        <p class="lab-note">
+          All three conditions must hold for continuity at the marked $x$-value. A single
+          failure produces a break—exactly the kind of dropout a network monitor would flag.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \lim_{x \to a} f(x) = f(a) $$</div>
+      <p>
+        This single equation packs the three requirements: the limit on the left must
+        exist (so left- and right-hand limits agree), $f(a)$ on the right must be defined,
+        and the two sides must be equal. When the equation holds, the graph has no break
+        at $x=a$ and can be drawn without lifting the pen.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a$</span><span class="legend-text">The $x$-value where we test continuity</span></div>
+        <div class="legend-item"><span class="legend-sym">$f(a)$</span><span class="legend-text">The actual function value at that point (must exist)</span></div>
+        <div class="legend-item"><span class="legend-sym">$\lim_{x\to a}f(x)$</span><span class="legend-text">The height the curve approaches from both sides</span></div>
+        <div class="legend-item"><span class="legend-sym">$=$</span><span class="legend-text">Equality of limit and value guarantees no break</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does a removable hole fail the continuity test even though the limit exists?</li>
+          <li>In a network signal, which of the three continuity conditions corresponds to a sudden packet dropout that never resumes?</li>
+          <li>Can a function be continuous at every point in an open interval yet still have a discontinuity at an endpoint? Sketch the idea.</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const scenario = document.getElementById('scenario');
+    const verdict = document.getElementById('verdict');
+    const curveA = document.getElementById('curveA');
+    const curveB = document.getElementById('curveB');
+    const openMark = document.getElementById('openMark');
+    const closedMark = document.getElementById('closedMark');
+    const asympLine = document.getElementById('asympLine');
+    const dot1 = document.getElementById('dot1');
+    const dot2 = document.getElementById('dot2');
+    const dot3 = document.getElementById('dot3');
+    const txt1 = document.getElementById('txt1');
+    const txt2 = document.getElementById('txt2');
+    const txt3 = document.getElementById('txt3');
+
+    const xMin = 0, xMax = 4;
+    const yMin = -1, yMax = 5;
+    const svgX0 = 40, svgX1 = 370;
+    const svgY0 = 220, svgY1 = 30;
+
+    function toSvgX(x) {
+      return svgX0 + (x - xMin) / (xMax - xMin) * (svgX1 - svgX0);
+    }
+    function toSvgY(y) {
+      return svgY0 + (y - yMin) / (yMax - yMin) * (svgY1 - svgY0);
+    }
+
+    function pathFrom(fn, from, to, steps) {
+      let d = '';
+      for (let i = 0; i <= steps; i++) {
+        const x = from + (i / steps) * (to - from);
+        const y = fn(x);
+        if (!isFinite(y)) continue;
+        const sx = toSvgX(x);
+        const sy = toSvgY(y);
+        d += (d === '' ? 'M' : 'L') + sx + ' ' + sy;
+      }
+      return d;
+    }
+
+    function setDots(pass1, pass2, pass3) {
+      dot1.className = 'dot ' + (pass1 ? 'pass' : 'fail');
+      dot2.className = 'dot ' + (pass2 ? 'pass' : 'fail');
+      dot3.className = 'dot ' + (pass3 ? 'pass' : 'fail');
+    }
+
+    function update() {
+      const s = scenario.value;
+      openMark.setAttribute('opacity', '0');
+      closedMark.setAttribute('opacity', '0');
+      asympLine.setAttribute('opacity', '0');
+      curveB.setAttribute('d', '');
+
+      if (s === 'cont') {
+        // y = 0.4x^2 - 0.5x + 1.5, continuous everywhere
+        const fn = x => 0.4 * x * x - 0.5 * x + 1.5;
+        curveA.setAttribute('d', pathFrom(fn, 0.2, 3.8, 60));
+        const ax = toSvgX(2);
+        const ay = toSvgY(fn(2));
+        closedMark.setAttribute('cx', ax);
+        closedMark.setAttribute('cy', ay);
+        closedMark.setAttribute('opacity', '1');
+        setDots(true, true, true);
+        verdict.textContent = 'Continuous';
+        verdict.className = 'status ok';
+        const fnVal = fn(2).toFixed(2);
+        txt1.textContent = 'f(2) is defined (= ' + fnVal + ')';
+        txt2.textContent = 'limit exists (= ' + fnVal + ')';
+        txt3.textContent = 'limit equals f(2)';
+      } else if (s === 'hole') {
+        // (x^2 - 4)/(x - 2) with hole at 2, value would be 4
+        const fn = x => (x * x - 4) / (x - 2);
+        curveA.setAttribute('d', pathFrom(fn, 0.2, 1.95, 40));
+        curveB.setAttribute('d', pathFrom(fn, 2.05, 3.8, 40));
+        const hx = toSvgX(2);
+        const hy = toSvgY(4);
+        openMark.setAttribute('cx', hx);
+        openMark.setAttribute('cy', hy);
+        openMark.setAttribute('opacity', '1');
+        setDots(false, true, false);
+        verdict.textContent = 'Discontinuous (hole)';
+        verdict.className = 'status break';
+        txt1.textContent = 'f(2) is undefined';
+        txt2.textContent = 'limit exists (= 4)';
+        txt3.textContent = 'limit ≠ f(2) (no value)';
+      } else if (s === 'jump') {
+        // left: 1, right: 3 at x=2
+        const left = x => 1 + 0.15 * (x - 1);
+        const right = x => 3 + 0.2 * (x - 2);
+        curveA.setAttribute('d', pathFrom(left, 0.2, 2, 40));
+        curveB.setAttribute('d', pathFrom(right, 2, 3.8, 40));
+        const jx = toSvgX(2);
+        openMark.setAttribute('cx', jx);
+        openMark.setAttribute('cy', toSvgY(left(2)));
+        openMark.setAttribute('opacity', '1');
+        closedMark.setAttribute('cx', jx);
+        closedMark.setAttribute('cy', toSvgY(right(2)));
+        closedMark.setAttribute('opacity', '1');
+        setDots(true, false, false);
+        verdict.textContent = 'Discontinuous (jump)';
+        verdict.className = 'status break';
+        txt1.textContent = 'f(2) is defined (= 3)';
+        txt2.textContent = 'limit does not exist (L ≠ R)';
+        txt3.textContent = 'limit ≠ f(2)';
+      } else {
+        // 1/(x-2) vertical asymptote
+        const fn = x => 1 / (x - 2);
+        curveA.setAttribute('d', pathFrom(fn, 0.3, 1.85, 40));
+        curveB.setAttribute('d', pathFrom(fn, 2.15, 3.7, 40));
+        const ax = toSvgX(2);
+        asympLine.setAttribute('x1', ax);
+        asympLine.setAttribute('y1', svgY1);
+        asympLine.setAttribute('x2', ax);
+        asympLine.setAttribute('y2', svgY0);
+        asympLine.setAttribute('opacity', '1');
+        setDots(false, false, false);
+        verdict.textContent = 'Discontinuous (asymptote)';
+        verdict.className = 'status break';
+        txt1.textContent = 'f(2) is undefined';
+        txt2.textContent = 'limit does not exist (±∞)';
+        txt3.textContent = 'limit ≠ f(2)';
+      }
+    }
+
+    scenario.addEventListener('change', update);
+    update();
+  })();
+  </script>
+</body>
+</html>
