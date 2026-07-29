@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="See how differentiating a position vector frame-by-frame reveals velocity and acceleration as vectors of their own.">
-  <title>Vector-Valued Functions — Position, Velocity &amp; Acceleration | Math for AI</title>
+  <meta name="description" content="Track position, velocity, and acceleration vectors that update frame-by-frame along a parametric path.">
+  <title>Vector-Valued Functions — Position, Velocity & Acceleration | Math for AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,58 +14,63 @@
   <link rel="stylesheet" href="course-common.css">
   <script defer src="course-common.js"></script>
   <style>
-    #vvfDial {
+    #vecLab {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
     }
-    #vvfDial .vf-graph-wrap {
+    #vecLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #vecLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #vecLab input[type="range"] {
+      width: 160px;
+      accent-color: var(--cyan);
+    }
+    #vecLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 6ch;
+    }
+    #vecLab .lab-svg-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
       border: 1px solid var(--line);
       border-radius: 12px;
       background: var(--panel-2);
-      padding: 10px;
+      overflow: hidden;
     }
-    #vvfDial svg {
+    #vecLab svg {
       display: block;
       width: 100%;
       height: auto;
     }
-    #vvfDial .vf-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 14px;
+    #vecLab .info-box {
       font-family: var(--font-mono);
       font-size: .85rem;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
       color: var(--ink-dim);
+      line-height: 1.55;
     }
-    #vvfDial .vf-controls label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1 1 260px;
-    }
-    #vvfDial input[type="range"] {
-      flex: 1 1 auto;
-      accent-color: var(--cyan);
-    }
-    #vvfDial .vf-readout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 20px;
-      color: var(--ink);
-    }
-    #vvfDial .vf-readout span.k {
-      color: var(--ink-faint);
-    }
-    #vvfDial .vf-readout strong {
-      color: var(--green);
-      font-weight: 600;
-    }
-    #vvfDial .vf-label {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      fill: #9098ae;
+    #vecLab .info-box .hl { color: var(--cyan); }
+    #vecLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
     }
   </style>
 </head>
@@ -75,53 +80,54 @@
       <p class="lesson-kicker">Module 5.5 · Lesson 5.5.2</p>
       <h1>Vector-Valued Functions — Position, Velocity & Acceleration</h1>
       <p class="lesson-summary">
-        Differentiate a moving point's position vector frame-by-frame to uncover its velocity and acceleration as vectors in their own right.
+        Watch position, velocity, and acceleration vectors update frame-by-frame along a parametric path, exactly as an animation engine advances a moving object.
       </p>
     </header>
 
     <section class="lesson-section">
       <h2>Intuition</h2>
       <p>
-        Picture an animation: each frame updates a dot's position a little. The
-        position itself is a vector, $\vec{r}(t)$, pointing from the origin to the dot.
-        But how that vector changes from frame to frame — its own rate of change — is
-        just as meaningful. That rate of change is a vector too, and it's called
-        velocity.
+        A vector-valued function $\mathbf{r}(t)=\langle x(t),y(t)\rangle$ hands back a
+        position vector at every instant $t$. Differentiate once and you obtain the
+        velocity vector $\mathbf{v}(t)=\mathbf{r}'(t)$; differentiate again and you obtain
+        the acceleration $\mathbf{a}(t)=\mathbf{r}''(t)$. Each new frame of an animation
+        simply evaluates these three vectors at the next time stamp.
+      </p>
+      <p>
+        Bézier curves used in motion graphics are built the same way: the control points
+        define a parametric path, and the animation system samples $\mathbf{r}(t)$,
+        $\mathbf{v}(t)$, and $\mathbf{a}(t)$ to place, orient, and ease the object.
       </p>
       <div class="concept-card">
         <h3>Core concept</h3>
         <p>
-          Differentiating a vector-valued function works component by component:
-          differentiate $x(t)$ and $y(t)$ separately, then bundle the results back
-          into a vector. $\vec{v}(t) = \vec{r}\,'(t)$ gives the velocity vector —
-          its direction is the direction of motion, and its length is the speed.
-          Differentiate again and you get $\vec{a}(t) = \vec{r}\,''(t)$, the
-          acceleration vector, describing how the velocity itself is changing.
+          Position is the vector $\mathbf{r}(t)$. Velocity is its derivative—the tangent
+          that points in the direction of motion and whose length is speed. Acceleration
+          is the derivative of velocity; it tells how the velocity vector itself is
+          changing length or direction.
         </p>
       </div>
 
       <div class="concept-card worked-example">
         <div class="worked-visual">
-          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A velocity arrow attached to a point on a projectile path">
-            <line x1="15" y1="110" x2="150" y2="110" stroke="#565f78" stroke-width="1"/>
-            <path d="M 15 110 Q 82 15 149 110" stroke="#e8b95f" stroke-width="2" fill="none"/>
-            <circle cx="48" cy="60" r="4" fill="#7ee0a8"/>
-            <line x1="48" y1="60" x2="90" y2="45" stroke="#5fd4e8" stroke-width="2" marker-end="url(#vArrow)"/>
-            <defs>
-              <marker id="vArrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-                <path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/>
-              </marker>
-            </defs>
-            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">velocity vector at t=1</text>
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <!-- path arc -->
+            <path d="M 25 80 Q 50 20 90 40 Q 120 55 125 75" fill="none" stroke="#5fd4e8" stroke-width="2"/>
+            <!-- position point -->
+            <circle cx="70" cy="32" r="4" fill="#e8b95f"/>
+            <!-- velocity arrow -->
+            <line x1="70" y1="32" x2="100" y2="20" stroke="#7ee0a8" stroke-width="2" marker-end="url(#a)"/>
+            <text x="30" y="100" fill="#9098ae" font-size="8" font-family="monospace">r(t)</text>
+            <text x="95" y="16" fill="#7ee0a8" font-size="8" font-family="monospace">v</text>
           </svg>
         </div>
         <div class="worked-steps">
-          <div class="row"><span class="l">Position vector</span><span class="r">r(t) = ⟨10t, 20t−5t²⟩</span></div>
-          <div class="row"><span class="l">Velocity vector</span><span class="r">v(t) = ⟨10, 20−10t⟩</span></div>
-          <div class="row"><span class="l">Acceleration vector</span><span class="r">a(t) = ⟨0, −10⟩</span></div>
-          <div class="row"><span class="l">Velocity at t = 1</span><span class="r">⟨10, 10⟩</span></div>
-          <div class="row"><span class="l">Speed = |v(1)|</span><span class="r">√(10² + 10²) ≈ 14.14</span></div>
-          <div class="row"><span class="l">Answer</span><span class="r">v(1) = ⟨10, 10⟩, speed ≈ 14.14</span></div>
+          <div class="row"><span class="l">$\mathbf{r}(t)$</span><span class="r">$\langle t,\,t^{2}\rangle$</span></div>
+          <div class="row"><span class="l">At $t=1$</span><span class="r">$\mathbf{r}=\langle 1,1\rangle$</span></div>
+          <div class="row"><span class="l">$\mathbf{v}=\mathbf{r}'$</span><span class="r">$\langle 1,2t\rangle=\langle 1,2\rangle$</span></div>
+          <div class="row"><span class="l">$\mathbf{a}=\mathbf{r}''$</span><span class="r">$\langle 0,2\rangle$</span></div>
+          <div class="row"><span class="l">Speed</span><span class="r">$|\mathbf{v}|=\sqrt{5}$</span></div>
         </div>
       </div>
     </section>
@@ -129,58 +135,68 @@
     <section class="lesson-section">
       <h2>Interactive Lab</h2>
       <p>
-        Slide $t$ forward frame by frame. The arrow attached to the dot is its
-        velocity vector at that instant — watch how its direction and length change
-        as the point rises, peaks, and falls.
+        Drag the time slider. The amber point traces the path; the green arrow is
+        velocity and the cyan arrow is acceleration, both redrawn every frame.
       </p>
-      <div class="interactive-card">
-        <div id="vvfDial">
-          <div class="vf-graph-wrap">
-            <svg id="vvfSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A dot moving along a trajectory with its velocity vector drawn as an arrow">
-              <defs>
-                <marker id="vvfArrow" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
-                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#5fd4e8"/>
-                </marker>
-              </defs>
-              <line x1="20" y1="200" x2="300" y2="200" stroke="#565f78" stroke-width="1"/>
-              <line x1="20" y1="200" x2="20" y2="15" stroke="#565f78" stroke-width="1"/>
-              <text x="292" y="212" class="vf-label">x</text>
-              <text x="26" y="22" class="vf-label">y</text>
-              <path id="vvfTrail" d="" stroke="#e8b95f" stroke-width="2.5" fill="none"/>
-              <line id="vvfVector" x1="0" y1="0" x2="0" y2="0" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#vvfArrow)"/>
-              <circle id="vvfDot" cx="20" cy="200" r="5" fill="#7ee0a8"/>
-            </svg>
-          </div>
-          <div class="vf-controls">
-            <label>
-              Parameter t
-              <input type="range" id="vvfSlider" min="0" max="4" step="0.05" value="1">
-            </label>
-          </div>
-          <div class="vf-readout">
-            <span><span class="k">t =</span> <strong id="vvfT">1.00</strong></span>
-            <span><span class="k">r(t) =</span> <strong id="vvfPos">⟨10.0, 15.0⟩</strong></span>
-            <span><span class="k">v(t) =</span> <strong id="vvfVel">⟨10.0, 10.0⟩</strong></span>
-            <span><span class="k">speed =</span> <strong id="vvfSpeed">14.14</strong></span>
-          </div>
+      <div class="interactive-card" id="vecLab">
+        <div class="lab-controls">
+          <label>
+            Time $t$
+            <input type="range" id="tSlider" min="0" max="2.5" step="0.02" value="1.0">
+            <span class="readout" id="tValue">1.00</span>
+          </label>
+          <span>Speed $|\mathbf{v}|$: <span class="readout" id="speedValue">2.24</span></span>
         </div>
+        <div class="lab-svg-wrap">
+          <svg id="vecSvg" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Parametric path with velocity and acceleration vectors">
+            <defs>
+              <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#7ee0a8"/>
+              </marker>
+              <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/>
+              </marker>
+            </defs>
+            <g stroke="#1a2238" stroke-width="1">
+              <line x1="40" y1="20" x2="40" y2="260"/>
+              <line x1="40" y1="260" x2="380" y2="260"/>
+            </g>
+            <text x="370" y="275" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">x</text>
+            <text x="22" y="30" fill="#565f78" font-size="12" font-family="IBM Plex Mono, monospace">y</text>
+            <path id="pathCurve" fill="none" stroke="#5fd4e8" stroke-width="2" opacity="0.7"/>
+            <line id="velArrow" stroke="#7ee0a8" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+            <line id="accArrow" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+            <circle id="posPt" r="6" fill="#e8b95f"/>
+          </svg>
+        </div>
+        <div class="info-box" id="infoBox">
+          $\mathbf{r}(t)=\langle t,\,t^{2}\rangle$
+        </div>
+        <p class="lab-note">
+          Green arrow = velocity (tangent, length = speed). Cyan arrow = acceleration
+          (here constant $\langle 0,2\rangle$). This is the same data an animation system
+          reads each frame to move an object along a Bézier path.
+        </p>
       </div>
     </section>
 
     <section class="lesson-section">
       <h2>Key Idea</h2>
-      <div class="formula">$$ \vec{v}(t) = \vec{r}\,'(t) = \big\langle x'(t),\, y'(t) \big\rangle, \qquad \vec{a}(t) = \vec{r}\,''(t) = \big\langle x''(t),\, y''(t) \big\rangle $$</div>
+      <div class="formula">$$ \mathbf{r}(t)=\langle x(t),y(t)\rangle,\quad
+      \mathbf{v}(t)=\mathbf{r}'(t),\quad
+      \mathbf{a}(t)=\mathbf{r}''(t) $$</div>
       <p>
-        Both derivatives are still vectors, found by differentiating each component
-        on its own. Velocity tracks how position changes frame to frame; acceleration
-        tracks how velocity itself changes frame to frame — the same idea applied one
-        level deeper.
+        A vector-valued function packages the coordinates into a single object that can
+        be differentiated component-wise. The first derivative is the velocity vector;
+        the second is the acceleration vector. Speed is the magnitude $|\mathbf{v}(t)|$.
+        In animation and physics engines these three vectors are evaluated at successive
+        time steps to advance the object along its path.
       </p>
       <div class="legend">
-        <div class="legend-item"><span class="legend-sym">$\vec{r}(t)$</span><span class="legend-text">The position vector at parameter value $t$</span></div>
-        <div class="legend-item"><span class="legend-sym">$\vec{v}(t)$</span><span class="legend-text">The velocity vector — direction and speed of motion</span></div>
-        <div class="legend-item"><span class="legend-sym">$\vec{a}(t)$</span><span class="legend-text">The acceleration vector — how the velocity vector is changing</span></div>
-        <div class="legend-item"><span class="legend-sym">$|\vec{v}(t)|$</span><span class="legend-text">Speed — the length of the velocity vector, with direction stripped away</span></div>
+        <div class="legend-item"><span class="legend-sym">$\mathbf{r}(t)$</span><span class="legend-text">Position vector at time $t$</span></div>
+        <div class="legend-item"><span class="legend-sym">$\mathbf{v}(t)$</span><span class="legend-text">Velocity = first derivative (direction of motion)</span></div>
+        <div class="legend-item"><span class="legend-sym">$\mathbf{a}(t)$</span><span class="legend-text">Acceleration = second derivative</span></div>
+        <div class="legend-item"><span class="legend-sym">$|\mathbf{v}|$</span><span class="legend-text">Speed (length of the velocity vector)</span></div>
       </div>
     </section>
 
@@ -188,20 +204,10 @@
       <h2>Think Further</h2>
       <div class="concept-card">
         <ol>
-          <li>At the peak of the projectile's path (t = 2), predict what the vertical component of the velocity vector equals. Why does that make sense geometrically?</li>
-          <li>A designer animating an object along a Bezier path cares about $\vec{r}\,'(t)$, not just $\vec{r}(t)$. What would knowing only the position, and not the velocity vector, fail to tell them about the animation?</li>
-          <li>The acceleration vector here stays constant at ⟨0, −10⟩ for the whole flight. Predict what that implies about how the velocity vector's direction changes over time, versus its vertical component's rate of change.</li>
+          <li>If acceleration is always perpendicular to velocity, what is happening to the speed of the object?</li>
+          <li>In a cubic Bézier animation curve, why does the velocity vector change length even when the object appears to move at “constant speed” on screen?</li>
+          <li>How would you write the unit tangent vector in terms of $\mathbf{v}(t)$, and why is it useful for orienting a sprite along its path?</li>
         </ol>
-        <details class="answer-reveal">
-          <summary>Show suggested answers</summary>
-          <div class="answer-content">
-            <ol>
-              <li>It equals zero. At the peak, the dot is momentarily moving purely horizontally — neither rising nor falling — which is exactly the geometric meaning of a flat tangent at the top of the arc.</li>
-              <li>Position alone says where the object is, but not how fast or in what direction it's moving through that point — information the velocity vector supplies, which controls how smooth or abrupt the animation feels frame to frame.</li>
-              <li>Since acceleration is constant, the vertical component of velocity changes at a steady rate throughout the flight, while the horizontal component never changes at all — so the velocity vector's direction steadily rotates from angled-upward, through horizontal at the peak, to angled-downward.</li>
-            </ol>
-          </div>
-        </details>
       </div>
     </section>
 
@@ -209,67 +215,91 @@
   </main>
 
   <script>
-    (function () {
-      var slider = document.getElementById('vvfSlider');
-      var trail = document.getElementById('vvfTrail');
-      var dot = document.getElementById('vvfDot');
-      var vector = document.getElementById('vvfVector');
+  (function () {
+    const tSlider = document.getElementById('tSlider');
+    const tValue = document.getElementById('tValue');
+    const speedValue = document.getElementById('speedValue');
+    const pathCurve = document.getElementById('pathCurve');
+    const velArrow = document.getElementById('velArrow');
+    const accArrow = document.getElementById('accArrow');
+    const posPt = document.getElementById('posPt');
+    const infoBox = document.getElementById('infoBox');
 
-      var tLabel = document.getElementById('vvfT');
-      var posLabel = document.getElementById('vvfPos');
-      var velLabel = document.getElementById('vvfVel');
-      var speedLabel = document.getElementById('vvfSpeed');
+    // r(t) = <t, t^2>, t in [0, 2.5]
+    // x: 0..2.5 -> 40..360, y: 0..6.5 -> 260..30
+    const xMin = 0, xMax = 2.8;
+    const yMin = 0, yMax = 7;
+    const svgX0 = 40, svgX1 = 360;
+    const svgY0 = 260, svgY1 = 30;
 
-      var originX = 20, originY = 200;
-      var scaleX = 7;
-      var scaleY = 7;
-      var arrowScale = 0.55;
+    function toSvgX(x) {
+      return svgX0 + (x - xMin) / (xMax - xMin) * (svgX1 - svgX0);
+    }
+    function toSvgY(y) {
+      return svgY0 + (y - yMin) / (yMax - yMin) * (svgY1 - svgY0);
+    }
 
-      function xOf(t) { return 10 * t; }
-      function yOf(t) { return 20 * t - 5 * t * t; }
-      function vxOf() { return 10; }
-      function vyOf(t) { return 20 - 10 * t; }
+    function rx(t) { return t; }
+    function ry(t) { return t * t; }
+    function vx(t) { return 1; }
+    function vy(t) { return 2 * t; }
+    function ax(t) { return 0; }
+    function ay(t) { return 2; }
 
-      function toPx(x, y) {
-        return { px: originX + x * scaleX, py: originY - y * scaleY };
-      }
+    // draw path
+    let d = '';
+    for (let i = 0; i <= 80; i++) {
+      const t = (i / 80) * 2.5;
+      const sx = toSvgX(rx(t));
+      const sy = toSvgY(ry(t));
+      d += (i === 0 ? 'M' : 'L') + sx + ' ' + sy;
+    }
+    pathCurve.setAttribute('d', d);
 
-      function render() {
-        var t = parseFloat(slider.value);
-        var x = xOf(t), y = yOf(t);
-        var vx = vxOf(), vy = vyOf(t);
-        var speed = Math.sqrt(vx * vx + vy * vy);
+    // scale factors so arrows are visible
+    const vScale = 0.35;
+    const aScale = 0.5;
 
-        tLabel.textContent = t.toFixed(2);
-        posLabel.textContent = '⟨' + x.toFixed(1) + ', ' + y.toFixed(1) + '⟩';
-        velLabel.textContent = '⟨' + vx.toFixed(1) + ', ' + vy.toFixed(1) + '⟩';
-        speedLabel.textContent = speed.toFixed(2);
+    function update() {
+      const t = parseFloat(tSlider.value);
+      tValue.textContent = t.toFixed(2);
 
-        var pts = [];
-        for (var s = 0; s <= t; s += 0.05) {
-          var p = toPx(xOf(s), yOf(s));
-          pts.push(p.px.toFixed(1) + ',' + p.py.toFixed(1));
-        }
-        if (pts.length === 0) {
-          var p0 = toPx(xOf(0), yOf(0));
-          pts.push(p0.px.toFixed(1) + ',' + p0.py.toFixed(1));
-        }
-        trail.setAttribute('d', 'M ' + pts.join(' L '));
+      const x = rx(t), y = ry(t);
+      const vX = vx(t), vY = vy(t);
+      const aX = ax(t), aY = ay(t);
+      const speed = Math.sqrt(vX * vX + vY * vY);
+      speedValue.textContent = speed.toFixed(2);
 
-        var dotPos = toPx(x, y);
-        dot.setAttribute('cx', dotPos.px.toFixed(1));
-        dot.setAttribute('cy', dotPos.py.toFixed(1));
+      const px = toSvgX(x);
+      const py = toSvgY(y);
+      posPt.setAttribute('cx', px);
+      posPt.setAttribute('cy', py);
 
-        var tip = toPx(x + vx * arrowScale, y + vy * arrowScale);
-        vector.setAttribute('x1', dotPos.px.toFixed(1));
-        vector.setAttribute('y1', dotPos.py.toFixed(1));
-        vector.setAttribute('x2', tip.px.toFixed(1));
-        vector.setAttribute('y2', tip.py.toFixed(1));
-      }
+      // velocity arrow (in svg coords the y component flips)
+      const vEndX = toSvgX(x + vX * vScale);
+      const vEndY = toSvgY(y + vY * vScale);
+      velArrow.setAttribute('x1', px);
+      velArrow.setAttribute('y1', py);
+      velArrow.setAttribute('x2', vEndX);
+      velArrow.setAttribute('y2', vEndY);
 
-      slider.addEventListener('input', render);
-      render();
-    })();
+      // acceleration arrow
+      const aEndX = toSvgX(x + aX * aScale);
+      const aEndY = toSvgY(y + aY * aScale);
+      accArrow.setAttribute('x1', px);
+      accArrow.setAttribute('y1', py);
+      accArrow.setAttribute('x2', aEndX);
+      accArrow.setAttribute('y2', aEndY);
+
+      infoBox.innerHTML =
+        'r(t) = ⟨' + x.toFixed(2) + ', ' + y.toFixed(2) + '⟩<br>' +
+        '<span class="hl">v(t) = ⟨' + vX.toFixed(2) + ', ' + vY.toFixed(2) + '⟩</span> &nbsp;|&nbsp; ' +
+        '<span class="hl">a(t) = ⟨' + aX.toFixed(2) + ', ' + aY.toFixed(2) + '⟩</span>';
+    }
+
+    tSlider.addEventListener('input', update);
+    update();
+  })();
   </script>
 </body>
 </html>
