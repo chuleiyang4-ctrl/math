@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how the definite integral emerges from summing infinitely many thin rectangles under a curve.">
+  <title>The Definite Integral & Riemann Sums | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #riemannDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #riemannDial .rd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #riemannDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #riemannDial .rd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #riemannDial .rd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #riemannDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #riemannDial .rd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #riemannDial .rd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #riemannDial .rd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #riemannDial .rd-note {
+      color: var(--ink-faint);
+      font-size: .8rem;
+    }
+  </style>
+</head>
+<body data-lesson-id="5.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 5 · Lesson 5.2</p>
+      <h1>The Definite Integral & Riemann Sums</h1>
+      <p class="lesson-summary">
+        Discover how slicing the area under a curve into thin rectangles — and letting them get infinitely thin — defines the definite integral.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        If a curve were a straight edge, finding the area underneath it would just be
+        geometry: a rectangle, a triangle, done. But most curves bend, so there's no
+        single clean shape to measure. The fix is to chop the region into thin vertical
+        strips, treat each strip as a rectangle you already know how to measure, and add
+        them all up.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Each rectangle's area is $f(x_i)\cdot\Delta x$ — height times width. Adding up
+          $n$ of these rectangles gives an estimate of the area under the curve. The
+          estimate isn't exact, because rectangles don't perfectly trace a curved edge.
+          But as $n$ grows and each rectangle gets thinner, the leftover gaps shrink
+          toward zero, and the sum approaches the true area exactly.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four rectangles approximating the area under a line from zero to four">
+            <line x1="15" y1="110" x2="150" y2="110" stroke="#565f78" stroke-width="1"/>
+            <line x1="15" y1="110" x2="15" y2="15" stroke="#565f78" stroke-width="1"/>
+            <rect x="15" y="90" width="30" height="20" fill="#5fd4e8" fill-opacity="0.35" stroke="#5fd4e8"/>
+            <rect x="45" y="70" width="30" height="40" fill="#5fd4e8" fill-opacity="0.35" stroke="#5fd4e8"/>
+            <rect x="75" y="50" width="30" height="60" fill="#5fd4e8" fill-opacity="0.35" stroke="#5fd4e8"/>
+            <rect x="105" y="30" width="30" height="80" fill="#5fd4e8" fill-opacity="0.35" stroke="#5fd4e8"/>
+            <line x1="15" y1="110" x2="135" y2="30" stroke="#e8b95f" stroke-width="2"/>
+            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">f(x) = x, four rectangles</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Function &amp; interval</span><span class="r">f(x) = x, from 0 to 4</span></div>
+          <div class="row"><span class="l">Rectangle width Δx</span><span class="r">1</span></div>
+          <div class="row"><span class="l">Right-edge heights</span><span class="r">f(1), f(2), f(3), f(4)</span></div>
+          <div class="row"><span class="l">Sum of areas</span><span class="r">1 + 2 + 3 + 4 = 10</span></div>
+          <div class="row"><span class="l">Exact area (triangle)</span><span class="r">½ × 4 × 4 = 8</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Estimate overshoots by 2</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide to change how many rectangles slice the region under the curve.
+        Watch the gaps between the bars and the curve shrink, and see the running
+        sum close in on the exact area.
+      </p>
+      <div class="interactive-card">
+        <div id="riemannDial">
+          <div class="rd-graph-wrap">
+            <svg id="rdSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Riemann sum bars approximating the area under a curve">
+              <line x1="20" y1="200" x2="300" y2="200" stroke="#565f78" stroke-width="1"/>
+              <line x1="20" y1="200" x2="20" y2="15" stroke="#565f78" stroke-width="1"/>
+              <text x="292" y="212" font-family="IBM Plex Mono, monospace" font-size="9" fill="#565f78">x</text>
+              <text x="26" y="22" font-family="IBM Plex Mono, monospace" font-size="9" fill="#565f78">y</text>
+              <g id="rdBars"></g>
+              <path id="rdCurve" d="" stroke="#e8b95f" stroke-width="2.5" fill="none"/>
+            </svg>
+          </div>
+          <div class="rd-controls">
+            <label>
+              Number of rectangles (n)
+              <input type="range" id="rdSlider" min="2" max="40" step="1" value="4">
+            </label>
+          </div>
+          <div class="rd-readout">
+            <span><span class="k">n =</span> <strong id="rdN">4</strong></span>
+            <span><span class="k">Riemann sum ≈</span> <strong id="rdSum">—</strong></span>
+            <span><span class="k">Exact area =</span> <strong>9.33</strong></span>
+            <span class="rd-note" id="rdNote"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \int_a^b f(x)\,dx = \lim_{n\to\infty} \sum_{i=1}^{n} f(x_i)\,\Delta x $$</div>
+      <p>
+        The definite integral is exactly the limit of the Riemann sum as the rectangles
+        become infinitely thin and infinitely numerous. It's still an accumulation of
+        tiny pieces — just carried all the way to the limit, so the leftover gaps
+        vanish completely.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a, b$</span><span class="legend-text">The left and right edges of the region being measured</span></div>
+        <div class="legend-item"><span class="legend-sym">$f(x_i)$</span><span class="legend-text">The height of the curve at the $i$-th rectangle's sample point</span></div>
+        <div class="legend-item"><span class="legend-sym">$\Delta x$</span><span class="legend-text">The width of each thin rectangle</span></div>
+        <div class="legend-item"><span class="legend-sym">$\lim_{n\to\infty}$</span><span class="legend-text">Letting the rectangle count grow without bound, so the width shrinks to zero</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>In the worked example, the right-endpoint sum (10) was larger than the exact area (8). Would using left endpoints instead give a sum that's too big or too small for this increasing function? Why?</li>
+          <li>An autonomous vehicle only has speed readings sampled once per second, not a continuous speedometer curve. How does a Riemann sum let it still estimate total distance traveled?</li>
+          <li>If a curve dips below the x-axis for part of the interval, what do you predict happens to the "area" contributed by that portion of the Riemann sum?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Too small. Since $f(x)=x$ is increasing, the left edge of each rectangle sits below the curve, so left-endpoint heights underestimate, giving a sum smaller than the true area of 8.</li>
+              <li>Each sampled speed reading becomes the height of one rectangle, and the one-second gap becomes its width. Multiplying and summing those speed×time rectangles approximates total distance, exactly like a discrete Riemann sum.</li>
+              <li>Rectangles below the x-axis have negative height, so they contribute negative area to the sum. The Riemann sum treats area below the axis as subtracting from the total rather than adding to it.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('rdSlider');
+      var barsGroup = document.getElementById('rdBars');
+      var curve = document.getElementById('rdCurve');
+      var nLabel = document.getElementById('rdN');
+      var sumLabel = document.getElementById('rdSum');
+      var noteLabel = document.getElementById('rdNote');
+
+      var originX = 20, originY = 200;
+      var scaleX = 70;
+      var scaleY = 30;
+      var xMin = 0, xMax = 4;
+
+      function fn(x) {
+        return 0.25 * x * x + 1;
+      }
+
+      function toPx(x, y) {
+        return { px: originX + x * scaleX, py: originY - y * scaleY };
+      }
+
+      function svgNS(tag) {
+        return document.createElementNS('http://www.w3.org/2000/svg', tag);
+      }
+
+      function render() {
+        var n = parseInt(slider.value, 10);
+        nLabel.textContent = n;
+
+        var dx = (xMax - xMin) / n;
+        var sum = 0;
+
+        while (barsGroup.firstChild) {
+          barsGroup.removeChild(barsGroup.firstChild);
+        }
+
+        for (var i = 1; i <= n; i++) {
+          var xLeft = xMin + (i - 1) * dx;
+          var xRight = xMin + i * dx;
+          var h = fn(xRight);
+          sum += h * dx;
+
+          var p1 = toPx(xLeft, 0);
+          var p2 = toPx(xRight, h);
+
+          var rect = svgNS('rect');
+          rect.setAttribute('x', p1.px.toFixed(1));
+          rect.setAttribute('y', p2.py.toFixed(1));
+          rect.setAttribute('width', Math.max(0, (p2.px - p1.px) - (n > 20 ? 0 : 1)).toFixed(1));
+          rect.setAttribute('height', (originY - p2.py).toFixed(1));
+          rect.setAttribute('fill', '#5fd4e8');
+          rect.setAttribute('fill-opacity', '0.35');
+          rect.setAttribute('stroke', '#5fd4e8');
+          rect.setAttribute('stroke-width', '0.75');
+          barsGroup.appendChild(rect);
+        }
+
+        var points = [];
+        for (var x = xMin; x <= xMax; x += 0.1) {
+          var p = toPx(x, fn(x));
+          points.push(p.px.toFixed(1) + ',' + p.py.toFixed(1));
+        }
+        curve.setAttribute('d', 'M ' + points.join(' L '));
+
+        sumLabel.textContent = sum.toFixed(3);
+
+        var exact = 9.333;
+        var diff = Math.abs(sum - exact);
+        noteLabel.textContent = 'gap from exact: ' + diff.toFixed(3);
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
