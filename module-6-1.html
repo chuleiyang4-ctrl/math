@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Understand matrix multiplication geometrically as the composition of successive linear transformations in space.">
+  <title>Matrix Multiplication as Composition of Transformations | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="6.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 6 · Lesson 6.1</p>
+      <h1>Matrix Multiplication as Composition of Transformations</h1>
+      <p class="lesson-summary">
+        Discover how matrix multiplication represents applying two or more space transformations in sequence, and why order matters when composing linear operations.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        In traditional algebra courses, matrix multiplication is often introduced as a tedious recipe of multiplying rows by columns. But geometrically, multiplying matrices has a clean, physical meaning: <strong>composing linear transformations</strong>.
+      </p>
+      <p>
+        Imagine applying a spatial transformation $B$ to a grid—such as stretching it horizontally. Next, imagine applying a second transformation $A$—such as rotating the space by $90^\circ$. Instead of applying these two transformations one after another to every point in space, we can compute a single combined matrix $C = AB$ that accomplishes both actions in one step.
+      </p>
+
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Matrix multiplication reads from <strong>right to left</strong>: in the expression $(AB)\vec{v}$, transformation $B$ acts on vector $\vec{v}$ first, and transformation $A$ acts on the result second.
+        </p>
+        <ul>
+          <li><strong>Step 1 (First action $B$):</strong> Maps initial vector $\vec{v}$ to intermediate position $B\vec{v}$.</li>
+          <li><strong>Step 2 (Second action $A$):</strong> Maps intermediate position $B\vec{v}$ to final position $A(B\vec{v})$.</li>
+          <li><strong>Composite Matrix $C = AB$:</strong> A single matrix that transforms $\vec{v}$ directly to $A(B\vec{v})$.</li>
+          <li><strong>Non-Commutativity ($AB \neq BA$):</strong> Changing the order of transformations usually changes the final result.</li>
+        </ul>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 140" width="100%" height="100%" aria-label="Visual representation of matrix composition">
+            <defs>
+              <marker id="arrow-cyan" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 6 3 L 0 6 z" fill="#5fd4e8" />
+              </marker>
+              <marker id="arrow-green" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 6 3 L 0 6 z" fill="#7ee0a8" />
+              </marker>
+              <marker id="arrow-amber" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 6 3 L 0 6 z" fill="#e8b95f" />
+              </marker>
+            </defs>
+            <line x1="80" y1="130" x2="80" y2="10" stroke="rgba(231,235,243,0.15)" stroke-width="1"/>
+            <line x1="10" y1="70" x2="150" y2="70" stroke="rgba(231,235,243,0.15)" stroke-width="1"/>
+            <line x1="80" y1="70" x2="105" y2="45" stroke="#5fd4e8" stroke-width="2" stroke-dasharray="2 2" marker-end="url(#arrow-cyan)"/>
+            <line x1="80" y1="70" x2="130" y2="45" stroke="#7ee0a8" stroke-width="2" stroke-dasharray="2 2" marker-end="url(#arrow-green)"/>
+            <line x1="80" y1="70" x2="55" y2="20" stroke="#e8b95f" stroke-width="2.5" marker-end="url(#arrow-amber)"/>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Initial Vector $\vec{v}$</span><span class="r">$\begin{pmatrix} 1 \\ 1 \end{pmatrix}$</span></div>
+          <div class="row"><span class="l">Transform $B$ (Scale X by 2)</span><span class="r">$\begin{pmatrix} 2 & 0 \\ 0 & 1 \end{pmatrix}$</span></div>
+          <div class="row"><span class="l">Intermediate $B\vec{v}$</span><span class="r">$\begin{pmatrix} 2 \\ 1 \end{pmatrix}$</span></div>
+          <div class="row"><span class="l">Transform $A$ (Rotate $90^\circ$)</span><span class="r">$\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$</span></div>
+          <div class="row"><span class="l">Composite $C = AB$</span><span class="r">$\begin{pmatrix} 0 & -1 \\ 2 & 0 \end{pmatrix}$</span></div>
+          <div class="row"><span class="l">Final $C\vec{v} = A(B\vec{v})$</span><span class="r">$\begin{pmatrix} -1 \\ 2 \end{pmatrix}$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Select transformations $B$ (first action) and $A$ (second action). Drag the progress slider or click Animate to see how space transforms step-by-step, or click "Compare AB vs BA" to visually experience why order matters.
+      </p>
+      <div class="interactive-card">
+        <div id="matrix-compose-lab">
+          <div class="lab-controls">
+            <div class="control-group">
+              <label for="select-b">First Transform $B$</label>
+              <select id="select-b">
+                <option value="scaleX">Scale X by 2</option>
+                <option value="shearX">Horizontal Shear (1.0)</option>
+                <option value="rot45">Rotate +45°</option>
+                <option value="reflectX">Reflect across Y-axis</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="select-a">Second Transform $A$</label>
+              <select id="select-a">
+                <option value="rot90">Rotate +90°</option>
+                <option value="scaleY">Scale Y by 2</option>
+                <option value="shearY">Vertical Shear (1.0)</option>
+                <option value="reflectY">Reflect across X-axis</option>
+              </select>
+            </div>
+            <div class="control-group slider-group">
+              <label for="step-slider">Transformation Progress: <span id="step-val">State 2 (Final AB)</span></label>
+              <input type="range" id="step-slider" min="0" max="2" step="0.01" value="2">
+            </div>
+            <div class="control-group button-group">
+              <button type="button" id="play-btn" class="lab-btn">Animate</button>
+              <button type="button" id="compare-btn" class="lab-btn secondary">Compare AB vs BA</button>
+            </div>
+          </div>
+
+          <div class="lab-display">
+            <svg id="lab-svg" viewBox="0 0 500 360" width="100%" height="auto">
+              <g id="grid-lines"></g>
+              <polygon id="unit-square" fill="rgba(95, 212, 232, 0.15)" stroke="#5fd4e8" stroke-width="1.5"/>
+              <line id="vec-ihat" stroke="#7ee0a8" stroke-width="2.5" marker-end="url(#lab-arrow-green)"/>
+              <line id="vec-jhat" stroke="#e8b95f" stroke-width="2.5" marker-end="url(#lab-arrow-amber)"/>
+              <line id="vec-v" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#lab-arrow-cyan)"/>
+              <circle id="point-v" r="5" fill="#e7ebf3" stroke="#0a0e1a" stroke-width="2"/>
+
+              <polygon id="unit-square-ba" fill="rgba(232, 185, 95, 0.12)" stroke="#e8b95f" stroke-width="1.5" stroke-dasharray="3 3" style="display:none;"/>
+              <line id="vec-v-ba" stroke="#e8b95f" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#lab-arrow-amber)" style="display:none;"/>
+
+              <defs>
+                <marker id="lab-arrow-cyan" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 6 3 L 0 6 z" fill="#5fd4e8"/>
+                </marker>
+                <marker id="lab-arrow-green" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 6 3 L 0 6 z" fill="#7ee0a8"/>
+                </marker>
+                <marker id="lab-arrow-amber" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 6 3 L 0 6 z" fill="#e8b95f"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+
+          <div class="lab-metrics">
+            <div class="metric-card">
+              <span class="m-label">Matrix $B$ (First)</span>
+              <span class="m-val val-green" id="m-b-display">[ 2, 0 | 0, 1 ]</span>
+            </div>
+            <div class="metric-card">
+              <span class="m-label">Matrix $A$ (Second)</span>
+              <span class="m-val val-amber" id="m-a-display">[ 0, -1 | 1, 0 ]</span>
+            </div>
+            <div class="metric-card highlight">
+              <span class="m-label">Product $C = AB$</span>
+              <span class="m-val val-cyan" id="m-ab-display">[ 0, -1 | 2, 0 ]</span>
+            </div>
+            <div class="metric-card" id="card-ba-wrap">
+              <span class="m-label">Reversed $BA$</span>
+              <span class="m-val val-amber" id="m-ba-display">[ 0, -2 | 1, 0 ]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">
+        $$ (A B) \vec{v} = A (B \vec{v}) $$
+        $$ \begin{pmatrix} a & b \\ c & d \end{pmatrix} \begin{pmatrix} e & f \\ g & h \end{pmatrix} = \begin{pmatrix} ae + bg & af + bh \\ ce + dg & cf + dh \end{pmatrix} $$
+      </div>
+      <p>
+        The mechanics of matrix multiplication—multiplying rows of the first matrix by columns of the second—calculate where the transformed basis vectors end up after two consecutive spatial moves.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$B$</span><span class="legend-text">The initial linear transformation matrix applied first to space</span></div>
+        <div class="legend-item"><span class="legend-sym">$A$</span><span class="legend-text">The second linear transformation matrix applied to the result of $B$</span></div>
+        <div class="legend-item"><span class="legend-sym">$AB$</span><span class="legend-text">The combined matrix performing both transformations in sequence</span></div>
+        <div class="legend-item"><span class="legend-sym">$\vec{v}$</span><span class="legend-text">The initial input column vector in original space coordinates</span></div>
+        <div class="legend-item"><span class="legend-sym">$B\vec{v}$</span><span class="legend-text">The intermediate position vector after applying transformation $B$</span></div>
+        <div class="legend-item"><span class="legend-sym">$(AB)\vec{v}$</span><span class="legend-text">The final position vector after applying $B$ followed by $A$</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>
+            In nested notation $A(B\vec{v})$, why is matrix multiplication evaluated from right to left rather than left to right?
+          </li>
+          <li>
+            Is matrix multiplication commutative? That is, does $AB = BA$ for all $2 \times 2$ matrices? Give a geometric explanation.
+          </li>
+          <li>
+            In 3D animation, object models undergo scaling, rotation, and camera placement. How does matrix composition optimize performance when rendering thousands of mesh vertices per frame?
+          </li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>
+                In standard mathematical function notation $f(g(x))$, the inner function $g(x)$ acts first on input $x$, and the outer function $f$ acts second on that result. Writing matrix composition as $A B \vec{v}$ follows this exact nested functional structure.
+              </li>
+              <li>
+                No, matrix multiplication is generally non-commutative ($AB \neq BA$). For example, stretching horizontally ($B$) then rotating $90^\circ$ ($A$) moves the stretched axis to the vertical orientation. But rotating $90^\circ$ first ($A$) and then stretching horizontally ($B$) stretches what was originally the vertical axis, producing a totally different outcome.
+              </li>
+              <li>
+                Rather than executing three separate matrix-vector multiplications for every single vertex in a complex 3D model, graphics engines multiply the transformation matrices together once ($M = M_{\text{proj}} M_{\text{view}} M_{\text{model}}$). Applying this single composite matrix $M$ to each vertex cuts calculation overhead dramatically.
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style>
+    /* Scoped styles for Matrix Compose Lab */
+    #matrix-compose-lab {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #matrix-compose-lab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    #matrix-compose-lab .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #matrix-compose-lab .slider-group {
+      flex: 1 1 220px;
+    }
+
+    #matrix-compose-lab label {
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      color: var(--ink-dim);
+    }
+
+    #matrix-compose-lab select {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      padding: 8px 12px;
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    #matrix-compose-lab select:focus {
+      border-color: var(--cyan);
+    }
+
+    #matrix-compose-lab input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+      cursor: pointer;
+    }
+
+    #matrix-compose-lab .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    #matrix-compose-lab .lab-btn {
+      min-height: 38px;
+      padding: 0 16px;
+      border: 1px solid color-mix(in srgb, var(--cyan) 40%, var(--line));
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    #matrix-compose-lab .lab-btn:hover {
+      background: color-mix(in srgb, var(--cyan) 15%, var(--panel-2));
+      border-color: var(--cyan);
+    }
+
+    #matrix-compose-lab .lab-btn.secondary {
+      border-color: color-mix(in srgb, var(--amber) 40%, var(--line));
+      color: var(--amber);
+    }
+
+    #matrix-compose-lab .lab-btn.secondary:hover {
+      background: color-mix(in srgb, var(--amber) 15%, var(--panel-2));
+      border-color: var(--amber);
+    }
+
+    #matrix-compose-lab .lab-btn.active {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+
+    #matrix-compose-lab .lab-btn.secondary.active {
+      background: var(--amber);
+      color: var(--bg);
+    }
+
+    #matrix-compose-lab .lab-display {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    #matrix-compose-lab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    #matrix-compose-lab .lab-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    #matrix-compose-lab .metric-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+
+    #matrix-compose-lab .metric-card.highlight {
+      border-color: color-mix(in srgb, var(--cyan) 35%, var(--line));
+    }
+
+    #matrix-compose-lab .m-label {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+    }
+
+    #matrix-compose-lab .m-val {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    #matrix-compose-lab .val-cyan { color: var(--cyan); }
+    #matrix-compose-lab .val-green { color: var(--green); }
+    #matrix-compose-lab .val-amber { color: var(--amber); }
+  </style>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const selectB = document.getElementById('select-b');
+      const selectA = document.getElementById('select-a');
+      const stepSlider = document.getElementById('step-slider');
+      const stepVal = document.getElementById('step-val');
+      const playBtn = document.getElementById('play-btn');
+      const compareBtn = document.getElementById('compare-btn');
+
+      const gridLinesGroup = document.getElementById('grid-lines');
+      const unitSquare = document.getElementById('unit-square');
+      const vecIhat = document.getElementById('vec-ihat');
+      const vecJhat = document.getElementById('vec-jhat');
+      const vecV = document.getElementById('vec-v');
+      const pointV = document.getElementById('point-v');
+
+      const unitSquareBa = document.getElementById('unit-square-ba');
+      const vecVBa = document.getElementById('vec-v-ba');
+
+      const mBDisplay = document.getElementById('m-b-display');
+      const mADisplay = document.getElementById('m-a-display');
+      const mAbDisplay = document.getElementById('m-ab-display');
+      const mBaDisplay = document.getElementById('m-ba-display');
+      const cardBaWrap = document.getElementById('card-ba-wrap');
+
+      const width = 500;
+      const height = 360;
+      const originX = 250;
+      const originY = 180;
+      const scale = 50;
+
+      let showCompare = false;
+      let isAnimating = false;
+      let animFrameId = null;
+
+      const matrixPresets = {
+        scaleX: [2, 0, 0, 1],
+        scaleY: [1, 0, 0, 2],
+        shearX: [1, 1, 0, 1],
+        shearY: [1, 0, 0.5, 1],
+        rot45: [Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2],
+        rot90: [0, -1, 1, 0],
+        reflectX: [-1, 0, 0, 1],
+        reflectY: [1, 0, 0, -1]
+      };
+
+      function multiplyMatrices(A, B) {
+        return [
+          A[0]*B[0] + A[1]*B[2], A[0]*B[1] + A[1]*B[3],
+          A[2]*B[0] + A[3]*B[2], A[2]*B[1] + A[3]*B[3]
+        ];
+      }
+
+      function applyMatrix(M, v) {
+        return [
+          M[0]*v[0] + M[1]*v[1],
+          M[2]*v[0] + M[3]*v[1]
+        ];
+      }
+
+      function interpolateMatrix(M1, M2, t) {
+        return [
+          (1-t)*M1[0] + t*M2[0], (1-t)*M1[1] + t*M2[1],
+          (1-t)*M1[2] + t*M2[2], (1-t)*M1[3] + t*M2[3]
+        ];
+      }
+
+      function toScreen(pt) {
+        return [originX + pt[0]*scale, originY - pt[1]*scale];
+      }
+
+      function formatMatrix(M) {
+        const fmt = val => Math.abs(val) < 0.001 ? '0' : val.toFixed(2).replace(/\.00$/, '');
+        return `[ ${fmt(M[0])}, ${fmt(M[1])} | ${fmt(M[2])}, ${fmt(M[3])} ]`;
+      }
+
+      function renderGrid(M) {
+        gridLinesGroup.innerHTML = '';
+        const range = 4;
+
+        for (let i = -range; i <= range; i++) {
+          const ptH1 = applyMatrix(M, [-range, i]);
+          const ptH2 = applyMatrix(M, [range, i]);
+          const sH1 = toScreen(ptH1);
+          const sH2 = toScreen(ptH2);
+
+          const lH = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          lH.setAttribute('x1', sH1[0]); lH.setAttribute('y1', sH1[1]);
+          lH.setAttribute('x2', sH2[0]); lH.setAttribute('y2', sH2[1]);
+          lH.setAttribute('stroke', i === 0 ? 'rgba(231,235,243,0.3)' : 'rgba(231,235,243,0.08)');
+          lH.setAttribute('stroke-width', i === 0 ? '1.5' : '1');
+          gridLinesGroup.appendChild(lH);
+
+          const ptV1 = applyMatrix(M, [i, -range]);
+          const ptV2 = applyMatrix(M, [i, range]);
+          const sV1 = toScreen(ptV1);
+          const sV2 = toScreen(ptV2);
+
+          const lV = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          lV.setAttribute('x1', sV1[0]); lV.setAttribute('y1', sV1[1]);
+          lV.setAttribute('x2', sV2[0]); lV.setAttribute('y2', sV2[1]);
+          lV.setAttribute('stroke', i === 0 ? 'rgba(231,235,243,0.3)' : 'rgba(231,235,243,0.08)');
+          lV.setAttribute('stroke-width', i === 0 ? '1.5' : '1');
+          gridLinesGroup.appendChild(lV);
+        }
+      }
+
+      function update() {
+        const B = matrixPresets[selectB.value];
+        const A = matrixPresets[selectA.value];
+        const AB = multiplyMatrices(A, B);
+        const BA = multiplyMatrices(B, A);
+
+        mBDisplay.textContent = formatMatrix(B);
+        mADisplay.textContent = formatMatrix(A);
+        mAbDisplay.textContent = formatMatrix(AB);
+        mBaDisplay.textContent = formatMatrix(BA);
+
+        const progress = parseFloat(stepSlider.value);
+        let currentM;
+        const identity = [1, 0, 0, 1];
+
+        if (progress <= 1) {
+          currentM = interpolateMatrix(identity, B, progress);
+          stepVal.textContent = progress < 0.05 ? 'State 0 (Identity)' : 'Transition to B';
+        } else {
+          currentM = interpolateMatrix(B, AB, progress - 1);
+          stepVal.textContent = progress >= 1.95 ? 'State 2 (Final AB)' : 'Transition B → AB';
+        }
+
+        renderGrid(currentM);
+
+        const sqPts = [[0,0], [1,0], [1,1], [0,1]].map(p => toScreen(applyMatrix(currentM, p)));
+        unitSquare.setAttribute('points', sqPts.map(p => `${p[0]},${p[1]}`).join(' '));
+
+        const sI = toScreen(applyMatrix(currentM, [1,0]));
+        const sJ = toScreen(applyMatrix(currentM, [0,1]));
+        const sO = toScreen([0,0]);
+
+        vecIhat.setAttribute('x1', sO[0]); vecIhat.setAttribute('y1', sO[1]);
+        vecIhat.setAttribute('x2', sI[0]); vecIhat.setAttribute('y2', sI[1]);
+
+        vecJhat.setAttribute('x1', sO[0]); vecJhat.setAttribute('y1', sO[1]);
+        vecJhat.setAttribute('x2', sJ[0]); vecJhat.setAttribute('y2', sJ[1]);
+
+        const vSample = [1, 1];
+        const sV = toScreen(applyMatrix(currentM, vSample));
+        vecV.setAttribute('x1', sO[0]); vecV.setAttribute('y1', sO[1]);
+        vecV.setAttribute('x2', sV[0]); vecV.setAttribute('y2', sV[1]);
+        pointV.setAttribute('cx', sV[0]); pointV.setAttribute('cy', sV[1]);
+
+        if (showCompare) {
+          unitSquareBa.style.display = '';
+          vecVBa.style.display = '';
+          cardBaWrap.style.display = '';
+
+          const sqPtsBa = [[0,0], [1,0], [1,1], [0,1]].map(p => toScreen(applyMatrix(BA, p)));
+          unitSquareBa.setAttribute('points', sqPtsBa.map(p => `${p[0]},${p[1]}`).join(' '));
+
+          const sVBa = toScreen(applyMatrix(BA, vSample));
+          vecVBa.setAttribute('x1', sO[0]); vecVBa.setAttribute('y1', sO[1]);
+          vecVBa.setAttribute('x2', sVBa[0]); vecVBa.setAttribute('y2', sVBa[1]);
+        } else {
+          unitSquareBa.style.display = 'none';
+          vecVBa.style.display = 'none';
+        }
+      }
+
+      function animate() {
+        if (isAnimating) return;
+        isAnimating = true;
+        playBtn.classList.add('active');
+        stepSlider.value = 0;
+
+        let startTime = null;
+        const duration = 2200;
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          let p = (elapsed / duration) * 2;
+
+          if (p >= 2) {
+            p = 2;
+            isAnimating = false;
+            playBtn.classList.remove('active');
+          } else {
+            animFrameId = requestAnimationFrame(step);
+          }
+
+          stepSlider.value = p;
+          update();
+        }
+
+        animFrameId = requestAnimationFrame(step);
+      }
+
+      selectB.addEventListener('change', update);
+      selectA.addEventListener('change', update);
+      stepSlider.addEventListener('input', () => {
+        if (isAnimating) {
+          cancelAnimationFrame(animFrameId);
+          isAnimating = false;
+          playBtn.classList.remove('active');
+        }
+        update();
+      });
+
+      playBtn.addEventListener('click', animate);
+
+      compareBtn.addEventListener('click', () => {
+        showCompare = !showCompare;
+        if (showCompare) {
+          compareBtn.classList.add('active');
+          stepSlider.value = 2;
+        } else {
+          compareBtn.classList.remove('active');
+        }
+        update();
+      });
+
+      update();
+    })();
+  </script>
+</body>
+</html>
