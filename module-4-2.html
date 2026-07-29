@@ -198,6 +198,14 @@
           <li>When an AI framework computes the gradient of a loss that contains a soft-max, which of these three rules is applied most often?</li>
           <li>Show that the quotient rule can be derived from the product rule by writing $\frac{u}{v}=u\cdot v^{-1}$ and using the power rule on $v^{-1}$.</li>
         </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content"><ol>
+            <li>Both factors change. One term measures the change in $u$ while $v$ is held, and the other measures the change in $v$ while $u$ is held.</li>
+            <li>The chain rule is used most often because softmax is nested inside the larger loss function; product and quotient rules may appear inside that chain.</li>
+            <li>Differentiate $uv^{-1}$: $u'v^{-1}+u(-v^{-2}v')=\frac{u'v-uv'}{v^2}$.</li>
+          </ol></div>
+        </details>
       </div>
     </section>
 
