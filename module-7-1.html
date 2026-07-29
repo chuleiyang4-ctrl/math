@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how freezing every variable but one lets you measure the slope of a multivariable function along a single direction.">
+  <title>Partial Derivatives — Slicing Multivariable Functions | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #partialDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #partialDial .pt-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #partialDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #partialDial .pt-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #partialDial .pt-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #partialDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #partialDial .pt-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #partialDial .pt-readout span.k {
+      color: var(--ink-faint);
+    }
+    #partialDial .pt-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #partialDial .pt-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="7.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 7 · Lesson 7.1</p>
+      <h1>Partial Derivatives — Slicing Multivariable Functions</h1>
+      <p class="lesson-summary">
+        Freeze every variable but one to measure a multivariable function's slope along a single direction at a time.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Standing on a hillside, "how steep is it here?" doesn't have one answer —
+        walking north might be a gentle climb while walking east is a steep drop. A
+        function of two variables, like terrain height $h(x, y)$, works the same way:
+        there's no single slope, only a slope in each specific direction you might
+        walk.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A partial derivative answers "how steep, in exactly this one direction?" by
+          freezing every other variable as if it were a fixed constant, then
+          differentiating normally. $\frac{\partial h}{\partial x}$ treats $y$ as
+          locked in place and measures the slope as $x$ alone changes;
+          $\frac{\partial h}{\partial y}$ does the reverse, freezing $x$ and measuring
+          the slope as $y$ alone changes.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A hill sliced along one axis to reveal its slope">
+            <path d="M 15 100 Q 80 20 145 100" stroke="#565f78" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+            <path d="M 15 85 Q 80 15 145 85" stroke="#e8b95f" stroke-width="2" fill="none"/>
+            <circle cx="105" cy="45" r="4" fill="#7ee0a8"/>
+            <line x1="90" y1="55" x2="120" y2="35" stroke="#5fd4e8" stroke-width="2"/>
+            <text x="80" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">slice along x, y frozen</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Terrain height function</span><span class="r">h(x,y) = 10 − 0.5x² − 0.3y²</span></div>
+          <div class="row"><span class="l">∂h/∂x (freeze y)</span><span class="r">−x</span></div>
+          <div class="row"><span class="l">∂h/∂y (freeze x)</span><span class="r">−0.6y</span></div>
+          <div class="row"><span class="l">At point (2, 3): ∂h/∂x</span><span class="r">−2</span></div>
+          <div class="row"><span class="l">At point (2, 3): ∂h/∂y</span><span class="r">−0.6(3) = −1.8</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">steeper descent along x (−2) than along y (−1.8)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        The terrain's $y$-coordinate is frozen at 2. Slide $x$ to move along that
+        single slice of the hill, and watch the tangent line show the slope,
+        $\partial h/\partial x$, at that exact spot.
+      </p>
+      <div class="interactive-card">
+        <div id="partialDial">
+          <div class="pt-graph-wrap">
+            <svg id="ptSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A slice of a hill with a tangent line showing the partial derivative at a point">
+              <line x1="20" y1="200" x2="300" y2="200" stroke="#565f78" stroke-width="1"/>
+              <line x1="160" y1="200" x2="160" y2="15" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <text x="292" y="212" class="pt-label">x</text>
+              <text x="26" y="22" class="pt-label">h</text>
+              <path id="ptCurve" d="" stroke="#e8b95f" stroke-width="2.5" fill="none"/>
+              <line id="ptTangent" x1="0" y1="0" x2="0" y2="0" stroke="#5fd4e8" stroke-width="2" stroke-dasharray="4 3"/>
+              <circle id="ptPoint" cx="0" cy="0" r="5" fill="#7ee0a8"/>
+            </svg>
+          </div>
+          <div class="pt-controls">
+            <label>
+              Position x (y frozen at 2)
+              <input type="range" id="ptSlider" min="-4" max="4" step="0.1" value="0">
+            </label>
+          </div>
+          <div class="pt-readout">
+            <span><span class="k">x =</span> <strong id="ptX">0.0</strong></span>
+            <span><span class="k">h(x, 2) =</span> <strong id="ptH">8.80</strong></span>
+            <span><span class="k">∂h/∂x =</span> <strong id="ptSlope">0.0</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \frac{\partial f}{\partial x} = \lim_{h\to 0} \frac{f(x+h,\, y) - f(x,\, y)}{h} $$</div>
+      <p>
+        This is the ordinary derivative limit, with one change: $y$ never moves. Only
+        $x$ gets nudged by the tiny step $h$, so whatever slope comes out reflects
+        movement in the $x$-direction alone.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\partial f/\partial x$</span><span class="legend-text">The partial derivative — slope of $f$ in the $x$-direction only</span></div>
+        <div class="legend-item"><span class="legend-sym">$f(x+h,y)$</span><span class="legend-text">The function's value after a tiny nudge in $x$ alone</span></div>
+        <div class="legend-item"><span class="legend-sym">$h$</span><span class="legend-text">A tiny step size in the $x$-direction (not to be confused with terrain height)</span></div>
+        <div class="legend-item"><span class="legend-sym">$y$ held fixed</span><span class="legend-text">Every other variable stays frozen while the limit is taken</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Could $\partial h/\partial x$ be positive while $\partial h/\partial y$ is negative at the exact same point on a terrain map? What would that say about the shape of the terrain there?</li>
+          <li>Predict: standing at the very peak of a hill, like the origin in this lesson's terrain function, what would you expect both $\partial h/\partial x$ and $\partial h/\partial y$ to equal there, and why?</li>
+          <li>A partial derivative only tells you the slope along one specific axis. What information would you be missing if you wanted to know the single steepest direction to walk, rather than just the slope along x or along y?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Yes — the terrain could be rising as you move in the x-direction while simultaneously falling as you move in the y-direction at that same point, which happens naturally on a tilted or saddle-shaped surface.</li>
+              <li>Both should equal zero. At the very peak, the terrain is momentarily flat in every direction since it's a local maximum, so the tangent slice in either single direction has no slope there.</li>
+              <li>You'd be missing the slopes in every direction besides the x- and y-axes. Partial derivatives alone don't reveal which combined direction gives the steepest climb — that requires combining them into a single gradient vector, which is exactly the next step.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('ptSlider');
+      var curve = document.getElementById('ptCurve');
+      var tangent = document.getElementById('ptTangent');
+      var point = document.getElementById('ptPoint');
+
+      var xLabel = document.getElementById('ptX');
+      var hLabel = document.getElementById('ptH');
+      var slopeLabel = document.getElementById('ptSlope');
+
+      var originX = 160, originY = 200;
+      var scaleX = 35, scaleY = 18;
+      var yFixed = 2;
+
+      function h(x) { return 10 - 0.5 * x * x - 0.3 * yFixed * yFixed; }
+      function slope(x) { return -x; }
+
+      function toPx(x, y) {
+        return { px: originX + x * scaleX, py: originY - y * scaleY };
+      }
+
+      function render() {
+        var x = parseFloat(slider.value);
+        xLabel.textContent = x.toFixed(1);
+        hLabel.textContent = h(x).toFixed(2);
+        slopeLabel.textContent = slope(x).toFixed(2);
+
+        var pts = [];
+        for (var t = -4; t <= 4; t += 0.2) {
+          var p = toPx(t, h(t));
+          pts.push(p.px.toFixed(1) + ',' + p.py.toFixed(1));
+        }
+        curve.setAttribute('d', 'M ' + pts.join(' L '));
+
+        var m = slope(x);
+        var y0 = h(x);
+        var half = 1.2;
+        var p1 = toPx(x - half, y0 - m * half);
+        var p2 = toPx(x + half, y0 + m * half);
+        tangent.setAttribute('x1', p1.px.toFixed(1));
+        tangent.setAttribute('y1', p1.py.toFixed(1));
+        tangent.setAttribute('x2', p2.px.toFixed(1));
+        tangent.setAttribute('y2', p2.py.toFixed(1));
+
+        var pc = toPx(x, y0);
+        point.setAttribute('cx', pc.px.toFixed(1));
+        point.setAttribute('cy', pc.py.toFixed(1));
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

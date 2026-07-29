@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how bundling partial derivatives into a single vector points you directly toward the steepest uphill direction.">
+  <title>The Gradient — Finding the Steepest Direction | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #gradDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #gradDial .gd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #gradDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #gradDial .gd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #gradDial .gd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #gradDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #gradDial .gd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #gradDial .gd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #gradDial .gd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #gradDial .gd-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="7.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 7 · Lesson 7.2</p>
+      <h1>The Gradient — Finding the Steepest Direction</h1>
+      <p class="lesson-summary">
+        Bundle the partial derivatives together into a single vector that points directly toward the steepest uphill direction.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Knowing the slope along x and the slope along y separately is useful, but
+        neither one alone tells you the single best direction to walk if you want to
+        climb as fast as possible. Combine them into one vector, and that vector does
+        exactly that: it points in the steepest uphill direction, and its length tells
+        you just how steep that climb is.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          The gradient $\nabla f$ is simply the two partial derivatives packaged
+          together as a vector, $\left(\frac{\partial f}{\partial x},
+          \frac{\partial f}{\partial y}\right)$. On a contour map, this vector always
+          points perpendicular to the contour lines, straight toward higher elevation
+          — which is exactly why hiking trails that hug a single elevation always run
+          perpendicular to the gradient at every point.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A gradient arrow pointing uphill, perpendicular to a contour line">
+            <ellipse cx="80" cy="65" rx="55" ry="35" fill="none" stroke="#9098ae" stroke-width="1" stroke-dasharray="3 2"/>
+            <ellipse cx="80" cy="65" rx="30" ry="19" fill="none" stroke="#9098ae" stroke-width="1" stroke-dasharray="3 2"/>
+            <circle cx="118" cy="76" r="4" fill="#7ee0a8"/>
+            <line x1="118" y1="76" x2="92" y2="66" stroke="#5fd4e8" stroke-width="2" marker-end="url(#gArrow)"/>
+            <defs>
+              <marker id="gArrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/>
+              </marker>
+            </defs>
+            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">∇h points toward the peak</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Terrain height function</span><span class="r">h(x,y) = 10 − 0.5x² − 0.3y²</span></div>
+          <div class="row"><span class="l">Gradient ∇h</span><span class="r">(−x, −0.6y)</span></div>
+          <div class="row"><span class="l">At point (2, 3)</span><span class="r">∇h = (−2, −1.8)</span></div>
+          <div class="row"><span class="l">Magnitude |∇h|</span><span class="r">√(2² + 1.8²) ≈ 2.69</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">steepest ascent points toward (2, 1.8), slope ≈ 2.69</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        The dashed ellipses are contour lines of the same terrain, each one a
+        constant-elevation ring. Slide the point along $y = 2$ and watch the gradient
+        arrow — it always points inward, perpendicular to the local contour, straight
+        toward the peak.
+      </p>
+      <div class="interactive-card">
+        <div id="gradDial">
+          <div class="gd-graph-wrap">
+            <svg id="gdSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A gradient arrow on a contour map, always pointing toward the peak">
+              <defs>
+                <marker id="gdArrow" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#5fd4e8"/>
+                </marker>
+              </defs>
+              <ellipse cx="160" cy="110" rx="36" ry="47" fill="none" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <ellipse cx="160" cy="110" rx="57" ry="74" fill="none" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <ellipse cx="160" cy="110" rx="72" ry="93" fill="none" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <circle cx="160" cy="110" r="3" fill="#e8b95f"/>
+              <line x1="20" y1="74" x2="300" y2="74" stroke="#565f78" stroke-width="1" stroke-dasharray="2 4"/>
+              <line id="gdArrowLine" x1="160" y1="74" x2="160" y2="52" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#gdArrow)"/>
+              <circle id="gdPoint" cx="160" cy="74" r="5" fill="#7ee0a8"/>
+            </svg>
+          </div>
+          <div class="gd-controls">
+            <label>
+              Position x (y frozen at 2)
+              <input type="range" id="gdSlider" min="-4" max="4" step="0.1" value="2">
+            </label>
+          </div>
+          <div class="gd-readout">
+            <span><span class="k">point =</span> <strong id="gdPos">(2.0, 2.0)</strong></span>
+            <span><span class="k">∇h =</span> <strong id="gdGrad">(−2.0, −1.2)</strong></span>
+            <span><span class="k">|∇h| =</span> <strong id="gdMag">2.33</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \nabla f = \left(\frac{\partial f}{\partial x},\, \frac{\partial f}{\partial y}\right) $$</div>
+      <p>
+        The gradient is nothing more than the two partial derivatives, bundled into a
+        vector. Its direction is the steepest way uphill at that point; its magnitude
+        is exactly how steep that climb is.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\nabla f$</span><span class="legend-text">The gradient vector, combining both partial derivatives</span></div>
+        <div class="legend-item"><span class="legend-sym">$\partial f/\partial x,\ \partial f/\partial y$</span><span class="legend-text">The two components bundled together</span></div>
+        <div class="legend-item"><span class="legend-sym">direction of $\nabla f$</span><span class="legend-text">Points toward the steepest increase</span></div>
+        <div class="legend-item"><span class="legend-sym">$|\nabla f|$</span><span class="legend-text">Magnitude — how steep that steepest climb actually is</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>On a contour map, hiking trails that run exactly perpendicular to the gradient arrows stay at constant elevation. Why does moving perpendicular to the gradient never change your height?</li>
+          <li>Predict: at a point where the gradient vector has magnitude 0, what does that say about the terrain there? (Connect this back to Lesson 7.1's peak example.)</li>
+          <li>If you always walked in the exact direction the negative gradient points, rather than the gradient itself, where would you eventually end up on this lesson's terrain?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>The gradient points in the direction of maximum increase, so any direction perpendicular to it has zero component along that increase — moving along a contour line, by definition, keeps your height exactly unchanged.</li>
+              <li>A magnitude of 0 means every partial derivative is 0 at that point too, so the terrain is flat in every direction — exactly matching Lesson 7.1's peak, where both partials vanished at the local maximum.</li>
+              <li>Walking against the gradient always moves you downhill as steeply as possible, so you'd eventually settle at the lowest point in that region — moving away from the peak rather than toward it.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('gdSlider');
+      var arrowLine = document.getElementById('gdArrowLine');
+      var point = document.getElementById('gdPoint');
+
+      var posLabel = document.getElementById('gdPos');
+      var gradLabel = document.getElementById('gdGrad');
+      var magLabel = document.getElementById('gdMag');
+
+      var originX = 160, originY = 110;
+      var scale = 18;
+      var yFixed = 2;
+
+      function toPx(x, y) {
+        return { px: originX + x * scale, py: originY - y * scale };
+      }
+
+      function render() {
+        var x = parseFloat(slider.value);
+        var gx = -x;
+        var gy = -0.6 * yFixed;
+        var mag = Math.sqrt(gx * gx + gy * gy);
+
+        posLabel.textContent = '(' + x.toFixed(1) + ', ' + yFixed.toFixed(1) + ')';
+        gradLabel.textContent = '(' + gx.toFixed(2) + ', ' + gy.toFixed(2) + ')';
+        magLabel.textContent = mag.toFixed(2);
+
+        var start = toPx(x, yFixed);
+        var end = toPx(x + gx, yFixed + gy);
+
+        point.setAttribute('cx', start.px.toFixed(1));
+        point.setAttribute('cy', start.py.toFixed(1));
+        arrowLine.setAttribute('x1', start.px.toFixed(1));
+        arrowLine.setAttribute('y1', start.py.toFixed(1));
+        arrowLine.setAttribute('x2', end.px.toFixed(1));
+        arrowLine.setAttribute('y2', end.py.toFixed(1));
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
