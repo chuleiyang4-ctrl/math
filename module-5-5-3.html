@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how adding infinitely many shrinking pieces can still add up to a single finite number.">
+  <title>Sequences & Series — Infinite Sums & Convergence | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #seriesDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #seriesDial .sd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #seriesDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #seriesDial .sd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #seriesDial .sd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #seriesDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #seriesDial .sd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #seriesDial .sd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #seriesDial .sd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #seriesDial .sd-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="5.5.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 5.5 · Lesson 5.5.3</p>
+      <h1>Sequences &amp; Series — Infinite Sums &amp; Convergence</h1>
+      <p class="lesson-summary">
+        Discover how adding infinitely many shrinking pieces can still settle on a single finite total, instead of growing forever.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Walk halfway to a wall. Then walk half of what's left. Then half of what's
+        left after that. You take infinitely many steps, yet you never overshoot the
+        wall — and the total distance walked settles on one exact number. That's the
+        heart of an infinite series: adding endlessly many terms that shrink fast
+        enough to add up to something finite.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A sequence is just an ordered list of numbers, one per index $n$. A series
+          is what you get by adding the sequence's terms together, one after another.
+          The running total after $n$ terms is called a partial sum, $S_n$. If those
+          partial sums approach a specific number as $n$ grows, the series
+          <strong>converges</strong> to that number; if the partial sums grow without
+          bound instead, the series <strong>diverges</strong>.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A shrinking sequence of pieces filling toward a wall">
+            <rect x="15" y="55" width="130" height="20" fill="none" stroke="#565f78" stroke-width="1"/>
+            <rect x="15" y="55" width="65" height="20" fill="#5fd4e8" fill-opacity="0.4"/>
+            <rect x="80" y="55" width="32.5" height="20" fill="#e8b95f" fill-opacity="0.5"/>
+            <rect x="112.5" y="55" width="16.25" height="20" fill="#7ee0a8" fill-opacity="0.6"/>
+            <line x1="145" y1="45" x2="145" y2="85" stroke="#9098ae" stroke-width="2"/>
+            <text x="80" y="100" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">½ + ¼ + ⅛ + ... → 1</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Terms</span><span class="r">1/2, 1/4, 1/8, 1/16</span></div>
+          <div class="row"><span class="l">Partial sum after 4 terms</span><span class="r">15/16 = 0.9375</span></div>
+          <div class="row"><span class="l">Formula: a / (1 − r)</span><span class="r">(1/2) / (1 − 1/2)</span></div>
+          <div class="row"><span class="l">Simplify</span><span class="r">(1/2) / (1/2)</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Sum converges to 1</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide to add more terms of $\tfrac{1}{2} + \tfrac{1}{4} + \tfrac{1}{8} + \cdots$
+        to the number line. Each new piece fills half of whatever gap remains — watch
+        the total creep toward 1 without ever quite reaching it.
+      </p>
+      <div class="interactive-card">
+        <div id="seriesDial">
+          <div class="sd-graph-wrap">
+            <svg id="sdSvg" viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A number line filling with shrinking pieces approaching one">
+              <rect x="20" y="55" width="280" height="26" fill="none" stroke="#565f78" stroke-width="1"/>
+              <line x1="20" y1="45" x2="20" y2="91" stroke="#565f78" stroke-width="1"/>
+              <text x="17" y="105" class="sd-label">0</text>
+              <line id="sdLimit" x1="300" y1="45" x2="300" y2="91" stroke="#9098ae" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <text x="296" y="105" class="sd-label">1</text>
+              <g id="sdBars"></g>
+            </svg>
+          </div>
+          <div class="sd-controls">
+            <label>
+              Number of terms n
+              <input type="range" id="sdSlider" min="1" max="14" step="1" value="4">
+            </label>
+          </div>
+          <div class="sd-readout">
+            <span><span class="k">n =</span> <strong id="sdN">4</strong></span>
+            <span><span class="k">partial sum Sₙ =</span> <strong id="sdSum">0.9375</strong></span>
+            <span><span class="k">gap remaining =</span> <strong id="sdGap">0.0625</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \sum_{n=1}^{\infty} a\,r^{\,n-1} = \frac{a}{1-r}, \qquad |r| < 1 $$</div>
+      <p>
+        This is the geometric series formula. Every term is the previous term
+        multiplied by the same ratio $r$. As long as that ratio's size is less than
+        1 — meaning each new piece is smaller than the last — the infinite sum settles
+        on the finite value $a/(1-r)$ instead of growing forever.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a$</span><span class="legend-text">The first term of the series</span></div>
+        <div class="legend-item"><span class="legend-sym">$r$</span><span class="legend-text">The common ratio between one term and the next</span></div>
+        <div class="legend-item"><span class="legend-sym">$|r| < 1$</span><span class="legend-text">The condition required for the infinite sum to converge</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sum_{n=1}^{\infty}$</span><span class="legend-text">Add up every term, starting at $n=1$ and continuing forever</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Predict what happens to the partial sums if the ratio were $r = 1.5$ instead of $r = 0.5$ — terms growing instead of shrinking. Would the series still converge?</li>
+          <li>Compound interest sums up many small interest payments over a large number of periods. Why might treating that as an infinite series of shrinking contributions still give a very accurate approximation?</li>
+          <li>Using the pattern from the worked example, predict the sum of $1 + \tfrac{1}{3} + \tfrac{1}{9} + \tfrac{1}{27} + \cdots$ without computing several partial sums by hand.</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>No — with $r = 1.5$, each term is larger than the one before, so the partial sums keep growing without bound. The formula $a/(1-r)$ only applies when $|r| < 1$; outside that range the series diverges.</li>
+              <li>As the number of compounding periods grows very large, each individual period's contribution to the total becomes tiny, behaving like the shrinking terms of a convergent series — so the infinite-sum formula closely tracks the true, very-large-but-finite total.</li>
+              <li>Using $a/(1-r)$ with $a=1$ and $r=1/3$ gives $1 / (1 - 1/3) = 1 / (2/3) = 1.5$.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('sdSlider');
+      var barsGroup = document.getElementById('sdBars');
+      var nLabel = document.getElementById('sdN');
+      var sumLabel = document.getElementById('sdSum');
+      var gapLabel = document.getElementById('sdGap');
+
+      var startX = 20, barY = 55, barWidth = 280, barHeight = 26;
+      var colors = ['#5fd4e8', '#e8b95f', '#7ee0a8'];
+
+      function svgNS(tag) {
+        return document.createElementNS('http://www.w3.org/2000/svg', tag);
+      }
+
+      function render() {
+        var n = parseInt(slider.value, 10);
+        nLabel.textContent = n;
+
+        while (barsGroup.firstChild) {
+          barsGroup.removeChild(barsGroup.firstChild);
+        }
+
+        var cumulative = 0;
+        for (var i = 1; i <= n; i++) {
+          var term = Math.pow(0.5, i);
+          var x = startX + cumulative * barWidth;
+          var w = term * barWidth;
+
+          var rect = svgNS('rect');
+          rect.setAttribute('x', x.toFixed(1));
+          rect.setAttribute('y', barY);
+          rect.setAttribute('width', Math.max(0.4, w - 0.6).toFixed(1));
+          rect.setAttribute('height', barHeight);
+          rect.setAttribute('fill', colors[(i - 1) % colors.length]);
+          rect.setAttribute('fill-opacity', '0.45');
+          rect.setAttribute('stroke', colors[(i - 1) % colors.length]);
+          rect.setAttribute('stroke-width', '0.75');
+          barsGroup.appendChild(rect);
+
+          cumulative += term;
+        }
+
+        var gap = Math.pow(0.5, n);
+        sumLabel.textContent = cumulative.toFixed(4);
+        gapLabel.textContent = gap.toFixed(4);
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

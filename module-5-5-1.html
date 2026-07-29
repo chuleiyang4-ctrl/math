@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how a parameter like time can drive both x and y at once, letting a single dot trace out any path — including curves that loop or double back.">
+  <title>Parametric Equations — Tracing Motion with a Parameter | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #paramDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #paramDial .pd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #paramDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #paramDial .pd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #paramDial .pd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #paramDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #paramDial .pd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #paramDial .pd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #paramDial .pd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #paramDial .pd-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="5.5.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 5.5 · Lesson 5.5.1</p>
+      <h1>Parametric Equations — Tracing Motion with a Parameter</h1>
+      <p class="lesson-summary">
+        Drive both x and y from a single parameter like time, so one dot can trace out any path — even ones an ordinary function could never draw.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        An ordinary function $y = f(x)$ can only assign one $y$ to each $x$ — it can
+        never loop back or cross itself. But real motion doesn't work that way. A
+        thrown ball's horizontal and vertical positions both depend on the same clock,
+        time, and tracking that shared clock is exactly what a parameter does.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          In a parametric equation, both $x$ and $y$ are separate functions of a third
+          variable $t$, the parameter. As $t$ ticks forward, the point
+          $\big(x(t), y(t)\big)$ moves, tracing out a path. The parameter doesn't have
+          to be time, but time is the most natural way to picture it: press play, and
+          the dot moves.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A parabolic projectile path traced from launch to landing">
+            <line x1="15" y1="110" x2="150" y2="110" stroke="#565f78" stroke-width="1"/>
+            <line x1="15" y1="110" x2="15" y2="15" stroke="#565f78" stroke-width="1"/>
+            <path d="M 15 110 Q 82 15 149 110" stroke="#e8b95f" stroke-width="2" fill="none"/>
+            <circle cx="82" cy="40" r="4" fill="#7ee0a8"/>
+            <text x="82" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#7ee0a8">t=2</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Position functions</span><span class="r">x(t)=10t, y(t)=20t−5t²</span></div>
+          <div class="row"><span class="l">At t = 1</span><span class="r">(10, 15)</span></div>
+          <div class="row"><span class="l">At t = 2</span><span class="r">(20, 20)</span></div>
+          <div class="row"><span class="l">Landing: solve y(t)=0</span><span class="r">t = 4</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">position at t=2 is (20, 20)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide $t$ forward to watch the projectile's position trace its path. The trail
+        behind the dot shows everywhere it has already been.
+      </p>
+      <div class="interactive-card">
+        <div id="paramDial">
+          <div class="pd-graph-wrap">
+            <svg id="pdSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A dot tracing a projectile trajectory as the parameter t increases">
+              <line x1="20" y1="200" x2="300" y2="200" stroke="#565f78" stroke-width="1"/>
+              <line x1="20" y1="200" x2="20" y2="15" stroke="#565f78" stroke-width="1"/>
+              <text x="292" y="212" class="pd-label">x</text>
+              <text x="26" y="22" class="pd-label">y</text>
+              <path id="pdTrail" d="" stroke="#e8b95f" stroke-width="2.5" fill="none"/>
+              <circle id="pdDot" cx="20" cy="200" r="5" fill="#7ee0a8"/>
+            </svg>
+          </div>
+          <div class="pd-controls">
+            <label>
+              Parameter t
+              <input type="range" id="pdSlider" min="0" max="4" step="0.05" value="0">
+            </label>
+          </div>
+          <div class="pd-readout">
+            <span><span class="k">t =</span> <strong id="pdT">0.00</strong></span>
+            <span><span class="k">x(t) =</span> <strong id="pdXVal">0.0</strong></span>
+            <span><span class="k">y(t) =</span> <strong id="pdYVal">0.0</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \vec{r}(t) = \big\langle x(t),\, y(t) \big\rangle $$</div>
+      <p>
+        A parametric curve is really a pair of ordinary functions of $t$, packaged
+        together as a single position at each instant. Reading $x(t)$ and $y(t)$
+        separately tells you the horizontal and vertical motion; reading them together
+        tells you where the point actually is on the plane.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$t$</span><span class="legend-text">The parameter — often time, always increasing steadily</span></div>
+        <div class="legend-item"><span class="legend-sym">$x(t)$</span><span class="legend-text">The horizontal position as a function of the parameter</span></div>
+        <div class="legend-item"><span class="legend-sym">$y(t)$</span><span class="legend-text">The vertical position as a function of the parameter</span></div>
+        <div class="legend-item"><span class="legend-sym">$\vec{r}(t)$</span><span class="legend-text">The combined position at parameter value $t$</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Two different parametrizations could trace out the exact same visual path but reach the halfway point at different values of $t$. What would that difference actually represent physically?</li>
+          <li>A circle can be written parametrically as $x(t)=\cos t$, $y(t)=\sin t$, but never as a single function $y=f(x)$. Why does the parameter make the loop possible when an ordinary function can't?</li>
+          <li>If you solve $x(t)=10t$ for $t$ and substitute into $y(t)=20t-5t^2$, predict what kind of curve shape you'd get in terms of $x$ and $y$ alone.</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>It would represent a difference in speed along the same path — one object moving faster or slower than the other while covering the identical geometric route.</li>
+              <li>A function can only output one $y$ per $x$, but a circle needs two $y$ values for most $x$'s. Since $x(t)$ and $y(t)$ are tracked separately through $t$, the point can pass through the same $x$ twice at different times, which is exactly what a loop requires.</li>
+              <li>Substituting $t = x/10$ gives $y = 20(x/10) - 5(x/10)^2 = 2x - 0.05x^2$, a downward-opening parabola in $x$ and $y$ — matching the projectile arc shape traced in the lab.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('pdSlider');
+      var trail = document.getElementById('pdTrail');
+      var dot = document.getElementById('pdDot');
+
+      var tLabel = document.getElementById('pdT');
+      var xLabel = document.getElementById('pdXVal');
+      var yLabel = document.getElementById('pdYVal');
+
+      var originX = 20, originY = 200;
+      var scaleX = 7;
+      var scaleY = 7;
+
+      function xOf(t) { return 10 * t; }
+      function yOf(t) { return 20 * t - 5 * t * t; }
+
+      function toPx(x, y) {
+        return { px: originX + x * scaleX, py: originY - y * scaleY };
+      }
+
+      function render() {
+        var t = parseFloat(slider.value);
+        tLabel.textContent = t.toFixed(2);
+        xLabel.textContent = xOf(t).toFixed(1);
+        yLabel.textContent = yOf(t).toFixed(1);
+
+        var pts = [];
+        for (var s = 0; s <= t; s += 0.05) {
+          var p = toPx(xOf(s), yOf(s));
+          pts.push(p.px.toFixed(1) + ',' + p.py.toFixed(1));
+        }
+        if (pts.length === 0) {
+          pts.push(toPx(xOf(0), yOf(0)).px.toFixed(1) + ',' + toPx(xOf(0), yOf(0)).py.toFixed(1));
+        }
+        trail.setAttribute('d', 'M ' + pts.join(' L '));
+
+        var dotPos = toPx(xOf(t), yOf(t));
+        dot.setAttribute('cx', dotPos.px.toFixed(1));
+        dot.setAttribute('cy', dotPos.py.toFixed(1));
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
