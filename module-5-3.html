@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See why the area-so-far function's slope is always the original curve, and how that fact unlocks fast, exact evaluation of definite integrals.">
+  <title>The Fundamental Theorem of Calculus | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #ftcDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #ftcDial .fd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #ftcDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #ftcDial .fd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #ftcDial .fd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #ftcDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #ftcDial .fd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #ftcDial .fd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #ftcDial .fd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #ftcDial .fd-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="5.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 5 · Lesson 5.3</p>
+      <h1>The Fundamental Theorem of Calculus</h1>
+      <p class="lesson-summary">
+        Discover why the "area-so-far" function's slope is exactly the original curve — the fact that ties antiderivatives and Riemann sums together.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Imagine sliding a wall rightward across the region under a curve, keeping track
+        of how much area you've swept up so far. Call that running total $A(x)$. As the
+        wall moves one tiny step further right, it sweeps up one thin new sliver of
+        area — and that sliver's height is just the curve's height at that point.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A tiny step forward adds area roughly equal to $f(x)\cdot\Delta x$, so the
+          rate at which $A(x)$ grows is $f(x)$ itself. In other words, $A'(x) = f(x)$ —
+          the area-so-far function is an antiderivative of the curve. That single fact
+          means you never have to grind through a Riemann sum by hand again: find any
+          antiderivative $F$, and the exact definite integral is just $F(b) - F(a)$.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shaded area under a line from one to three">
+            <line x1="15" y1="110" x2="150" y2="110" stroke="#565f78" stroke-width="1"/>
+            <line x1="15" y1="110" x2="15" y2="15" stroke="#565f78" stroke-width="1"/>
+            <polygon points="55,90 55,90 115,50 115,110 55,110" fill="#5fd4e8" fill-opacity="0.3" stroke="none"/>
+            <line x1="15" y1="110" x2="145" y2="30" stroke="#e8b95f" stroke-width="2"/>
+            <line x1="55" y1="112" x2="55" y2="106" stroke="#9098ae" stroke-width="1"/>
+            <line x1="115" y1="112" x2="115" y2="106" stroke="#9098ae" stroke-width="1"/>
+            <text x="55" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">1</text>
+            <text x="115" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">3</text>
+            <text x="80" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#5fd4e8">f(x)=2x</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Integral to evaluate</span><span class="r">∫₁³ 2x dx</span></div>
+          <div class="row"><span class="l">Find an antiderivative</span><span class="r">F(x) = x²</span></div>
+          <div class="row"><span class="l">Evaluate at upper limit</span><span class="r">F(3) = 9</span></div>
+          <div class="row"><span class="l">Evaluate at lower limit</span><span class="r">F(1) = 1</span></div>
+          <div class="row"><span class="l">Subtract</span><span class="r">9 − 1</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">8</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Drag the slider to move the right edge of the shaded region. Watch the top graph's
+        shaded area grow, and watch the bottom graph trace out $A(x)$ — the running area
+        total. The dashed tangent line on the bottom graph always matches the curve's
+        height on the top graph at the same $x$.
+      </p>
+      <div class="interactive-card">
+        <div id="ftcDial">
+          <div class="fd-graph-wrap">
+            <svg id="ftcSvg" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Area-so-far accumulation linked to the original curve">
+              <line x1="20" y1="110" x2="300" y2="110" stroke="#565f78" stroke-width="1"/>
+              <line x1="20" y1="110" x2="20" y2="12" stroke="#565f78" stroke-width="1"/>
+              <text x="24" y="22" class="fd-label">f(t)</text>
+              <polygon id="ftcArea" points="" fill="#5fd4e8" fill-opacity="0.3" stroke="none"/>
+              <path id="ftcCurve" d="" stroke="#e8b95f" stroke-width="2.5" fill="none"/>
+              <circle id="ftcPointTop" cx="0" cy="0" r="3.5" fill="#e8b95f"/>
+
+              <line x1="20" y1="240" x2="300" y2="240" stroke="#565f78" stroke-width="1"/>
+              <line x1="20" y1="240" x2="20" y2="142" stroke="#565f78" stroke-width="1"/>
+              <text x="24" y="152" class="fd-label">A(x) = area so far</text>
+              <path id="ftcAccum" d="" stroke="#5fd4e8" stroke-width="2.5" fill="none"/>
+              <line id="ftcTangent" x1="0" y1="0" x2="0" y2="0" stroke="#7ee0a8" stroke-width="2" stroke-dasharray="4 3"/>
+              <circle id="ftcPointBottom" cx="0" cy="0" r="4" fill="#7ee0a8"/>
+            </svg>
+          </div>
+          <div class="fd-controls">
+            <label>
+              Upper limit x
+              <input type="range" id="ftcSlider" min="0" max="5" step="0.1" value="2">
+            </label>
+          </div>
+          <div class="fd-readout">
+            <span><span class="k">x =</span> <strong id="ftcX">2.0</strong></span>
+            <span><span class="k">f(x) =</span> <strong id="ftcF">2.0</strong></span>
+            <span><span class="k">A(x) =</span> <strong id="ftcA">2.0</strong></span>
+            <span><span class="k">slope of A at x =</span> <strong id="ftcSlope">2.0</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \frac{d}{dx}\int_a^x f(t)\,dt = f(x) \qquad\Longrightarrow\qquad \int_a^b f(x)\,dx = F(b) - F(a) $$</div>
+      <p>
+        The left equation says the area-so-far function's derivative is the original
+        curve. The right equation is the practical payoff: pick any antiderivative $F$
+        of $f$, plug in the two endpoints, and subtract. No rectangles, no limits, no
+        infinite sums required at evaluation time.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a$</span><span class="legend-text">The fixed starting point where the area-so-far count begins</span></div>
+        <div class="legend-item"><span class="legend-sym">$x$</span><span class="legend-text">The moving right edge of the accumulated region</span></div>
+        <div class="legend-item"><span class="legend-sym">$\int_a^x f(t)\,dt$</span><span class="legend-text">The area-so-far function — total area from $a$ up to $x$</span></div>
+        <div class="legend-item"><span class="legend-sym">$F$</span><span class="legend-text">Any antiderivative of $f$, used as a shortcut evaluation tool</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>If two different antiderivatives $F_1$ and $F_2$ of the same $f$ differ by a constant, would $F_1(b) - F_1(a)$ and $F_2(b) - F_2(a)$ give the same answer? Why does the constant not matter here?</li>
+          <li>A physics engine tracks an object's kinetic energy as the area under a force-versus-distance curve. Why would the Fundamental Theorem let it compute total energy without simulating every tiny step?</li>
+          <li>Predict what happens to $A(x)$ on an interval where $f(x)$ is negative. Does the area-so-far total go up, go down, or stay flat there?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Yes, they give the same answer. If $F_2(x) = F_1(x) + C$, then $F_2(b) - F_2(a) = (F_1(b)+C) - (F_1(a)+C) = F_1(b) - F_1(a)$ — the constant cancels out in the subtraction.</li>
+              <li>Because the theorem replaces a step-by-step accumulation with a single evaluation of an antiderivative at two points, turning what would be a costly simulation loop into one fast, exact calculation.</li>
+              <li>It goes down. Since $A'(x) = f(x)$, a negative $f(x)$ means $A(x)$ is decreasing there — each new sliver subtracts from the running total instead of adding to it.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('ftcSlider');
+      var area = document.getElementById('ftcArea');
+      var curve = document.getElementById('ftcCurve');
+      var pointTop = document.getElementById('ftcPointTop');
+      var accum = document.getElementById('ftcAccum');
+      var tangent = document.getElementById('ftcTangent');
+      var pointBottom = document.getElementById('ftcPointBottom');
+
+      var xLabel = document.getElementById('ftcX');
+      var fLabel = document.getElementById('ftcF');
+      var aLabel = document.getElementById('ftcA');
+      var slopeLabel = document.getElementById('ftcSlope');
+
+      var origin1X = 20, origin1Y = 110;
+      var origin2X = 20, origin2Y = 240;
+      var scaleX = 56;
+      var scaleY1 = 20;
+      var scaleY2 = 7.6;
+      var xMin = 0, xMax = 5;
+
+      function f(t) { return t; }
+      function A(x) { return 0.5 * x * x; }
+
+      function toPx1(x, y) {
+        return { px: origin1X + x * scaleX, py: origin1Y - y * scaleY1 };
+      }
+      function toPx2(x, y) {
+        return { px: origin2X + x * scaleX, py: origin2Y - y * scaleY2 };
+      }
+
+      function render() {
+        var x = parseFloat(slider.value);
+        xLabel.textContent = x.toFixed(1);
+        fLabel.textContent = f(x).toFixed(1);
+        aLabel.textContent = A(x).toFixed(2);
+        slopeLabel.textContent = f(x).toFixed(1);
+
+        var topPts = [];
+        for (var t = xMin; t <= xMax; t += 0.1) {
+          var p = toPx1(t, f(t));
+          topPts.push(p.px.toFixed(1) + ',' + p.py.toFixed(1));
+        }
+        curve.setAttribute('d', 'M ' + topPts.join(' L '));
+
+        var areaPts = [toPx1(xMin, 0)];
+        for (var tx = xMin; tx <= x; tx += 0.1) {
+          areaPts.push(toPx1(tx, f(tx)));
+        }
+        areaPts.push(toPx1(x, f(x)));
+        areaPts.push(toPx1(x, 0));
+        area.setAttribute('points', areaPts.map(function (p) { return p.px.toFixed(1) + ',' + p.py.toFixed(1); }).join(' '));
+
+        var pTop = toPx1(x, f(x));
+        pointTop.setAttribute('cx', pTop.px);
+        pointTop.setAttribute('cy', pTop.py);
+
+        var accumPts = [];
+        for (var ax = xMin; ax <= xMax; ax += 0.1) {
+          var p2 = toPx2(ax, A(ax));
+          accumPts.push(p2.px.toFixed(1) + ',' + p2.py.toFixed(1));
+        }
+        accum.setAttribute('d', 'M ' + accumPts.join(' L '));
+
+        var slope = f(x);
+        var y0 = A(x);
+        var half = 0.6;
+        var t1 = toPx2(Math.max(xMin, x - half), y0 - slope * half);
+        var t2 = toPx2(Math.min(xMax, x + half), y0 + slope * half);
+        tangent.setAttribute('x1', t1.px);
+        tangent.setAttribute('y1', t1.py);
+        tangent.setAttribute('x2', t2.px);
+        tangent.setAttribute('y2', t2.py);
+
+        var pBottom = toPx2(x, y0);
+        pointBottom.setAttribute('cx', pBottom.px);
+        pointBottom.setAttribute('cy', pBottom.py);
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

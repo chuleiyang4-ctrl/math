@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how the area between two curves is just one accumulation stacked on top of another, then subtracted.">
+  <title>Area Between Curves | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #betweenDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #betweenDial .bd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #betweenDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #betweenDial .bd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #betweenDial .bd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #betweenDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #betweenDial .bd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #betweenDial .bd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #betweenDial .bd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #betweenDial .bd-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="5.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 5 · Lesson 5.4</p>
+      <h1>Area Between Curves</h1>
+      <p class="lesson-summary">
+        Find the gap between two curves by stacking two separate accumulations and subtracting one from the other.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        You already know how to find the area under one curve. What if you want the
+        area trapped between two curves instead — the strip that sits above one and
+        below the other? There's no new idea needed: run the accumulation once for the
+        top curve, run it again for the bottom curve, and subtract.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          At each thin vertical slice, the strip's height is simply the top curve's
+          value minus the bottom curve's value, $f(x) - g(x)$. Summing those slices
+          from $a$ to $b$ gives the total trapped area. That's exactly the difference
+          between two ordinary definite integrals — one accumulation stacked against
+          another and subtracted.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shaded region between a rising revenue line and a rising cost curve">
+            <line x1="15" y1="110" x2="150" y2="110" stroke="#565f78" stroke-width="1"/>
+            <line x1="15" y1="110" x2="15" y2="15" stroke="#565f78" stroke-width="1"/>
+            <path d="M 15 110 Q 82 15 145 30" stroke="#7ee0a8" stroke-width="2" fill="none"/>
+            <path d="M 15 110 Q 82 95 145 30" stroke="#e8b95f" stroke-width="2" fill="none"/>
+            <path d="M 15 110 Q 82 15 145 30 Q 82 95 15 110 Z" fill="#5fd4e8" fill-opacity="0.25" stroke="none"/>
+            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">revenue above cost</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Revenue &amp; cost</span><span class="r">R(x)=4x, C(x)=x²</span></div>
+          <div class="row"><span class="l">Interval</span><span class="r">0 to 3</span></div>
+          <div class="row"><span class="l">Difference function</span><span class="r">4x − x²</span></div>
+          <div class="row"><span class="l">Antiderivative</span><span class="r">2x² − x³/3</span></div>
+          <div class="row"><span class="l">Evaluate at 3 minus at 0</span><span class="r">(18 − 9) − 0</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Profit area = 9</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide the upper bound to grow the shaded region between the revenue curve
+        (top) and the cost curve (bottom). Watch each accumulation total climb, and
+        see the profit area track their difference.
+      </p>
+      <div class="interactive-card">
+        <div id="betweenDial">
+          <div class="bd-graph-wrap">
+            <svg id="bdSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shaded area between a revenue curve and a cost curve">
+              <line x1="20" y1="200" x2="300" y2="200" stroke="#565f78" stroke-width="1"/>
+              <line x1="20" y1="200" x2="20" y2="15" stroke="#565f78" stroke-width="1"/>
+              <text x="266" y="30" class="bd-label" fill="#7ee0a8">R(x) = 4x</text>
+              <text x="266" y="185" class="bd-label" fill="#e8b95f">C(x) = x²</text>
+              <polygon id="bdArea" points="" fill="#5fd4e8" fill-opacity="0.28" stroke="none"/>
+              <path id="bdTop" d="" stroke="#7ee0a8" stroke-width="2.5" fill="none"/>
+              <path id="bdBottom" d="" stroke="#e8b95f" stroke-width="2.5" fill="none"/>
+            </svg>
+          </div>
+          <div class="bd-controls">
+            <label>
+              Upper bound x
+              <input type="range" id="bdSlider" min="0" max="4" step="0.1" value="3">
+            </label>
+          </div>
+          <div class="bd-readout">
+            <span><span class="k">x =</span> <strong id="bdX">3.0</strong></span>
+            <span><span class="k">revenue area =</span> <strong id="bdRevenue">18.00</strong></span>
+            <span><span class="k">cost area =</span> <strong id="bdCost">9.00</strong></span>
+            <span><span class="k">profit area =</span> <strong id="bdProfit">9.00</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \text{Area} = \int_a^b \big[f(x) - g(x)\big]\,dx $$</div>
+      <p>
+        This holds whenever $f(x) \ge g(x)$ across the whole interval — the top curve
+        never dips below the bottom one. Where that stops being true, the interval
+        needs to be split at the crossing point, since the "top" and "bottom" curves
+        swap roles there.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$f(x)$</span><span class="legend-text">The upper curve on the interval</span></div>
+        <div class="legend-item"><span class="legend-sym">$g(x)$</span><span class="legend-text">The lower curve on the interval</span></div>
+        <div class="legend-item"><span class="legend-sym">$a, b$</span><span class="legend-text">The left and right bounds where the trapped region begins and ends</span></div>
+        <div class="legend-item"><span class="legend-sym">$f(x)-g(x)$</span><span class="legend-text">The height of the thin vertical strip at each point</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Revenue R(x) = 4x and cost C(x) = x² cross again at x = 4. Predict what happens to the shaded "profit area" region as the slider passes x = 4, and why.</li>
+          <li>If a company's cost curve briefly rises above its revenue curve for part of an interval, how should the area-between-curves setup change to still represent a meaningful profit total?</li>
+          <li>Two accumulation totals, revenue area and cost area, both grow as x increases in the worked example. Why can their difference (profit area) still shrink even while both individual totals are growing?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Past x = 4, the cost curve rises above the revenue curve, so C(x) &gt; R(x). The region there represents a loss, not a profit, so simply continuing $\int (R-C)\,dx$ would start subtracting area rather than adding it.</li>
+              <li>The interval should be split at the crossing point, integrating $R(x)-C(x)$ where revenue leads and $C(x)-R(x)$ where cost leads, then combining the pieces — otherwise a loss region would silently cancel out a profit region.</li>
+              <li>Because the difference only shrinks when the cost curve is growing faster than the revenue curve at that stretch — the gap between the two accumulation rates, not their absolute sizes, determines whether the profit area is widening or narrowing.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('bdSlider');
+      var areaPoly = document.getElementById('bdArea');
+      var topCurve = document.getElementById('bdTop');
+      var bottomCurve = document.getElementById('bdBottom');
+
+      var xLabel = document.getElementById('bdX');
+      var revenueLabel = document.getElementById('bdRevenue');
+      var costLabel = document.getElementById('bdCost');
+      var profitLabel = document.getElementById('bdProfit');
+
+      var originX = 20, originY = 200;
+      var scaleX = 70;
+      var scaleY = 10.6;
+      var xMin = 0, xMax = 4;
+
+      function R(x) { return 4 * x; }
+      function C(x) { return x * x; }
+      function revenueArea(x) { return 2 * x * x; }
+      function costArea(x) { return (x * x * x) / 3; }
+
+      function toPx(x, y) {
+        return { px: originX + x * scaleX, py: originY - y * scaleY };
+      }
+
+      function render() {
+        var x = parseFloat(slider.value);
+        xLabel.textContent = x.toFixed(1);
+
+        var rA = revenueArea(x);
+        var cA = costArea(x);
+        revenueLabel.textContent = rA.toFixed(2);
+        costLabel.textContent = cA.toFixed(2);
+        profitLabel.textContent = (rA - cA).toFixed(2);
+
+        var topPts = [], bottomPts = [];
+        for (var t = xMin; t <= xMax; t += 0.1) {
+          var pr = toPx(t, R(t));
+          var pc = toPx(t, C(t));
+          topPts.push(pr.px.toFixed(1) + ',' + pr.py.toFixed(1));
+          bottomPts.push(pc.px.toFixed(1) + ',' + pc.py.toFixed(1));
+        }
+        topCurve.setAttribute('d', 'M ' + topPts.join(' L '));
+        bottomCurve.setAttribute('d', 'M ' + bottomPts.join(' L '));
+
+        var areaTopPts = [];
+        for (var ax = xMin; ax <= x; ax += 0.1) {
+          areaTopPts.push(toPx(ax, R(ax)));
+        }
+        areaTopPts.push(toPx(x, R(x)));
+        var areaBottomPts = [];
+        for (var bx = x; bx >= xMin; bx -= 0.1) {
+          areaBottomPts.push(toPx(bx, C(bx)));
+        }
+        var allPts = areaTopPts.concat(areaBottomPts);
+        areaPoly.setAttribute('points', allPts.map(function (p) { return p.px.toFixed(1) + ',' + p.py.toFixed(1); }).join(' '));
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

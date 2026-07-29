@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See how spinning a flat 2D region around an axis sweeps out a 3D solid, and how stacking thin disks gives its exact volume.">
+  <title>Volumes of Revolution — Slicing 3D Solids | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #revolutionDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #revolutionDial .rv-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #revolutionDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #revolutionDial .rv-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #revolutionDial .rv-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #revolutionDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #revolutionDial .rv-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #revolutionDial .rv-readout span.k {
+      color: var(--ink-faint);
+    }
+    #revolutionDial .rv-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #revolutionDial .rv-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="5.5">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 5 · Lesson 5.5</p>
+      <h1>Volumes of Revolution — Slicing 3D Solids</h1>
+      <p class="lesson-summary">
+        Spin a flat 2D region around an axis to sweep out a 3D solid, then find its exact volume by stacking infinitely thin disks.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Take a flat shape, like the region under a curve, and spin it a full turn
+        around a line. Every point traces out a circle, and the whole flat region
+        sweeps through space to become a solid — a vase, a cone, a lightbulb shape,
+        depending on the curve. To find how much space it fills, slice it back into
+        thin coins.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Each thin slice of the solid is a disk: a flat circle with radius $f(x)$ and
+          a tiny thickness $dx$. A disk's volume is $\pi [f(x)]^2\,dx$ — circle area
+          times thickness. Stack these disks along the axis from $a$ to $b$, and their
+          total volume is the volume of the whole solid. It's the exact same
+          accumulation idea as area under a curve, just measuring circles instead of
+          rectangles.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A cone formed by spinning a line around the horizontal axis">
+            <line x1="15" y1="65" x2="150" y2="65" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+            <path d="M 15 65 L 140 20 L 140 110 Z" fill="#5fd4e8" fill-opacity="0.25" stroke="#e8b95f" stroke-width="2"/>
+            <ellipse cx="140" cy="65" rx="6" ry="45" fill="none" stroke="#e8b95f" stroke-width="1.5"/>
+            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">f(x) = x, spun about the axis</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Curve &amp; interval</span><span class="r">f(x) = x, from 0 to 2</span></div>
+          <div class="row"><span class="l">Disk radius at x</span><span class="r">f(x) = x</span></div>
+          <div class="row"><span class="l">Disk volume element</span><span class="r">π x² dx</span></div>
+          <div class="row"><span class="l">Antiderivative</span><span class="r">π x³/3</span></div>
+          <div class="row"><span class="l">Evaluate at 2 minus at 0</span><span class="r">π(8/3) − 0</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">V = 8π/3 ≈ 8.38</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide to extend how far along the axis the solid has been swept. Each disk
+        stamped onto the axis represents one thin slice, and the running volume total
+        updates as more disks stack up.
+      </p>
+      <div class="interactive-card">
+        <div id="revolutionDial">
+          <div class="rv-graph-wrap">
+            <svg id="rvSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked disks forming a cone as the axis sweep extends">
+              <line x1="20" y1="110" x2="300" y2="110" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <text x="270" y="122" class="rv-label">axis of revolution</text>
+              <g id="rvDisks"></g>
+              <path id="rvProfileTop" d="" stroke="#e8b95f" stroke-width="2" fill="none"/>
+              <path id="rvProfileBottom" d="" stroke="#e8b95f" stroke-width="2" fill="none" stroke-opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="rv-controls">
+            <label>
+              Sweep length x
+              <input type="range" id="rvSlider" min="0" max="4" step="0.1" value="2">
+            </label>
+          </div>
+          <div class="rv-readout">
+            <span><span class="k">x =</span> <strong id="rvX">2.0</strong></span>
+            <span><span class="k">radius f(x) =</span> <strong id="rvR">2.0</strong></span>
+            <span><span class="k">volume so far =</span> <strong id="rvV">8.38</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ V = \pi \int_a^b \big[f(x)\big]^2 \, dx $$</div>
+      <p>
+        This is the disk method: square the radius function to get each disk's
+        circular cross-sectional area, multiply by $\pi$, and accumulate from $a$ to
+        $b$ exactly like any other definite integral. The only new ingredient is that
+        each thin slice is a circle instead of a rectangle.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$f(x)$</span><span class="legend-text">The radius of the disk at position $x$, taken from the generating curve</span></div>
+        <div class="legend-item"><span class="legend-sym">$\pi[f(x)]^2$</span><span class="legend-text">The cross-sectional area of one circular disk</span></div>
+        <div class="legend-item"><span class="legend-sym">$a, b$</span><span class="legend-text">The start and end of the axis segment being swept</span></div>
+        <div class="legend-item"><span class="legend-sym">$V$</span><span class="legend-text">The total volume of the solid formed by revolution</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does the disk method square $f(x)$ instead of just using $f(x)$ directly, the way the area-under-a-curve formula does?</li>
+          <li>A 3D printer builds an object layer by layer, each layer a thin disk of measured radius. How is that physical process the same accumulation idea as the disk method?</li>
+          <li>Predict what happens to the volume formula if the generating curve is doubled to $2f(x)$ instead of $f(x)$. Does the volume double, or change by some other factor?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Because a disk's cross section is a circle, and a circle's area depends on the square of its radius ($\pi r^2$) — squaring $f(x)$ turns the radius into the correct cross-sectional area before accumulating.</li>
+              <li>Each printed layer is a physical disk of known radius and small thickness, and stacking their volumes is exactly the same disk-accumulation idea the integral formalizes — the printer is running the Riemann sum in real material.</li>
+              <li>The volume scales by a factor of 4, not 2. Since the formula squares the radius, doubling $f(x)$ makes $[2f(x)]^2 = 4[f(x)]^2$, quadrupling each disk's area and therefore the total volume.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('rvSlider');
+      var disksGroup = document.getElementById('rvDisks');
+      var profileTop = document.getElementById('rvProfileTop');
+      var profileBottom = document.getElementById('rvProfileBottom');
+
+      var xLabel = document.getElementById('rvX');
+      var rLabel = document.getElementById('rvR');
+      var vLabel = document.getElementById('rvV');
+
+      var originX = 20, originY = 110;
+      var scaleX = 70;
+      var scaleY = 18;
+      var xMin = 0, xMax = 4;
+
+      function f(x) { return x; }
+      function volume(x) { return Math.PI * (x * x * x) / 3; }
+
+      function toPx(x, y) {
+        return { px: originX + x * scaleX, py: originY - y * scaleY };
+      }
+
+      function svgNS(tag) {
+        return document.createElementNS('http://www.w3.org/2000/svg', tag);
+      }
+
+      function render() {
+        var x = parseFloat(slider.value);
+        xLabel.textContent = x.toFixed(1);
+        rLabel.textContent = f(x).toFixed(1);
+        vLabel.textContent = volume(x).toFixed(2);
+
+        var topPts = [], bottomPts = [];
+        for (var t = xMin; t <= xMax; t += 0.1) {
+          var pTop = toPx(t, f(t));
+          var pBottom = toPx(t, -f(t));
+          topPts.push(pTop.px.toFixed(1) + ',' + pTop.py.toFixed(1));
+          bottomPts.push(pBottom.px.toFixed(1) + ',' + pBottom.py.toFixed(1));
+        }
+        profileTop.setAttribute('d', 'M ' + topPts.join(' L '));
+        profileBottom.setAttribute('d', 'M ' + bottomPts.join(' L '));
+
+        while (disksGroup.firstChild) {
+          disksGroup.removeChild(disksGroup.firstChild);
+        }
+
+        var step = 0.2;
+        for (var dx = step; dx <= x + 0.001; dx += step) {
+          var radiusPx = f(dx) * scaleY;
+          var center = toPx(dx, 0);
+          var ellipse = svgNS('ellipse');
+          ellipse.setAttribute('cx', center.px.toFixed(1));
+          ellipse.setAttribute('cy', center.py.toFixed(1));
+          ellipse.setAttribute('rx', 5);
+          ellipse.setAttribute('ry', radiusPx.toFixed(1));
+          ellipse.setAttribute('fill', '#5fd4e8');
+          ellipse.setAttribute('fill-opacity', '0.22');
+          ellipse.setAttribute('stroke', '#5fd4e8');
+          ellipse.setAttribute('stroke-opacity', '0.5');
+          ellipse.setAttribute('stroke-width', '0.75');
+          disksGroup.appendChild(ellipse);
+        }
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
