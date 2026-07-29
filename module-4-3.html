@@ -231,6 +231,14 @@
           <li>If a network has three layers, how many multiplications does the chain rule perform to obtain the gradient of the loss with respect to the first layer’s weights?</li>
           <li>What happens to the composite derivative when one of the intermediate gears has derivative zero at the current point?</li>
         </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content"><ol>
+            <li>The outer function receives $g(x)$ as its actual input, so its local rate of change must be measured at that value.</li>
+            <li>It multiplies the local derivative contributions along the full path from the first layer through the remaining layers to the loss—one factor for each link.</li>
+            <li>The product becomes zero along that path, so the gradient cannot flow through that intermediate step at the current point.</li>
+          </ol></div>
+        </details>
       </div>
     </section>
 
