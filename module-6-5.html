@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover the special directions a matrix only stretches or shrinks, never rotates — and why those directions matter for describing data.">
+  <title>Eigenvectors & Eigenvalues — Directions That Don't Turn | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #eigenDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #eigenDial .eg-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #eigenDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #eigenDial .eg-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #eigenDial .eg-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #eigenDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #eigenDial .eg-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #eigenDial .eg-readout span.k {
+      color: var(--ink-faint);
+    }
+    #eigenDial .eg-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #eigenDial .eg-readout strong.eg-hit {
+      color: var(--amber);
+    }
+    #eigenDial .eg-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="6.5">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 6 · Lesson 6.5</p>
+      <h1>Eigenvectors & Eigenvalues — Directions That Don't Turn</h1>
+      <p class="lesson-summary">
+        Find the special directions a matrix only stretches or shrinks, never rotates — and see why those directions matter for describing data.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Pick almost any vector and apply a matrix to it, and it gets pushed off in a
+        brand new direction — rotated as well as resized. But for a handful of special
+        directions, something simpler happens: the matrix only stretches or shrinks
+        the vector, leaving its direction completely untouched. Those special
+        directions are the eigenvectors, and how much they stretch is the eigenvalue.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A nonzero vector $\vec v$ is an eigenvector of $A$ if $A\vec v$ comes out as
+          a plain scalar multiple of $\vec v$ itself — same direction (or exactly
+          reversed), just longer or shorter. That scalar is the eigenvalue $\lambda$.
+          Most matrices have only a couple of these special directions, buried among
+          infinitely many ordinary ones that do get rotated.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A vector and its image lying along the exact same line">
+            <line x1="20" y1="110" x2="140" y2="20" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+            <line x1="80" y1="65" x2="105" y2="46" stroke="#9098ae" stroke-width="2" marker-end="url(#eArrow1)"/>
+            <line x1="80" y1="65" x2="130" y2="26" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#eArrow2)"/>
+            <defs>
+              <marker id="eArrow1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#9098ae"/>
+              </marker>
+              <marker id="eArrow2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/>
+              </marker>
+            </defs>
+            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">v and Av, same direction</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Matrix A</span><span class="r">[[2, 1], [1, 2]]</span></div>
+          <div class="row"><span class="l">Test vector v</span><span class="r">(1, 1)</span></div>
+          <div class="row"><span class="l">Compute Av</span><span class="r">(2·1+1·1, 1·1+2·1) = (3, 3)</span></div>
+          <div class="row"><span class="l">Compare to v</span><span class="r">(3, 3) = 3 × (1, 1)</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">v=(1,1) is an eigenvector, λ = 3</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide to sweep a test vector $\vec v$ (dashed) through every direction. Watch
+        its image $A\vec v$ (solid) — most of the time it points somewhere else
+        entirely. At two special angles, it snaps into perfect alignment with $\vec v$.
+      </p>
+      <div class="interactive-card">
+        <div id="eigenDial">
+          <div class="eg-graph-wrap">
+            <svg id="egSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A sweeping test vector and its image under a matrix, aligning only at eigenvector directions">
+              <defs>
+                <marker id="egArrowDashed" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#9098ae"/>
+                </marker>
+                <marker id="egArrowSolid" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#5fd4e8"/>
+                </marker>
+              </defs>
+              <line x1="20" y1="110" x2="300" y2="110" stroke="#565f78" stroke-width="1"/>
+              <line x1="160" y1="200" x2="160" y2="15" stroke="#565f78" stroke-width="1"/>
+              <line id="egVArrow" x1="160" y1="110" x2="190" y2="110" stroke="#9098ae" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#egArrowDashed)"/>
+              <line id="egAvArrow" x1="160" y1="110" x2="220" y2="110" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#egArrowSolid)"/>
+            </svg>
+          </div>
+          <div class="eg-controls">
+            <label>
+              Direction angle θ (degrees)
+              <input type="range" id="egSlider" min="0" max="180" step="1" value="0">
+            </label>
+          </div>
+          <div class="eg-readout">
+            <span><span class="k">θ =</span> <strong id="egTheta">0°</strong></span>
+            <span><span class="k">angle between v and Av =</span> <strong id="egAngle">45.0°</strong></span>
+            <span><span class="k">status:</span> <strong id="egStatus">rotated</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ A\vec{v} = \lambda \vec{v} $$</div>
+      <p>
+        This single equation defines everything: apply the matrix, and instead of
+        landing somewhere new, the eigenvector $\vec v$ just gets rescaled by the
+        eigenvalue $\lambda$. Every other direction gets bent away from itself; these
+        directions don't.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$A$</span><span class="legend-text">The transformation matrix being applied</span></div>
+        <div class="legend-item"><span class="legend-sym">$\vec{v}$</span><span class="legend-text">An eigenvector — its direction is preserved by $A$</span></div>
+        <div class="legend-item"><span class="legend-sym">$\lambda$</span><span class="legend-text">The eigenvalue — the factor $\vec v$ is stretched or shrunk by</span></div>
+        <div class="legend-item"><span class="legend-sym">$A\vec{v}$</span><span class="legend-text">The transformed vector, exactly parallel to $\vec v$</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>PCA finds the eigenvectors of a dataset's covariance matrix and treats them as the data's "principal directions." Why would directions a matrix only stretches, without rotating, be a natural choice for describing a dataset's most important directions?</li>
+          <li>If a matrix has two eigenvalues like 3 and 1 here, what happens to a generic vector's direction after the matrix is applied to it many times in a row? Which eigen-direction would you expect it to drift toward?</li>
+          <li>Predict what an eigenvalue of exactly 0 would mean about that eigenvector's direction, connecting back to the null space idea from Lesson 6.3.</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Because eigenvectors are the directions where the transformation's effect is purest — a clean stretch with no rotation muddying the picture — so they capture the axes along which the data spreads out most distinctly, without directional distortion mixing separate axes together.</li>
+              <li>The component along the eigenvalue-3 direction keeps tripling with each application while the eigenvalue-1 component stays constant, so the faster-growing direction increasingly dominates — the vector's direction drifts closer and closer to the eigenvalue-3 eigenvector over repeated applications.</li>
+              <li>An eigenvalue of 0 means $A\vec v = 0\cdot\vec v = \vec 0$ — that eigenvector's direction is exactly the collapsed direction from Lesson 6.3's null space, since the transformation squashes it all the way down to the zero vector.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('egSlider');
+      var vArrow = document.getElementById('egVArrow');
+      var avArrow = document.getElementById('egAvArrow');
+      var thetaLabel = document.getElementById('egTheta');
+      var angleLabel = document.getElementById('egAngle');
+      var statusLabel = document.getElementById('egStatus');
+
+      var originX = 160, originY = 110;
+      var scale = 30;
+
+      var a = 2, b = 1, c = 1, d = 2;
+
+      function render() {
+        var thetaDeg = parseFloat(slider.value);
+        var theta = thetaDeg * Math.PI / 180;
+        thetaLabel.textContent = thetaDeg.toFixed(0) + '°';
+
+        var vx = Math.cos(theta), vy = Math.sin(theta);
+        var avx = a * vx + b * vy;
+        var avy = c * vx + d * vy;
+
+        vArrow.setAttribute('x2', (originX + vx * scale).toFixed(1));
+        vArrow.setAttribute('y2', (originY - vy * scale).toFixed(1));
+        avArrow.setAttribute('x2', (originX + avx * scale).toFixed(1));
+        avArrow.setAttribute('y2', (originY - avy * scale).toFixed(1));
+
+        var avLen = Math.sqrt(avx * avx + avy * avy);
+        var dot = vx * avx + vy * avy;
+        var cosAngle = avLen > 0 ? dot / avLen : 1;
+        cosAngle = Math.max(-1, Math.min(1, cosAngle));
+        var angleDeg = Math.acos(cosAngle) * 180 / Math.PI;
+
+        angleLabel.textContent = angleDeg.toFixed(1) + '°';
+
+        if (angleDeg < 1.5) {
+          statusLabel.textContent = 'eigen-direction! λ ≈ ' + avLen.toFixed(2);
+          statusLabel.classList.add('eg-hit');
+        } else {
+          statusLabel.textContent = 'rotated';
+          statusLabel.classList.remove('eg-hit');
+        }
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

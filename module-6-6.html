@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See how vectors, dot products, and alignment extend perfectly well beyond 3D, into the high-dimensional meaning space behind word embeddings.">
+  <title>Abstract Vector Spaces & High-Dimensional Embeddings | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #embedDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #embedDial .em-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #embedDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #embedDial .em-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #embedDial .em-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #embedDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #embedDial .em-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #embedDial .em-readout span.k {
+      color: var(--ink-faint);
+    }
+    #embedDial .em-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #embedDial .em-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="6.6">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 6 · Lesson 6.6</p>
+      <h1>Abstract Vector Spaces & High-Dimensional Embeddings</h1>
+      <p class="lesson-summary">
+        See how vectors, dot products, and alignment extend perfectly well beyond 3D, into the high-dimensional "meaning space" behind word embeddings.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Every arrow you've drawn so far has lived in 2D or 3D, because that's what fits
+        on a page. But nothing about addition, scaling, or the dot product actually
+        requires an arrow you can draw. A vector can just as well be a list of a
+        thousand numbers — and every rule from earlier lessons still applies exactly
+        as written, even though there's no picture left to make of it.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A word embedding is exactly this: a long list of numbers assigned to a word,
+          placing it at a specific point in a high-dimensional "meaning space." Words
+          used in similar contexts end up with embeddings that point in similar
+          directions. The dot product still measures that alignment, component by
+          component, no matter whether there are 2 numbers or 4096 of them — it's the
+          same arithmetic, just with more terms to add up.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three word embeddings, with cat aligning more closely to dog than to car">
+            <text x="30" y="30" font-family="IBM Plex Mono, monospace" font-size="10" fill="#7ee0a8">cat</text>
+            <text x="120" y="30" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5fd4e8">dog</text>
+            <text x="120" y="105" font-family="IBM Plex Mono, monospace" font-size="10" fill="#e8b95f">car</text>
+            <line x1="45" y1="35" x2="110" y2="35" stroke="#9098ae" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <text x="75" y="28" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#9098ae">dot = 9</text>
+            <line x1="45" y1="40" x2="110" y2="98" stroke="#9098ae" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <text x="90" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#9098ae">dot = 1</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">cat, dog, car embeddings</span><span class="r">(1,2,0,1), (1,3,0,2), (0,0,4,1)</span></div>
+          <div class="row"><span class="l">dot(cat, dog)</span><span class="r">1+6+0+2 = 9</span></div>
+          <div class="row"><span class="l">dot(cat, car)</span><span class="r">0+0+0+1 = 1</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">cat aligns far more with dog (9 vs 1)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide a mystery word's embedding from exactly "dog" toward exactly "car." Even
+        though this 4-dimensional vector can't be drawn as an arrow, its similarity to
+        "cat" — measured with the same dot product — still tracks smoothly the whole
+        way across.
+      </p>
+      <div class="interactive-card">
+        <div id="embedDial">
+          <div class="em-graph-wrap">
+            <svg id="emSvg" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A mystery word embedding sliding between dog and car, with similarity to cat tracked live">
+              <text x="20" y="24" class="em-label" fill="#5fd4e8">dog-like</text>
+              <text x="248" y="24" class="em-label" fill="#e8b95f">car-like</text>
+              <line x1="20" y1="40" x2="300" y2="40" stroke="#565f78" stroke-width="1.5"/>
+              <circle id="emMarker" cx="20" cy="40" r="6" fill="#7ee0a8"/>
+
+              <text x="20" y="80" class="em-label">similarity to "cat"</text>
+              <rect x="20" y="90" width="280" height="18" fill="none" stroke="#565f78" stroke-width="1"/>
+              <rect id="emBar" x="20" y="90" width="280" height="18" fill="#7ee0a8" fill-opacity="0.45"/>
+            </svg>
+          </div>
+          <div class="em-controls">
+            <label>
+              Interpolation t (0 = dog, 1 = car)
+              <input type="range" id="emSlider" min="0" max="1" step="0.02" value="0">
+            </label>
+          </div>
+          <div class="em-readout">
+            <span><span class="k">mystery =</span> <strong id="emVec">(1.00, 3.00, 0.00, 2.00)</strong></span>
+            <span><span class="k">dot(cat, mystery) =</span> <strong id="emDot">9.00</strong></span>
+            <span><span class="k">closer to:</span> <strong id="emCloser">dog</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \vec{u}\cdot\vec{v} = \sum_{i=1}^{n} u_i v_i $$</div>
+      <p>
+        This is the exact same dot product from Lesson 6.4, just written for $n$
+        dimensions instead of 2. Nothing new is needed: multiply matching components
+        together, add them all up. Whether $n$ is 2 or 4096, this single sum is still
+        what tells you how aligned two vectors are.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$n$</span><span class="legend-text">The number of dimensions — 4096 for many LLM word embeddings</span></div>
+        <div class="legend-item"><span class="legend-sym">$u_i, v_i$</span><span class="legend-text">The $i$-th component of each vector</span></div>
+        <div class="legend-item"><span class="legend-sym">$\sum_{i=1}^{n}$</span><span class="legend-text">Add up the products across every dimension</span></div>
+        <div class="legend-item"><span class="legend-sym">$\vec{u}\cdot\vec{v}$</span><span class="legend-text">The dot product — still measures alignment, even in high dimensions</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>An LLM's word embeddings often have 4096 dimensions. Even though we can't draw a 4096-dimensional arrow, why does the dot product formula still work exactly the same way?</li>
+          <li>Predict: if two word embeddings have a dot product near zero, what would that suggest about how related the two words' meanings are? (Recall the perpendicular case from Lesson 6.4.)</li>
+          <li>In this lesson's interactive, the mystery vector's similarity to "cat" changed in a perfectly straight line as it slid from "dog" toward "car." Why does interpolating linearly between two vectors always produce a linear change in dot product with a fixed third vector?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Because the algebraic definition — multiply matching components, add them up — never depends on being able to picture the vector. It's ordinary arithmetic on however many numbers the vector has, whether that's 2 or 4096.</li>
+              <li>A near-zero dot product suggests the two words are largely unrelated in this embedding space, echoing Lesson 6.4's perpendicular case, where a zero dot product signaled no alignment at all between two directions.</li>
+              <li>The dot product is linear in each argument: expanding $\vec u \cdot [(1-t)\vec p + t\vec q]$ distributes to $(1-t)(\vec u\cdot\vec p) + t(\vec u\cdot\vec q)$, which is exactly a straight-line function of $t$.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('emSlider');
+      var marker = document.getElementById('emMarker');
+      var bar = document.getElementById('emBar');
+      var vecLabel = document.getElementById('emVec');
+      var dotLabel = document.getElementById('emDot');
+      var closerLabel = document.getElementById('emCloser');
+
+      var cat = [1, 2, 0, 1];
+      var dog = [1, 3, 0, 2];
+      var car = [0, 0, 4, 1];
+
+      var maxDot = 9;
+      var trackX1 = 20, trackX2 = 300;
+      var barX = 20, barWidth = 280;
+
+      function render() {
+        var t = parseFloat(slider.value);
+
+        var mystery = dog.map(function (dv, i) {
+          return (1 - t) * dv + t * car[i];
+        });
+
+        var dot = cat.reduce(function (sum, cv, i) {
+          return sum + cv * mystery[i];
+        }, 0);
+
+        vecLabel.textContent = '(' + mystery.map(function (v) { return v.toFixed(2); }).join(', ') + ')';
+        dotLabel.textContent = dot.toFixed(2);
+        closerLabel.textContent = t < 0.5 ? 'dog' : (t > 0.5 ? 'car' : 'dog & car equally');
+
+        var markerX = trackX1 + t * (trackX2 - trackX1);
+        marker.setAttribute('cx', markerX.toFixed(1));
+
+        var frac = Math.max(0, Math.min(1, dot / maxDot));
+        bar.setAttribute('width', (frac * barWidth).toFixed(1));
+        bar.setAttribute('fill', t < 0.5 ? '#7ee0a8' : '#e8b95f');
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

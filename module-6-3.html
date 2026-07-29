@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn when a matrix transformation can be undone, and what happens to the directions it collapses to zero along the way.">
+  <title>Inverse Matrices, Column Space & Null Space | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #nullDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #nullDial .nd-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #nullDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #nullDial .nd-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #nullDial .nd-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #nullDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #nullDial .nd-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #nullDial .nd-readout span.k {
+      color: var(--ink-faint);
+    }
+    #nullDial .nd-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #nullDial .nd-readout strong.nd-collapse {
+      color: var(--amber);
+    }
+    #nullDial .nd-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="6.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 6 · Lesson 6.3</p>
+      <h1>Inverse Matrices, Column Space & Null Space</h1>
+      <p class="lesson-summary">
+        Discover when a matrix transformation can be undone — and what happens to the directions it collapses to zero along the way.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        If a matrix $A$ stretches and shears the plane, can you always find a second
+        matrix that puts everything back where it started? Usually, yes — that
+        undo-matrix is called $A^{-1}$. But in the last lesson you saw that some
+        matrices flatten the plane entirely, collapsing area down to a line or a
+        point. Once information is squashed away like that, there's nothing left to
+        reconstruct from, and no inverse can exist.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          The <strong>column space</strong> of $A$ is everywhere the transformation
+          can possibly land — every reachable output. The <strong>null space</strong>
+          is the opposite: every input vector that $A$ sends straight to the origin,
+          $\vec{0}$. Whenever the null space contains more than just $\vec{0}$ itself,
+          some direction has been squashed flat, the determinant is zero, and no
+          inverse exists. If the null space contains only $\vec{0}$, nothing was lost,
+          and $A^{-1}$ exists.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A matrix and its inverse undoing each other">
+            <text x="80" y="45" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#5fd4e8">A</text>
+            <line x1="30" y1="65" x2="120" y2="65" stroke="#5fd4e8" stroke-width="2" marker-end="url(#invArrow)"/>
+            <text x="80" y="95" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#e8b95f">A⁻¹</text>
+            <line x1="120" y1="80" x2="30" y2="80" stroke="#e8b95f" stroke-width="2" marker-end="url(#invArrow2)"/>
+            <defs>
+              <marker id="invArrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/>
+              </marker>
+              <marker id="invArrow2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#e8b95f"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Matrix A</span><span class="r">[[2, 1], [1, 3]]</span></div>
+          <div class="row"><span class="l">det(A)</span><span class="r">5</span></div>
+          <div class="row"><span class="l">Swap diagonal, negate off-diagonal</span><span class="r">[[3, −1], [−1, 2]]</span></div>
+          <div class="row"><span class="l">Divide every entry by det(A)</span><span class="r">1/5 × [[3, −1], [−1, 2]]</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">A⁻¹ = [[0.6, −0.2], [−0.2, 0.4]]</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        The dashed arrow is a fixed test direction, $\vec{v} = (-3, 1)$. The solid
+        arrow is where matrix $A$ sends it, $A\vec{v}$. Slide the matrix entry $b$ and
+        watch the solid arrow shrink toward the origin — right where it vanishes
+        completely, $\vec{v}$ has fallen into the null space.
+      </p>
+      <div class="interactive-card">
+        <div id="nullDial">
+          <div class="nd-graph-wrap">
+            <svg id="ndSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A fixed test vector and its image under a matrix, shrinking to zero at the null space">
+              <defs>
+                <marker id="ndArrowSolid" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#5fd4e8"/>
+                </marker>
+                <marker id="ndArrowDashed" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#9098ae"/>
+                </marker>
+              </defs>
+              <line x1="20" y1="110" x2="300" y2="110" stroke="#565f78" stroke-width="1"/>
+              <line x1="200" y1="200" x2="200" y2="15" stroke="#565f78" stroke-width="1"/>
+              <circle cx="200" cy="110" r="3" fill="#565f78"/>
+              <line id="ndVArrow" x1="200" y1="110" x2="140" y2="90" stroke="#9098ae" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#ndArrowDashed)"/>
+              <text x="130" y="82" class="nd-label">v</text>
+              <line id="ndAvArrow" x1="200" y1="110" x2="0" y2="110" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#ndArrowSolid)"/>
+              <text id="ndAvLabelPos" x="60" y="122" class="nd-label">Av</text>
+            </svg>
+          </div>
+          <div class="nd-controls">
+            <label>
+              Matrix entry b
+              <input type="range" id="ndSlider" min="-4" max="8" step="0.25" value="1">
+            </label>
+          </div>
+          <div class="nd-readout">
+            <span><span class="k">matrix A =</span> <strong id="ndMatrix">[[2, 1], [1, 3]]</strong></span>
+            <span><span class="k">det(A) =</span> <strong id="ndDet">5.00</strong></span>
+            <span><span class="k">Av =</span> <strong id="ndAv">(−5.00, 0.00)</strong></span>
+            <span><span class="k">status:</span> <strong id="ndStatus">invertible</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ A^{-1} = \frac{1}{\det(A)}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}, \qquad \det(A) \neq 0 $$</div>
+      <p>
+        The inverse only exists when the determinant is nonzero — exactly the
+        condition that guarantees the null space contains nothing but the zero
+        vector. Whenever a system like $A\vec{x} = \vec{b}$ shows up in an application,
+        this formula is what lets you solve for $\vec{x}$ directly.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$A^{-1}$</span><span class="legend-text">The inverse matrix — undoes everything $A$ does</span></div>
+        <div class="legend-item"><span class="legend-sym">$\det(A)$</span><span class="legend-text">Must be nonzero for the inverse to exist</span></div>
+        <div class="legend-item"><span class="legend-sym">column space</span><span class="legend-text">Every output the transformation can possibly reach</span></div>
+        <div class="legend-item"><span class="legend-sym">null space</span><span class="legend-text">Every input that gets sent to the zero vector</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>In circuit analysis, solving $A\vec{x} = \vec{b}$ for unknown currents or voltages requires $A^{-1}$ to exist. What would it mean physically if $A$'s null space contained a nonzero vector?</li>
+          <li>If $\det(A) = 0$, predict what happens when you try to compute $A^{-1}$ using the formula $\frac{1}{\det(A)}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$.</li>
+          <li>Two matrices could have very different determinants but both have a null space containing only the zero vector. What does that tell you they both share, despite scaling area by different amounts?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>It would mean the system doesn't pin down a single, unique solution — some combination of currents or voltages could shift without changing the equations, leaving that part of the circuit's behavior undetermined.</li>
+              <li>The formula requires dividing by $\det(A)$, which is division by zero — undefined. That breakdown confirms directly that no inverse can exist whenever the determinant is exactly zero.</li>
+              <li>Both are invertible. Having only the zero vector in the null space is exactly the condition for a matrix to be invertible, regardless of how strongly each one individually stretches or shrinks area.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('ndSlider');
+      var avArrow = document.getElementById('ndAvArrow');
+      var avLabel = document.getElementById('ndAvLabelPos');
+      var matrixLabel = document.getElementById('ndMatrix');
+      var detLabel = document.getElementById('ndDet');
+      var avReadout = document.getElementById('ndAv');
+      var statusLabel = document.getElementById('ndStatus');
+
+      var originX = 200, originY = 110;
+      var scale = 20;
+
+      var a = 2, c = 1, d = 3;
+      var vx = -3, vy = 1;
+
+      function render() {
+        var b = parseFloat(slider.value);
+        var det = a * d - b * c;
+
+        var avx = a * vx + b * vy;
+        var avy = c * vx + d * vy;
+
+        matrixLabel.textContent = '[[' + a + ', ' + b.toFixed(2) + '], [' + c + ', ' + d + ']]';
+        detLabel.textContent = det.toFixed(2);
+        avReadout.textContent = '(' + avx.toFixed(2) + ', ' + avy.toFixed(2) + ')';
+
+        var tipX = originX + avx * scale;
+        var tipY = originY - avy * scale;
+        avArrow.setAttribute('x2', tipX.toFixed(1));
+        avArrow.setAttribute('y2', tipY.toFixed(1));
+
+        var labelX = originX + (avx * scale) / 2;
+        var labelY = originY - (avy * scale) / 2 - 8;
+        avLabel.setAttribute('x', labelX.toFixed(1));
+        avLabel.setAttribute('y', labelY.toFixed(1));
+
+        if (Math.abs(det) < 0.3) {
+          statusLabel.textContent = 'singular — v has fallen into the null space';
+          statusLabel.classList.add('nd-collapse');
+        } else {
+          statusLabel.textContent = 'invertible';
+          statusLabel.classList.remove('nd-collapse');
+        }
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

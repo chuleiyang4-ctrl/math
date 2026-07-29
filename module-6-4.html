@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how the dot product measures alignment between vectors, and how that same idea lets you translate coordinates into a new basis.">
+  <title>Dot Products, Cross Products & Change of Basis | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #basisDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #basisDial .bs-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #basisDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #basisDial .bs-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #basisDial .bs-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #basisDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #basisDial .bs-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #basisDial .bs-readout span.k {
+      color: var(--ink-faint);
+    }
+    #basisDial .bs-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #basisDial .bs-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="6.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 6 · Lesson 6.4</p>
+      <h1>Dot Products, Cross Products & Change of Basis</h1>
+      <p class="lesson-summary">
+        Learn how the dot product turns "how aligned are these two vectors?" into a single number — and how that same question lets you translate coordinates into a new basis.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        How much does one vector point in the same direction as another? The dot
+        product answers exactly that, collapsing the comparison into a single number:
+        large and positive when they point the same way, zero when they're
+        perpendicular, negative when they point opposite ways. Run that same question
+        in reverse, and you get something surprisingly useful: a way to describe a
+        point using a completely different set of coordinate axes.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A vector's coordinates are really just a record of how much it aligns with
+          each axis direction. Swap in a new pair of axes — a camera's own forward and
+          right directions, say — and dot-producting the point against each new axis
+          gives its coordinates in that new "language." A close cousin, the 2D cross
+          product $u_1v_2 - u_2v_1$, measures something different: signed area instead
+          of alignment. You've actually already seen this exact expression — it's the
+          same $ad-bc$ pattern from the determinant in Lesson 6.2.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A point re-expressed using a rotated pair of axes">
+            <line x1="15" y1="65" x2="145" y2="65" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+            <line x1="80" y1="15" x2="80" y2="115" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+            <line x1="80" y1="65" x2="122" y2="35" stroke="#5fd4e8" stroke-width="2"/>
+            <line x1="80" y1="65" x2="52" y2="17" stroke="#e8b95f" stroke-width="2"/>
+            <circle cx="132" cy="17" r="4" fill="#7ee0a8"/>
+            <line x1="80" y1="65" x2="132" y2="17" stroke="#7ee0a8" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <text x="80" y="125" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">p in a rotated basis</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">World vector p</span><span class="r">(4, 3)</span></div>
+          <div class="row"><span class="l">New basis</span><span class="r">e₁′=(0.6, 0.8), e₂′=(−0.8, 0.6)</span></div>
+          <div class="row"><span class="l">New coord 1 = p · e₁′</span><span class="r">4(0.6) + 3(0.8) = 4.8</span></div>
+          <div class="row"><span class="l">New coord 2 = p · e₂′</span><span class="r">4(−0.8) + 3(0.6) = −1.4</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">p in new basis = (4.8, −1.4)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide to rotate the new basis axes (imagine them as a camera's local view
+        directions). The fixed green point never moves in the world, but its
+        coordinates in the rotated basis — found purely with dot products — change as
+        the axes turn.
+      </p>
+      <div class="interactive-card">
+        <div id="basisDial">
+          <div class="bs-graph-wrap">
+            <svg id="bsSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A fixed point measured against a rotating pair of basis axes">
+              <defs>
+                <marker id="bsArrowCyan" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#5fd4e8"/>
+                </marker>
+                <marker id="bsArrowAmber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                  <path d="M0,0 L7,3.5 L0,7 Z" fill="#e8b95f"/>
+                </marker>
+              </defs>
+              <line x1="20" y1="110" x2="300" y2="110" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <line x1="160" y1="200" x2="160" y2="15" stroke="#565f78" stroke-width="1" stroke-dasharray="3 2"/>
+              <line id="bsE1" x1="160" y1="110" x2="220" y2="110" stroke="#5fd4e8" stroke-width="2.5" marker-end="url(#bsArrowCyan)"/>
+              <line id="bsE2" x1="160" y1="110" x2="160" y2="50" stroke="#e8b95f" stroke-width="2.5" marker-end="url(#bsArrowAmber)"/>
+              <circle id="bsPoint" cx="248" cy="44" r="5" fill="#7ee0a8"/>
+              <line x1="160" y1="110" x2="248" y2="44" stroke="#7ee0a8" stroke-width="1.5" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <div class="bs-controls">
+            <label>
+              Basis rotation θ (degrees)
+              <input type="range" id="bsSlider" min="0" max="360" step="5" value="0">
+            </label>
+          </div>
+          <div class="bs-readout">
+            <span><span class="k">θ =</span> <strong id="bsTheta">0°</strong></span>
+            <span><span class="k">p (world) =</span> <strong>(4.0, 3.0)</strong></span>
+            <span><span class="k">p (new basis) =</span> <strong id="bsNewCoords">(4.00, 3.00)</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \vec{u}\cdot\vec{v} = u_1v_1 + u_2v_2 = |\vec{u}|\,|\vec{v}|\cos\theta $$</div>
+      <p>
+        The left side is easy to compute directly from components. The right side
+        reveals what it means geometrically: it's the two lengths multiplied together,
+        scaled down by how misaligned the vectors are. This exact formula, applied
+        against each new axis direction, is what performs a change of basis.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\vec{u}\cdot\vec{v}$</span><span class="legend-text">The dot product — one number measuring alignment</span></div>
+        <div class="legend-item"><span class="legend-sym">$u_1v_1+u_2v_2$</span><span class="legend-text">The component-by-component way to compute it</span></div>
+        <div class="legend-item"><span class="legend-sym">$|\vec{u}|\,|\vec{v}|$</span><span class="legend-text">The product of the two vectors' lengths</span></div>
+        <div class="legend-item"><span class="legend-sym">$\cos\theta$</span><span class="legend-text">1 when aligned, 0 when perpendicular, −1 when opposite</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>If two vectors are perpendicular, predict what their dot product equals, and connect that back to the $\cos\theta$ term in the formula.</li>
+          <li>A camera's view-space transform re-expresses every world point using the camera's own forward and right directions as a new basis. Why does the dot product provide exactly the right tool for that conversion?</li>
+          <li>In Lesson 6.2, the expression $u_1v_2 - u_2v_1$ appeared inside the determinant. Predict what that same expression tells you geometrically when read as a 2D cross product, given what you know about signed area.</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Zero. Since $\cos 90^\circ = 0$, the entire right-hand side of the formula collapses to zero regardless of the vectors' lengths — which is exactly why "dot product equals zero" is the standard test for perpendicularity.</li>
+              <li>Dot-producting a world point against each of the camera's basis directions asks precisely "how much does this point align with this axis," which is exactly the coordinate that point should have along that axis in the camera's own frame.</li>
+              <li>It gives the signed area of the parallelogram formed by the two vectors: positive when the second vector sits counterclockwise from the first, negative when clockwise, and zero when the vectors point in the same or opposite direction with no area between them.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('bsSlider');
+      var e1Line = document.getElementById('bsE1');
+      var e2Line = document.getElementById('bsE2');
+      var point = document.getElementById('bsPoint');
+      var thetaLabel = document.getElementById('bsTheta');
+      var coordsLabel = document.getElementById('bsNewCoords');
+
+      var originX = 160, originY = 110;
+      var scale = 22;
+      var axisLength = 60;
+
+      var px = 4, py = 3;
+
+      function render() {
+        var thetaDeg = parseFloat(slider.value);
+        var theta = thetaDeg * Math.PI / 180;
+        thetaLabel.textContent = thetaDeg.toFixed(0) + '°';
+
+        var e1x = Math.cos(theta), e1y = Math.sin(theta);
+        var e2x = -Math.sin(theta), e2y = Math.cos(theta);
+
+        e1Line.setAttribute('x2', (originX + e1x * axisLength).toFixed(1));
+        e1Line.setAttribute('y2', (originY - e1y * axisLength).toFixed(1));
+        e2Line.setAttribute('x2', (originX + e2x * axisLength).toFixed(1));
+        e2Line.setAttribute('y2', (originY - e2y * axisLength).toFixed(1));
+
+        var pointPx = originX + px * scale;
+        var pointPy = originY - py * scale;
+        point.setAttribute('cx', pointPx.toFixed(1));
+        point.setAttribute('cy', pointPy.toFixed(1));
+
+        var c1 = px * e1x + py * e1y;
+        var c2 = px * e2x + py * e2y;
+        coordsLabel.textContent = '(' + c1.toFixed(2) + ', ' + c2.toFixed(2) + ')';
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
