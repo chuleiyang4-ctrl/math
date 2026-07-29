@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how the determinant measures the exact factor by which a matrix stretches area, and how its sign reveals a flipped orientation.">
+  <title>The Determinant — Measuring How Space Stretches | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #detDial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    #detDial .dt-graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    #detDial svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #detDial .dt-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #detDial .dt-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+    }
+    #detDial input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--cyan);
+    }
+    #detDial .dt-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      color: var(--ink);
+    }
+    #detDial .dt-readout span.k {
+      color: var(--ink-faint);
+    }
+    #detDial .dt-readout strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+    #detDial .dt-readout strong.dt-flip {
+      color: var(--amber);
+    }
+    #detDial .dt-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: #9098ae;
+    }
+  </style>
+</head>
+<body data-lesson-id="6.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 6 · Lesson 6.2</p>
+      <h1>The Determinant — Measuring How Space Stretches</h1>
+      <p class="lesson-summary">
+        Discover the single number that tells you exactly how much a matrix stretches area — and whether it flips space inside out along the way.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        A matrix doesn't just move points around — it can stretch, squish, or shear the
+        entire plane. Picture the unit square, one unit wide and one unit tall. Apply
+        a matrix to every corner, and that square becomes some parallelogram. The
+        determinant is the number that tells you exactly how the area of that square
+        changed: how much bigger, how much smaller, or whether the shape got turned
+        inside out.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          For a $2\times2$ matrix, the determinant is $ad - bc$. Its magnitude is the
+          area scale factor: a determinant of 5 means every region gets 5 times
+          bigger. Its sign tells you about orientation: a positive determinant keeps
+          shapes facing the same way, while a negative one means the transformation
+          flipped the plane over, like a reflection. A determinant of exactly zero
+          means the transformation collapsed the plane down to a line or a point —
+          all the area is gone.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Unit square transformed into a larger parallelogram">
+            <rect x="20" y="80" width="30" height="30" fill="none" stroke="#9098ae" stroke-width="1" stroke-dasharray="3 2"/>
+            <polygon points="20,110 90,80 130,20 60,50" fill="#5fd4e8" fill-opacity="0.3" stroke="#5fd4e8" stroke-width="2"/>
+            <text x="80" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9098ae">area 1 → area 5</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Matrix</span><span class="r">[[2, 1], [1, 3]]</span></div>
+          <div class="row"><span class="l">a × d</span><span class="r">2 × 3 = 6</span></div>
+          <div class="row"><span class="l">b × c</span><span class="r">1 × 1 = 1</span></div>
+          <div class="row"><span class="l">Determinant = ad − bc</span><span class="r">6 − 1</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">det = 5 → area scales ×5</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide the matrix entry $b$ and watch the dashed unit square get carried into
+        the solid parallelogram. Notice what happens to the shape — and the sign of
+        the determinant — right as it passes through zero.
+      </p>
+      <div class="interactive-card">
+        <div id="detDial">
+          <div class="dt-graph-wrap">
+            <svg id="dtSvg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A unit square transformed by a matrix into a parallelogram, with the determinant controlling its area and orientation">
+              <line x1="20" y1="190" x2="300" y2="190" stroke="#565f78" stroke-width="1"/>
+              <line x1="140" y1="190" x2="140" y2="15" stroke="#565f78" stroke-width="1"/>
+              <polygon points="140,190 156,190 156,174 140,174" fill="none" stroke="#9098ae" stroke-width="1" stroke-dasharray="3 2"/>
+              <polygon id="dtParallelogram" points="" fill="#5fd4e8" fill-opacity="0.3" stroke="#5fd4e8" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <div class="dt-controls">
+            <label>
+              Matrix entry b
+              <input type="range" id="dtSlider" min="-4" max="8" step="0.25" value="1">
+            </label>
+          </div>
+          <div class="dt-readout">
+            <span><span class="k">matrix =</span> <strong id="dtMatrix">[[2, 1], [1, 3]]</strong></span>
+            <span><span class="k">det =</span> <strong id="dtDet">5.00</strong></span>
+            <span><span class="k">status:</span> <strong id="dtStatus">area scales ×5.00</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \det\begin{pmatrix} a & b \\ c & d \end{pmatrix} = ad - bc $$</div>
+      <p>
+        Every $2\times2$ matrix boils down to this one number. Compute it directly from
+        the four entries — no need to actually draw the transformed shape to know how
+        much it stretched, or whether it flipped.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a, d$</span><span class="legend-text">The entries controlling stretch along each axis direction</span></div>
+        <div class="legend-item"><span class="legend-sym">$b, c$</span><span class="legend-text">The entries controlling shear between the axes</span></div>
+        <div class="legend-item"><span class="legend-sym">$ad-bc$</span><span class="legend-text">The determinant — magnitude gives the area scale factor</span></div>
+        <div class="legend-item"><span class="legend-sym">sign</span><span class="legend-text">Positive keeps orientation; negative means the plane got flipped</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>If a game engine's transform matrix has a determinant of 0, what does that tell you about the object being rendered, geometrically?</li>
+          <li>Predict: if a 3D model unexpectedly appears mirror-flipped inside a rendering engine, what sign would you expect its transform matrix's determinant to have?</li>
+          <li>Two different matrices could share the exact same determinant value. Does that guarantee they transform the unit square into the same shape? Why or why not?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>A determinant of 0 means the transformation collapses the plane down into a line or a point, flattening all area to zero — the object would render as degenerate, with no visible volume.</li>
+              <li>A negative determinant. A negative sign specifically signals that the transformation reversed orientation, which is exactly what a mirror-flipped model would show.</li>
+              <li>No. The determinant only captures the area scale factor and whether orientation flipped, not the specific shape produced — a pure stretch and a shear can scale area by the identical factor while producing very differently shaped parallelograms.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('dtSlider');
+      var parallelogram = document.getElementById('dtParallelogram');
+      var matrixLabel = document.getElementById('dtMatrix');
+      var detLabel = document.getElementById('dtDet');
+      var statusLabel = document.getElementById('dtStatus');
+
+      var originX = 140, originY = 190;
+      var scaleX = 16, scaleY = 16;
+
+      var a = 2, c = 1, d = 3;
+
+      function toPx(x, y) {
+        return { px: originX + x * scaleX, py: originY - y * scaleY };
+      }
+
+      function render() {
+        var b = parseFloat(slider.value);
+        var det = a * d - b * c;
+
+        matrixLabel.textContent = '[[' + a + ', ' + b.toFixed(2) + '], [' + c + ', ' + d + ']]';
+        detLabel.textContent = det.toFixed(2);
+
+        if (Math.abs(det) < 0.3) {
+          statusLabel.textContent = 'degenerate — area collapses toward zero';
+          statusLabel.classList.add('dt-flip');
+        } else if (det < 0) {
+          statusLabel.textContent = 'flipped — area scales ×' + Math.abs(det).toFixed(2);
+          statusLabel.classList.add('dt-flip');
+        } else {
+          statusLabel.textContent = 'area scales ×' + det.toFixed(2);
+          statusLabel.classList.remove('dt-flip');
+        }
+
+        var O = toPx(0, 0);
+        var P1 = toPx(a, c);
+        var P2 = toPx(a + b, c + d);
+        var P3 = toPx(b, d);
+
+        var pts = [O, P1, P2, P3].map(function (p) {
+          return p.px.toFixed(1) + ',' + p.py.toFixed(1);
+        }).join(' ');
+        parallelogram.setAttribute('points', pts);
+
+        var fillColor = det < 0 ? '#e8b95f' : '#5fd4e8';
+        parallelogram.setAttribute('fill', fillColor);
+        parallelogram.setAttribute('stroke', fillColor);
+      }
+
+      slider.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
