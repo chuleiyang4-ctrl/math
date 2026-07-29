@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Use implicit differentiation to find related rates when two quantities change together in lockstep.">
+  <title>Implicit Differentiation & Related Rates | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #relatedLab {
+      display: grid;
+      gap: 18px;
+    }
+    #relatedLab .lab-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      color: var(--ink-dim);
+    }
+    #relatedLab .lab-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #relatedLab input[type="range"] {
+      width: 150px;
+      accent-color: var(--cyan);
+    }
+    #relatedLab .readout {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+      min-width: 7ch;
+    }
+    #relatedLab .lab-svg-wrap {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    #relatedLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #relatedLab .rate-box {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--ink-dim);
+      line-height: 1.55;
+    }
+    #relatedLab .rate-box .hl { color: var(--cyan); }
+    #relatedLab .lab-note {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--ink-dim);
+    }
+  </style>
+</head>
+<body data-lesson-id="4.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 4 · Lesson 4.4</p>
+      <h1>Implicit Differentiation & Related Rates</h1>
+      <p class="lesson-summary">
+        Differentiate equations that link two changing quantities, then solve for the unknown rate when they move in lockstep.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Sometimes a relationship is given by an equation that mixes $x$ and $y$ together,
+        not by an explicit formula $y=f(x)$. Both variables can still change with time.
+        Differentiating both sides with respect to $t$ produces an equation that links
+        their rates $\frac{dx}{dt}$ and $\frac{dy}{dt}$. That is related-rates reasoning.
+      </p>
+      <p>
+        The classic picture is a ladder sliding down a wall: the top drops while the base
+        slides out. Pythagoras keeps the length fixed, so the two speeds are locked
+        together. Knowing one speed instantly gives the other.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Implicit differentiation treats every variable as a function of time, applies the
+          chain rule to each term, and solves the resulting equation for the unknown rate.
+          The geometric constraint (fixed ladder length, expanding circle, \ldots) supplies
+          the equation that binds the rates.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="140" height="110" fill="#101a30"/>
+            <!-- wall and ground -->
+            <line x1="20" y1="15" x2="20" y2="95" stroke="#565f78" stroke-width="2"/>
+            <line x1="20" y1="95" x2="125" y2="95" stroke="#565f78" stroke-width="2"/>
+            <!-- ladder -->
+            <line x1="20" y1="35" x2="95" y2="95" stroke="#5fd4e8" stroke-width="2.5"/>
+            <circle cx="20" cy="35" r="3.5" fill="#7ee0a8"/>
+            <circle cx="95" cy="95" r="3.5" fill="#e8b95f"/>
+            <text x="28" y="32" fill="#9098ae" font-size="9" font-family="monospace">y</text>
+            <text x="70" y="108" fill="#9098ae" font-size="9" font-family="monospace">x</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Ladder</span><span class="r">length $L=5$ m</span></div>
+          <div class="row"><span class="l">Constraint</span><span class="r">$x^{2}+y^{2}=25$</span></div>
+          <div class="row"><span class="l">Differentiate</span><span class="r">$2x\,x'+2y\,y'=0$</span></div>
+          <div class="row"><span class="l">At $x=3$, $y=4$</span><span class="r">$x'=0.6$ m/s out</span></div>
+          <div class="row"><span class="l">Solve</span><span class="r">$y'=-0.45$ m/s</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide the base distance $x$. The ladder stays length 5; the top height $y$ and
+        both rates update from the differentiated constraint.
+      </p>
+      <div class="interactive-card" id="relatedLab">
+        <div class="lab-controls">
+          <label>
+            Base $x$ (m)
+            <input type="range" id="xSlider" min="1.0" max="4.5" step="0.05" value="3.0">
+            <span class="readout" id="xValue">3.00</span>
+          </label>
+          <label>
+            Base speed $x'$ (m/s)
+            <input type="range" id="xpSlider" min="0.1" max="1.5" step="0.05" value="0.6">
+            <span class="readout" id="xpValue">0.60</span>
+          </label>
+        </div>
+        <div class="lab-svg-wrap">
+          <svg id="ladderSvg" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ladder sliding down a wall">
+            <!-- wall -->
+            <line x1="40" y1="20" x2="40" y2="230" stroke="#565f78" stroke-width="3"/>
+            <!-- ground -->
+            <line x1="40" y1="230" x2="300" y2="230" stroke="#565f78" stroke-width="3"/>
+            <!-- ladder -->
+            <line id="ladder" stroke="#5fd4e8" stroke-width="3"/>
+            <circle id="topPt" r="6" fill="#7ee0a8"/>
+            <circle id="basePt" r="6" fill="#e8b95f"/>
+            <text id="xLabel" fill="#9098ae" font-size="12" font-family="IBM Plex Mono, monospace"></text>
+            <text id="yLabel" fill="#9098ae" font-size="12" font-family="IBM Plex Mono, monospace"></text>
+          </svg>
+        </div>
+        <div class="rate-box" id="rateBox">
+          $x^{2}+y^{2}=25$ → $x\,x'+y\,y'=0$<br>
+          Current rates will appear here.
+        </div>
+        <p class="lab-note">
+          Green point is the top of the ladder; amber is the base. The differentiated
+          Pythagorean relation forces the two speeds to stay in lockstep.
+        </p>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \frac{d}{dt}\bigl(F(x(t),y(t))\bigr)=0 \quad\Rightarrow\quad F_x\,x'+F_y\,y'=0 $$</div>
+      <p>
+        When a constraint $F(x,y)=C$ holds for all time, its total derivative with respect
+        to $t$ is zero. Solving for the unknown rate (usually $y'$) yields the related-rate
+        formula. The same technique works for any implicit relation—circles, similar
+        triangles, volume formulas—once every variable is viewed as a function of time.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$x(t),y(t)$</span><span class="legend-text">Quantities that change with time</span></div>
+        <div class="legend-item"><span class="legend-sym">$x',y'$</span><span class="legend-text">Their instantaneous rates $\frac{dx}{dt}$, $\frac{dy}{dt}$</span></div>
+        <div class="legend-item"><span class="legend-sym">$F(x,y)=C$</span><span class="legend-text">The geometric or physical constraint that never changes</span></div>
+        <div class="legend-item"><span class="legend-sym">$F_x,F_y$</span><span class="legend-text">Partial derivatives of the constraint (chain-rule coefficients)</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does the top of the ladder speed up as it nears the ground, even if the base moves at constant speed?</li>
+          <li>If a circular oil slick expands so that its radius grows at 2 cm/s, how would you find the rate at which the area is increasing when the radius is 30 cm?</li>
+          <li>What goes wrong if you try to solve for $y'$ at the exact moment the ladder is horizontal?</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    const xSlider = document.getElementById('xSlider');
+    const xpSlider = document.getElementById('xpSlider');
+    const xValue = document.getElementById('xValue');
+    const xpValue = document.getElementById('xpValue');
+    const ladder = document.getElementById('ladder');
+    const topPt = document.getElementById('topPt');
+    const basePt = document.getElementById('basePt');
+    const xLabel = document.getElementById('xLabel');
+    const yLabel = document.getElementById('yLabel');
+    const rateBox = document.getElementById('rateBox');
+
+    const L = 5; // ladder length
+    // svg mapping: x from 0..5 -> 40..280, y from 0..5 -> 230..30 (inverted)
+    const scale = 48; // pixels per meter
+    const originX = 40;
+    const originY = 230;
+
+    function update() {
+      const x = parseFloat(xSlider.value);
+      const xp = parseFloat(xpSlider.value);
+      xValue.textContent = x.toFixed(2);
+      xpValue.textContent = xp.toFixed(2);
+
+      const y = Math.sqrt(L * L - x * x);
+      // from x x' + y y' = 0  =>  y' = - (x / y) x'
+      const yp = y > 0.05 ? -(x / y) * xp : NaN;
+
+      // draw
+      const sx = originX + x * scale;
+      const sy = originY - y * scale;
+      ladder.setAttribute('x1', originX);
+      ladder.setAttribute('y1', sy);
+      ladder.setAttribute('x2', sx);
+      ladder.setAttribute('y2', originY);
+      topPt.setAttribute('cx', originX);
+      topPt.setAttribute('cy', sy);
+      basePt.setAttribute('cx', sx);
+      basePt.setAttribute('cy', originY);
+
+      xLabel.setAttribute('x', originX + (sx - originX) / 2 - 10);
+      xLabel.setAttribute('y', originY + 18);
+      xLabel.textContent = 'x = ' + x.toFixed(2);
+      yLabel.setAttribute('x', originX - 36);
+      yLabel.setAttribute('y', originY - (originY - sy) / 2);
+      yLabel.textContent = 'y = ' + y.toFixed(2);
+
+      const ypStr = isNaN(yp) ? 'undefined' : yp.toFixed(3);
+      rateBox.innerHTML =
+        'Constraint: x² + y² = 25<br>' +
+        'Differentiated: x·x′ + y·y′ = 0<br>' +
+        '<span class="hl">x′ = ' + xp.toFixed(2) + ' m/s (out)</span><br>' +
+        '<span class="hl">y′ = ' + ypStr + ' m/s (down is negative)</span>';
+    }
+
+    xSlider.addEventListener('input', update);
+    xpSlider.addEventListener('input', update);
+    update();
+  })();
+  </script>
+</body>
+</html>
