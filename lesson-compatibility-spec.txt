@@ -92,9 +92,12 @@ Use this exact section order and these shared classes:
 
 An optional "Think Further" section may appear after Key Idea. Keep it
 short: two to four high-quality questions that invite reasoning, transfer,
-or prediction. Do not add answer keys, repetitive drills, scores, timers,
-grading, or a large exercise bank. The Math AI assistant will provide
-guided help later.
+or prediction. Add concise suggested answers inside one collapsed
+<details class="answer-reveal"> element. Its <summary> text must be
+"Show suggested answers", and its answer body must use
+<div class="answer-content">. Keep the answers hidden until clicked.
+Do not add repetitive drills, scores, timers, grading, or a large
+exercise bank. The Math AI assistant will provide guided help later.
 
 3. MATHEMATICS AND KATEX
 
@@ -170,6 +173,7 @@ and do not duplicate or reference navigation code from course-common.js.
 - Intuition → worked example → interactive → formula + legend
 - No lesson-authored top navigation, theme switcher, or font switcher
 - Optional Think Further section contains only 2-4 reasoning questions
+- Suggested answers use the shared collapsed .answer-reveal structure
 - No duplicated shared class definitions
 - Interactive CSS uses a unique id
 - Interactive script is wrapped in an IIFE
