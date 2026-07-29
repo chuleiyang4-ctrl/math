@@ -60,9 +60,9 @@ button { font: inherit; }
   max-width: 760px;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 7vw, 5rem);
-  line-height: .98;
-  letter-spacing: -.055em;
+  font-size: clamp(2rem, 4.6vw, 3.65rem);
+  line-height: 1.04;
+  letter-spacing: -.045em;
 }
 
 .lesson-summary {
@@ -393,6 +393,46 @@ a.course-tool-button {
   font-family: var(--font-display);
   font-size: .92rem;
 }
+
+.answer-reveal {
+  margin-top: 18px;
+  border: 1px solid color-mix(in srgb, var(--cyan) 24%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--panel-2) 84%, transparent);
+  overflow: hidden;
+}
+
+.answer-reveal summary {
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+  padding: 13px 42px 13px 16px;
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-size: .86rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+.answer-reveal summary::-webkit-details-marker { display: none; }
+.answer-reveal summary::after {
+  content: "+";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: var(--ink-dim);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+.answer-reveal[open] summary::after { content: "−"; }
+.answer-reveal .answer-content {
+  padding: 0 18px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-dim);
+}
+.answer-reveal .answer-content ol { margin-bottom: 0; padding-left: 22px; }
+.answer-reveal .answer-content li { margin-top: 12px; }
 
 .lesson-footer {
   padding-top: 32px;
