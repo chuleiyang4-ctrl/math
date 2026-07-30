@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How diffusion models turn a clean signal into pure noise, one small step at a time, and why that process has a direct closed-form shortcut.">
+  <title>Forward Diffusion — Turning Signal Into Noise | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #diffLab {
+      display: grid;
+      gap: 18px;
+    }
+    #diffLab .diff-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #diffLab .diff-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 320px;
+    }
+    #diffLab input[type="range"] {
+      flex: 1 1 auto;
+      accent-color: var(--amber);
+    }
+    #diffLab .diff-t-value {
+      min-width: 84px;
+      color: var(--amber);
+      font-weight: 600;
+      text-align: right;
+    }
+    #diffLab .diff-strip-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+      padding: 18px;
+    }
+    #diffLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #diffLab .diff-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 0;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      color: var(--ink-dim);
+    }
+    #diffLab .diff-readout strong {
+      color: var(--ink);
+    }
+    #diffLab .diff-caption {
+      margin: 0;
+      color: var(--ink-faint);
+      font-family: var(--font-mono);
+      font-size: .78rem;
+    }
+  </style>
+</head>
+<body data-lesson-id="10.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 10 · Lesson 10.3</p>
+      <h1>Forward Diffusion — Turning Signal Into Noise</h1>
+      <p class="lesson-summary">
+        Forward diffusion blends a tiny bit of random noise into a signal at every step, and repeating that small step enough times is enough to erase the signal completely.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        In Lessons 10.1 and 10.2, a quantity changed step by step according to a small, fixed rule applied over and over. Forward diffusion uses the exact same idea, applied to an image instead of a population. At every step, you take the current image and blend in a small amount of random static — mostly image, a little noise. On its own, one step barely changes anything. But apply that same small blend sixty times in a row, and the original image effectively disappears into pure static.
+      </p>
+      <p>
+        This matters for training image generators like Stable Diffusion: the model needs to see examples at every noise level, from barely-touched to completely destroyed, so it can later learn to run the process backward.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Each forward step takes the previous value $x_{t-1}$, shrinks it slightly, and adds in a slightly-scaled random sample $\varepsilon_t$ drawn fresh at every step:
+        </p>
+        <p style="text-align:center; font-family: var(--font-mono);">
+          $x_t = \sqrt{1-\beta_t}\; x_{t-1} + \sqrt{\beta_t}\; \varepsilon_t$
+        </p>
+        <p>
+          $\beta_t$ is a small number, often around 0.001 to 0.15, controlling how much noise gets mixed in at step $t$. The two square-root weights are chosen so that signal and noise are combined without the overall energy of the image exploding or vanishing too fast.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="30" width="30" height="70" fill="#dcdcdc"></rect>
+            <text x="35" y="20" fill="var(--ink-faint)" font-size="8" font-family="IBM Plex Mono, monospace" text-anchor="middle">x0</text>
+            <text x="65" y="70" fill="var(--ink-dim)" font-size="14" text-anchor="middle">→</text>
+            <rect x="90" y="30" width="30" height="70" fill="#b7b0a3"></rect>
+            <text x="105" y="20" fill="var(--ink-faint)" font-size="8" font-family="IBM Plex Mono, monospace" text-anchor="middle">x1</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Starting pixel x0</span><span class="r">0.80</span></div>
+          <div class="row"><span class="l">Noise level β1</span><span class="r">0.05</span></div>
+          <div class="row"><span class="l">Noise sample ε1</span><span class="r">0.60</span></div>
+          <div class="row"><span class="l">Blend</span><span class="r">√0.95·0.80 + √0.05·0.60</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">x1 ≈ 0.91</span></div>
+        </div>
+      </div>
+      <p>
+        After one step the pixel barely moved — from 0.80 to about 0.91. Nothing looks different yet. But this same blending rule, applied again to $x_1$ to get $x_2$, then again to get $x_3$, and so on, compounds. That's exactly the interactive below.
+      </p>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        The strip below is a simplified "image" — just one row of pixel brightness values. Drag the slider to move forward through the diffusion steps and watch the original pattern dissolve into static.
+      </p>
+      <div class="interactive-card">
+        <div id="diffLab">
+          <div class="diff-controls">
+            <label>
+              step t
+              <input type="range" id="diffT" min="0" max="60" step="1" value="0">
+            </label>
+            <span class="diff-t-value" id="diffTValue">t = 0 / 60</span>
+          </div>
+          <div class="diff-strip-wrap">
+            <svg id="diffSvg" viewBox="0 0 640 120" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <p class="diff-readout" id="diffReadout">Signal remaining: <strong>100%</strong> · noise added: <strong>0%</strong></p>
+          <p class="diff-caption">Same random noise sample is reused at every step so only t changes what you see.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ x_t = \sqrt{\bar{\alpha}_t}\; x_0 + \sqrt{1-\bar{\alpha}_t}\; \varepsilon $$</div>
+      <p>
+        Stepping through the blend sixty times in a row to reach $x_{60}$ would be slow, especially when training on millions of images. Just like Lesson 10.2 traded step-by-step tracing for a direct exponential formula, diffusion has a closed-form shortcut: $\bar{\alpha}_t$ is the running product of every $(1-\beta_s)$ up through step $t$, so it already bakes in the effect of all the previous steps. One multiplication and one noise draw jumps straight from $x_0$ to $x_t$ at any step, with no loop required.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$x_0$</span><span class="legend-text">The original, clean signal or image</span></div>
+        <div class="legend-item"><span class="legend-sym">$x_t$</span><span class="legend-text">The signal after t forward diffusion steps</span></div>
+        <div class="legend-item"><span class="legend-sym">$\bar{\alpha}_t$</span><span class="legend-text">The fraction of original signal strength left after t steps</span></div>
+        <div class="legend-item"><span class="legend-sym">$\varepsilon$</span><span class="legend-text">A single fresh sample of random noise, same shape as $x_0$</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>As $t$ grows large, $\bar{\alpha}_t$ shrinks toward 0. Looking at the closed-form formula, what does $x_t$ become in that limit, and why is that exactly the goal of forward diffusion?</li>
+          <li>Lesson 10.2's exact solution was $y = Ce^{kt}$. What role does $\bar{\alpha}_t$ play here that $e^{kt}$ played there?</li>
+          <li>Why is being able to jump straight to any noise level $t$, instead of looping through every earlier step, especially valuable when training on millions of images?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>As $\bar{\alpha}_t \to 0$, the term $\sqrt{\bar{\alpha}_t}\,x_0$ vanishes and $\sqrt{1-\bar{\alpha}_t}$ approaches 1, so $x_t$ becomes essentially just $\varepsilon$ — pure random noise with no trace of the original signal. That's precisely the destination forward diffusion is built to reach.</li>
+              <li>Both act as a compounding multiplier that summarizes many small repeated steps into one number. $e^{kt}$ compounds continuous proportional growth or decay over time; $\bar{\alpha}_t$ compounds the small noise-mixing factor from every step into one running product, letting you skip straight to step $t$.</li>
+              <li>Training needs many images at many different noise levels. Looping through every step for every image would multiply the cost by the number of steps; the closed form makes each training example a single quick calculation, so training can scale to huge datasets.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    var svg = document.getElementById('diffSvg');
+    var slider = document.getElementById('diffT');
+    var tLabel = document.getElementById('diffTValue');
+    var readout = document.getElementById('diffReadout');
+
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var N = 48;
+    var T = 60;
+    var betaStart = 0.001;
+    var betaEnd = 0.15;
+
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0;
+        seed = (seed + 0x6D2B79F5) | 0;
+        var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    var rng = mulberry32(20260101);
+
+    function gaussianNoise() {
+      var u1 = Math.max(rng(), 1e-6);
+      var u2 = rng();
+      return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+
+    var x0 = [];
+    for (var i = 0; i < N; i++) {
+      var pos = i / (N - 1);
+      var bump1 = Math.exp(-Math.pow(pos - 0.3, 2) / (2 * 0.05 * 0.05));
+      var bump2 = 0.8 * Math.exp(-Math.pow(pos - 0.7, 2) / (2 * 0.03 * 0.03));
+      var val = 0.1 + 0.85 * Math.max(bump1, bump2);
+      x0.push(Math.min(1, Math.max(0, val)));
+    }
+
+    var noise = [];
+    for (var j = 0; j < N; j++) {
+      noise.push(gaussianNoise());
+    }
+
+    var alphaBar = [1];
+    for (var s = 1; s <= T; s++) {
+      var beta = betaStart + (betaEnd - betaStart) * (s - 1) / (T - 1);
+      var alpha = 1 - beta;
+      alphaBar.push(alphaBar[s - 1] * alpha);
+    }
+
+    var rects = [];
+    var barW = 640 / N;
+    for (var k = 0; k < N; k++) {
+      var rect = document.createElementNS(SVG_NS, 'rect');
+      rect.setAttribute('x', (k * barW).toFixed(2));
+      rect.setAttribute('y', 0);
+      rect.setAttribute('width', Math.ceil(barW));
+      rect.setAttribute('height', 120);
+      svg.appendChild(rect);
+      rects.push(rect);
+    }
+
+    function grayscale(value) {
+      var clamped = Math.min(1, Math.max(0, value));
+      var v = Math.round(clamped * 255);
+      return 'rgb(' + v + ',' + v + ',' + v + ')';
+    }
+
+    function render(t) {
+      var abar = alphaBar[t];
+      var sigSqrt = Math.sqrt(abar);
+      var noiseSqrt = Math.sqrt(1 - abar);
+      for (var i = 0; i < N; i++) {
+        var xt = sigSqrt * x0[i] + noiseSqrt * noise[i];
+        rects[i].setAttribute('fill', grayscale(xt));
+      }
+      tLabel.textContent = 't = ' + t + ' / ' + T;
+      readout.innerHTML = 'Signal remaining: <strong>' + Math.round(sigSqrt * 100) + '%</strong> · noise added: <strong>' + Math.round(noiseSqrt * 100) + '%</strong>';
+    }
+
+    slider.addEventListener('input', function () {
+      render(parseInt(slider.value, 10));
+    });
+
+    render(0);
+  })();
+  </script>
+</body>
+</html>

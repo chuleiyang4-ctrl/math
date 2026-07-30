@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How to solve a differential equation by stepping through its slope field, and how to check a solution by substitution.">
+  <title>Solving Simple Differential Equations | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    #odeLab {
+      display: grid;
+      gap: 18px;
+    }
+    #odeLab .ode-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--ink-dim);
+    }
+    #odeLab .ode-controls label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #odeLab input[type="range"] {
+      width: 180px;
+      accent-color: var(--cyan);
+    }
+    #odeLab .ode-h-value {
+      min-width: 40px;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+    #odeLab .ode-btn {
+      min-height: 32px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #odeLab .ode-btn.is-primary {
+      color: var(--cyan);
+      border-color: color-mix(in srgb, var(--cyan) 45%, var(--line));
+    }
+    #odeLab .ode-btn:hover {
+      color: var(--ink);
+      border-color: color-mix(in srgb, var(--cyan) 45%, var(--line));
+    }
+    #odeLab .ode-svg-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    #odeLab svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #odeLab .ode-axis {
+      stroke: var(--line);
+      stroke-width: 1;
+    }
+    #odeLab .ode-exact {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 1.6;
+      stroke-dasharray: 5 5;
+      opacity: .8;
+    }
+    #odeLab .ode-euler-line {
+      fill: none;
+      stroke: var(--amber);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #odeLab .ode-euler-dot {
+      fill: var(--amber);
+      stroke: var(--bg-2);
+      stroke-width: 1.5;
+    }
+    #odeLab .ode-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 0;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      color: var(--ink-dim);
+    }
+    #odeLab .ode-readout strong {
+      color: var(--ink);
+    }
+    #odeLab .ode-legend-inline {
+      display: flex;
+      gap: 18px;
+      font-family: var(--font-mono);
+      font-size: .74rem;
+      color: var(--ink-faint);
+    }
+    #odeLab .ode-legend-inline span::before {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    #odeLab .ode-legend-inline .lg-exact::before { background: var(--cyan); }
+    #odeLab .ode-legend-inline .lg-euler::before { background: var(--amber); }
+  </style>
+</head>
+<body data-lesson-id="10.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 10 · Lesson 10.2</p>
+      <h1>Solving Simple Differential Equations</h1>
+      <p class="lesson-summary">
+        Solving a differential equation means finding the actual path that follows the slope field everywhere — either by stepping through the arrows, or by finding an exact formula and checking it fits.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Lesson 10.1 showed a field of tiny arrows, one for every point, telling you which way a curve would move if it were there. But a field of arrows isn't an answer by itself. Solving the differential equation means producing the one curve that starts where you say and follows those arrows at every single instant.
+      </p>
+      <p>
+        There are two ways to get that curve. You can step through the field physically: stand at your starting point, look at the arrow there, take a small step in that direction, look at the new arrow, and repeat. Or, for equations simple enough, you can guess a formula, check that its slope matches the equation everywhere, and skip the stepping entirely.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Checking a candidate solution is just substitution. If someone claims $y = 100e^{0.08t}$ solves $\frac{dy}{dt} = 0.08y$, differentiate the candidate and see if it matches $0.08$ times the candidate itself. If both sides agree for every $t$, the candidate is a genuine solution — not just a curve that happens to look right.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="20" y1="110" x2="150" y2="110" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="20" y1="110" x2="20" y2="15" stroke="var(--line)" stroke-width="1"></line>
+            <path d="M 22 105 C 55 100, 90 78, 140 25" fill="none" stroke="var(--cyan)" stroke-width="2"></path>
+            <text x="60" y="18" fill="var(--ink-dim)" font-size="9" font-family="IBM Plex Mono, monospace">y = 100e^0.08t</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Candidate</span><span class="r">y = 100e^0.08t</span></div>
+          <div class="row"><span class="l">Differentiate</span><span class="r">dy/dt = 100 · 0.08 · e^0.08t</span></div>
+          <div class="row"><span class="l">Rewrite</span><span class="r">dy/dt = 0.08 · (100e^0.08t)</span></div>
+          <div class="row"><span class="l">Compare to 0.08y</span><span class="r">dy/dt = 0.08y</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">Matches — it's a solution</span></div>
+        </div>
+      </div>
+      <p>
+        That trick works because $\frac{d}{dt}e^{kt} = ke^{kt}$ — the exponential function is its own derivative up to a constant, which is exactly the self-referencing behavior $\frac{dy}{dt} = ky$ demands. But not every equation hands you such a clean guess. The interactive below builds the solution the other way: by walking through the field step by step.
+      </p>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Starting from $y(0) = 1$ with $\frac{dy}{dt} = 0.5y$, press <strong>Step forward</strong> to take one small hop in the direction the field points, then land, look around, and step again. The dashed curve is the exact solution $y = e^{0.5t}$ for comparison. Try a smaller step size and see the stepped path hug the exact curve more closely.
+      </p>
+      <div class="interactive-card">
+        <div id="odeLab">
+          <div class="ode-controls">
+            <label>
+              step size h
+              <input type="range" id="odeH" min="0.1" max="1" step="0.1" value="0.5">
+              <span class="ode-h-value" id="odeHValue">0.5</span>
+            </label>
+            <button type="button" class="ode-btn is-primary" id="odeStep">Step forward</button>
+            <button type="button" class="ode-btn" id="odeReset">Reset</button>
+          </div>
+          <div class="ode-svg-wrap">
+            <svg id="odeSvg" viewBox="0 0 640 340" xmlns="http://www.w3.org/2000/svg">
+              <line class="ode-axis" x1="50" y1="20" x2="50" y2="300"></line>
+              <line class="ode-axis" x1="50" y1="300" x2="610" y2="300"></line>
+              <path id="odeExact" class="ode-exact"></path>
+              <path id="odeEulerLine" class="ode-euler-line"></path>
+              <g id="odeDots"></g>
+            </svg>
+          </div>
+          <div class="ode-legend-inline">
+            <span class="lg-exact">Exact solution y = e^0.5t</span>
+            <span class="lg-euler">Stepped path (Euler's method)</span>
+          </div>
+          <p class="ode-readout" id="odeReadout">t = 0.00 · stepped y = 1.00 · exact y = 1.00 · gap = 0.00</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ y(t) = C\,e^{kt} $$</div>
+      <p>
+        For the whole family of equations $\frac{dy}{dt} = ky$, the exact solution is always an exponential. You find it by separating the variables — moving every $y$ to one side and every $t$ to the other, $\frac{dy}{y} = k\,dt$ — then integrating both sides. The constant $C$ isn't free; it's pinned down by the starting value, since $y(0) = C$. Stepping through the field, as in the lab above, is how you approximate this same curve when no clean formula is available, or as a way to sanity-check a formula you already found.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$y(t)$</span><span class="legend-text">The exact solution function, giving the value at any time $t$</span></div>
+        <div class="legend-item"><span class="legend-sym">$C$</span><span class="legend-text">The starting value $y(0)$, fixed by the initial condition</span></div>
+        <div class="legend-item"><span class="legend-sym">$k$</span><span class="legend-text">The same rate constant from the differential equation</span></div>
+        <div class="legend-item"><span class="legend-sym">$e$</span><span class="legend-text">Euler's number, the base whose exponential is its own derivative</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>If you cut the step size $h$ in half, roughly what happens to how closely the stepped path tracks the exact curve? Why doesn't a smaller step make the path perfectly exact?</li>
+          <li>Suppose someone proposes $y = 5e^{0.5t}$ as a solution to $\frac{dy}{dt} = 0.5y$ with $y(0) = 1$. Using substitution, is it a valid solution to the equation? Is it the solution that matches this starting condition?</li>
+          <li>Two different starting points, $y(0)=1$ and $y(0)=3$, both follow $\frac{dy}{dt}=0.5y$. Will their stepped paths ever cross each other? What does that tell you about solutions to this kind of equation?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Halving $h$ roughly halves the gap between the stepped path and the exact curve, since Euler's method uses the slope at the start of each step rather than the true changing slope across the step. Even a tiny step still commits this small error every hop, so it never becomes exactly zero — only smaller.</li>
+              <li>Substitution shows $\frac{d}{dt}(5e^{0.5t}) = 0.5 \cdot 5e^{0.5t}$, which does equal $0.5y$, so it is a valid solution to the differential equation. But it doesn't match $y(0)=1$, since $5e^{0} = 5 \ne 1$ — it solves the equation while answering a different starting condition.</li>
+              <li>They never cross. Because $\frac{dy}{dt}=ky$ only depends on the current value of $y$, two curves that start at different heights keep responding to the field in the same proportional way and never converge to the same value at the same time — solutions to this kind of equation stay ordered forever.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+  (function () {
+    var svg = document.getElementById('odeSvg');
+    var exactPath = document.getElementById('odeExact');
+    var eulerLine = document.getElementById('odeEulerLine');
+    var dotsGroup = document.getElementById('odeDots');
+    var hSlider = document.getElementById('odeH');
+    var hValueLabel = document.getElementById('odeHValue');
+    var stepBtn = document.getElementById('odeStep');
+    var resetBtn = document.getElementById('odeReset');
+    var readout = document.getElementById('odeReadout');
+
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+
+    var plot = { x0: 50, x1: 610, y0: 300, y1: 20 };
+    var domain = { tMin: 0, tMax: 4, yMin: 0, yMax: 8 };
+    var k = 0.5;
+    var y0 = 1;
+
+    var h = parseFloat(hSlider.value);
+    var points = [];
+
+    function toPx(t, y) {
+      var px = plot.x0 + (t - domain.tMin) / (domain.tMax - domain.tMin) * (plot.x1 - plot.x0);
+      var py = plot.y0 + (y - domain.yMin) / (domain.yMax - domain.yMin) * (plot.y1 - plot.y0);
+      return { x: px, y: py };
+    }
+
+    function drawExact() {
+      var steps = 80;
+      var d = '';
+      for (var i = 0; i <= steps; i++) {
+        var t = domain.tMin + (i / steps) * (domain.tMax - domain.tMin);
+        var y = y0 * Math.exp(k * t);
+        if (y > domain.yMax + 2) continue;
+        var p = toPx(t, y);
+        d += (d === '' ? 'M ' : ' L ') + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
+      }
+      exactPath.setAttribute('d', d);
+    }
+
+    function redrawEuler() {
+      while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+      var d = '';
+      for (var i = 0; i < points.length; i++) {
+        var p = toPx(points[i].t, points[i].y);
+        d += (i === 0 ? 'M ' : ' L ') + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
+        var dot = document.createElementNS(SVG_NS, 'circle');
+        dot.setAttribute('class', 'ode-euler-dot');
+        dot.setAttribute('cx', p.x);
+        dot.setAttribute('cy', p.y);
+        dot.setAttribute('r', 4);
+        dotsGroup.appendChild(dot);
+      }
+      eulerLine.setAttribute('d', d);
+      updateReadout();
+    }
+
+    function updateReadout() {
+      var last = points[points.length - 1];
+      var exactY = y0 * Math.exp(k * last.t);
+      var gap = Math.abs(exactY - last.y);
+      readout.textContent =
+        't = ' + last.t.toFixed(2) +
+        ' · stepped y = ' + last.y.toFixed(2) +
+        ' · exact y = ' + exactY.toFixed(2) +
+        ' · gap = ' + gap.toFixed(2);
+    }
+
+    function resetPath() {
+      points = [{ t: 0, y: y0 }];
+      redrawEuler();
+    }
+
+    function stepForward() {
+      var last = points[points.length - 1];
+      if (last.t >= domain.tMax) return;
+      var nextT = last.t + h;
+      var nextY = last.y + k * last.y * h;
+      points.push({ t: nextT, y: nextY });
+      redrawEuler();
+    }
+
+    hSlider.addEventListener('input', function () {
+      h = parseFloat(hSlider.value);
+      hValueLabel.textContent = h.toFixed(1);
+      resetPath();
+    });
+
+    stepBtn.addEventListener('click', stepForward);
+    resetBtn.addEventListener('click', resetPath);
+
+    hValueLabel.textContent = h.toFixed(1);
+    drawExact();
+    resetPath();
+  })();
+  </script>
+</body>
+</html>
