@@ -46,6 +46,26 @@
     );
   };
 
+  const loadMathAIAssets = () => {
+    if (!document.querySelector('link[href="math-ai.css"]')) {
+      const style = document.createElement("link");
+      style.rel = "stylesheet";
+      style.href = "math-ai.css";
+      document.head.append(style);
+    }
+
+    if (window.MathAI) {
+      window.MathAI.initialize();
+      return;
+    }
+    if (!document.querySelector('script[src="math-ai.js"]')) {
+      const script = document.createElement("script");
+      script.src = "math-ai.js";
+      script.defer = true;
+      document.head.append(script);
+    }
+  };
+
   const addCourseTopbar = () => {
     if (document.querySelector(".course-topbar")) return;
 
@@ -87,6 +107,7 @@
 
     document.body.prepend(header);
     document.body.append(panel);
+    loadMathAIAssets();
 
     header.querySelector(".course-search").addEventListener("submit", (event) => {
       event.preventDefault();
