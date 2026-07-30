@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See how any wiggly signal can be built by adding up simple spinning circles at different speeds.">
+  <title>The Fourier Transform | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="11.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 11 · Lesson 11.2</p>
+      <h1>The Fourier Transform</h1>
+      <p class="lesson-summary">
+        Any wiggly signal, no matter how jagged, can be built by adding together simple circles spinning at different speeds.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        A single point spinning at a constant speed traces a plain sine wave when you watch just its height
+        over time. That's boring on its own — but attach a second, smaller spinning point to the tip of the
+        first one, let it spin faster, and their combined height traces something far more interesting.
+      </p>
+      <p>
+        Keep attaching more spinning circles at different speeds and sizes, and you can build up almost any
+        shape of wiggle. The Fourier transform is the reverse trick: given a complicated signal, it tells you
+        exactly which spinning circles — which frequencies and amplitudes — you'd need to reconstruct it.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          An audio equalizer's bass, mid, and treble sliders are literally turning up or down the amplitude of
+          different spinning circles inside the sound. JPEG compression works the same way for images: keep
+          the slow, important circles and discard the fast, barely-noticeable ones.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A big circle with a small circle attached, tracing a combined wave">
+            <line x1="10" y1="65" x2="120" y2="65" stroke="var(--line)" stroke-width="1"></line>
+            <circle cx="45" cy="65" r="30" fill="none" stroke="var(--cyan)" stroke-width="1.5"></circle>
+            <circle cx="60" cy="35" r="15" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="2,2"></circle>
+            <line x1="45" y1="65" x2="60" y2="35" stroke="var(--cyan)" stroke-width="1.5"></line>
+            <line x1="60" y1="35" x2="75" y2="35" stroke="var(--amber)" stroke-width="1.5"></line>
+            <circle cx="75" cy="35" r="4" fill="var(--green)"></circle>
+            <line x1="75" y1="35" x2="120" y2="35" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2,2"></line>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">f(θ) = sin(θ) + 0.5·sin(3θ)</span><span class="r">θ = 30°</span></div>
+          <div class="row"><span class="l">sin(30°)</span><span class="r">0.5</span></div>
+          <div class="row"><span class="l">0.5 · sin(3 × 30°) = 0.5 · sin(90°)</span><span class="r">0.5</span></div>
+          <div class="row"><span class="l">Answer: f(30°) = 0.5 + 0.5</span><span class="r">1.0</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Adjust the second circle's speed (harmonic) and size (amplitude), then drag the angle slider to sweep
+        through time. Watch the green dot trace the combined wave on the right.
+      </p>
+      <div class="interactive-card">
+        <div id="fourierLab">
+          <svg id="flSvg" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two spinning circles on the left tracing a combined wave on the right">
+            <line x1="10" y1="110" x2="330" y2="110" stroke="var(--line)" stroke-width="1"></line>
+            <circle cx="90" cy="110" r="45" fill="none" stroke="var(--cyan)" stroke-width="1.5"></circle>
+            <line id="flArm1" x1="90" y1="110" x2="135" y2="110" stroke="var(--cyan)" stroke-width="2"></line>
+            <circle id="flCircle2" cx="135" cy="110" r="22" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="2,2"></circle>
+            <line id="flArm2" x1="135" y1="110" x2="157" y2="110" stroke="var(--amber)" stroke-width="2"></line>
+            <circle id="flTip" cx="157" cy="110" r="5" fill="var(--green)"></circle>
+            <line id="flConnector" x1="157" y1="110" x2="140" y2="110" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2,3"></line>
+            <path id="flWavePath" d="" fill="none" stroke="var(--ink-dim)" stroke-width="1.5"></path>
+            <circle id="flMarker" cx="140" cy="110" r="4" fill="var(--green)"></circle>
+          </svg>
+          <div class="fl-controls">
+            <label for="flHarmonic">Second circle speed (harmonic n) = <span id="flHarmonicVal">3</span></label>
+            <input type="range" id="flHarmonic" min="1" max="6" step="1" value="3">
+            <label for="flAmp">Second circle amplitude = <span id="flAmpVal">0.50</span></label>
+            <input type="range" id="flAmp" min="0" max="1" step="0.05" value="0.5">
+            <label for="flTheta">Angle θ = <span id="flThetaVal">30°</span></label>
+            <input type="range" id="flTheta" min="0" max="360" step="1" value="30">
+          </div>
+          <div class="fl-readout">f(θ) = <strong id="flFVal">1.00</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ f(\theta) = \sum_{k=1}^{N} a_k \sin(k\theta) $$</div>
+      <p>
+        Every term in the sum is one spinning circle: $k$ sets how fast it spins relative to the others, and
+        $a_k$ sets how big it is. The Fourier transform works backward from a signal to find these
+        $a_k$ values — which circles, and how much of each, were used to build it.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$f(\theta)$</span><span class="legend-text">The combined signal at angle (or time) $\theta$</span></div>
+        <div class="legend-item"><span class="legend-sym">$k$</span><span class="legend-text">The harmonic number — how many times faster this circle spins</span></div>
+        <div class="legend-item"><span class="legend-sym">$a_k$</span><span class="legend-text">The amplitude — how large the $k$-th spinning circle is</span></div>
+        <div class="legend-item"><span class="legend-sym">$N$</span><span class="legend-text">The number of spinning circles being summed together</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>If you set the second circle's amplitude to 0, what does the combined wave look like, and why?</li>
+          <li>Why does increasing the harmonic number make the wave look more jagged instead of just faster?</li>
+          <li>An equalizer boosts "treble" — which typically means high harmonics. What would that do to the amplitudes $a_k$ for large $k$?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>It becomes a plain sine wave, since the second term drops out entirely and only the first spinning circle contributes to the height.</li>
+              <li>A higher harmonic completes more full spins within the same stretch of θ, so it adds and subtracts from the base wave more often, creating extra wiggles rather than just speeding up the overall shape.</li>
+              <li>Boosting treble increases the $a_k$ values for large $k$, giving the fast-spinning, high-frequency circles more influence on the final combined sound.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style id="fourierLabStyle">
+    #fourierLab { font-family: var(--font-body); }
+    #fourierLab svg { width: 100%; height: auto; display: block; }
+    #fourierLab .fl-controls {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: var(--font-mono);
+      color: var(--ink);
+      font-size: .88rem;
+    }
+    #fourierLab .fl-controls label { margin-top: 8px; }
+    #fourierLab .fl-controls label:first-child { margin-top: 0; }
+    #fourierLab .fl-controls input[type="range"] { width: 100%; accent-color: var(--cyan); }
+    #fourierLab .fl-readout {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+      font-size: .92rem;
+    }
+    #fourierLab .fl-readout strong { color: var(--green); }
+  </style>
+
+  <script>
+    (function () {
+      var cx1 = 90, cy1 = 110, r1 = 45;
+      var plotLeft = 140, plotRight = 330, plotBase = 110, plotScale = 40;
+
+      var harmonicSlider = document.getElementById('flHarmonic');
+      var harmonicVal = document.getElementById('flHarmonicVal');
+      var ampSlider = document.getElementById('flAmp');
+      var ampVal = document.getElementById('flAmpVal');
+      var thetaSlider = document.getElementById('flTheta');
+      var thetaVal = document.getElementById('flThetaVal');
+      var fVal = document.getElementById('flFVal');
+
+      var arm1 = document.getElementById('flArm1');
+      var circle2 = document.getElementById('flCircle2');
+      var arm2 = document.getElementById('flArm2');
+      var tip = document.getElementById('flTip');
+      var connector = document.getElementById('flConnector');
+      var wavePath = document.getElementById('flWavePath');
+      var marker = document.getElementById('flMarker');
+
+      function deg2rad(d) { return d * Math.PI / 180; }
+
+      function signal(thetaDeg, n, amp) {
+        var t = deg2rad(thetaDeg);
+        return Math.sin(t) + amp * Math.sin(n * t);
+      }
+
+      function thetaToX(thetaDeg) {
+        return plotLeft + (thetaDeg / 360) * (plotRight - plotLeft);
+      }
+
+      function buildWavePath(n, amp) {
+        var d = '';
+        for (var deg = 0; deg <= 360; deg += 5) {
+          var x = thetaToX(deg);
+          var y = plotBase - plotScale * signal(deg, n, amp);
+          d += (deg === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+        }
+        wavePath.setAttribute('d', d);
+      }
+
+      function update() {
+        var n = parseInt(harmonicSlider.value, 10);
+        var amp = parseFloat(ampSlider.value);
+        var thetaDeg = parseFloat(thetaSlider.value);
+        var theta = deg2rad(thetaDeg);
+
+        harmonicVal.textContent = n;
+        ampVal.textContent = amp.toFixed(2);
+        thetaVal.textContent = thetaDeg.toFixed(0) + '°';
+
+        var tip1x = cx1 + r1 * Math.cos(theta);
+        var tip1y = cy1 - r1 * Math.sin(theta);
+        var r2 = amp * 22;
+        var tip2x = tip1x + r2 * Math.cos(n * theta);
+        var tip2y = tip1y - r2 * Math.sin(n * theta);
+
+        arm1.setAttribute('x2', tip1x); arm1.setAttribute('y2', tip1y);
+        circle2.setAttribute('cx', tip1x); circle2.setAttribute('cy', tip1y); circle2.setAttribute('r', r2);
+        arm2.setAttribute('x2', tip2x); arm2.setAttribute('y2', tip2y);
+        tip.setAttribute('cx', tip2x); tip.setAttribute('cy', tip2y);
+
+        var f = signal(thetaDeg, n, amp);
+        var markerX = thetaToX(thetaDeg);
+        var markerY = plotBase - plotScale * f;
+
+        connector.setAttribute('x1', tip2x);
+        connector.setAttribute('y1', tip2y);
+        connector.setAttribute('x2', markerX);
+        connector.setAttribute('y2', markerY);
+
+        marker.setAttribute('cx', markerX);
+        marker.setAttribute('cy', markerY);
+
+        buildWavePath(n, amp);
+        fVal.textContent = f.toFixed(2);
+      }
+
+      harmonicSlider.addEventListener('input', update);
+      ampSlider.addEventListener('input', update);
+      thetaSlider.addEventListener('input', update);
+
+      update();
+    })();
+  </script>
+</body>
+</html>

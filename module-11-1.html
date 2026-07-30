@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See why multiplying a complex number by i is nothing more than rotating it 90 degrees around the origin.">
+  <title>Complex Numbers as 2D Rotations | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="11.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 11 · Lesson 11.1</p>
+      <h1>Complex Numbers as 2D Rotations</h1>
+      <p class="lesson-summary">
+        A complex number is a point on a plane, and multiplying by i is just a 90-degree spin around the origin — nothing more mysterious than that.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Plot a complex number $a + bi$ as the point $(a, b)$: the real part is how far right, the imaginary
+        part is how far up. Once you see it that way, multiplication by $i$ stops looking like an algebra
+        trick — it's a rotation. Take any point, spin it a quarter turn counterclockwise around the origin,
+        and you've just multiplied it by $i$.
+      </p>
+      <p>
+        This is why complex numbers show up anywhere a phase or rotation needs tracking, like the phase
+        shift of an audio signal: rotating the "angle" of a wave is literally multiplying its complex
+        representation by a number on the unit circle.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Multiplying $a + bi$ by $i$ swaps the real and imaginary parts and flips a sign:
+          $i(a + bi) = ai + bi^2 = -b + ai$. The point $(a, b)$ becomes $(-b, a)$ — exactly a 90° rotation.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Point (3,2) rotating to (-2,3) after multiplying by i">
+            <line x1="10" y1="65" x2="120" y2="65" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="65" y1="10" x2="65" y2="120" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="65" y1="65" x2="101" y2="25" stroke="var(--amber)" stroke-width="1.5"></line>
+            <circle cx="101" cy="25" r="5" fill="var(--amber)"></circle>
+            <text x="106" y="20" fill="var(--ink-dim)" font-family="IBM Plex Mono, monospace" font-size="9">3+2i</text>
+            <line x1="65" y1="65" x2="41" y2="1" stroke="var(--green)" stroke-width="1.5" transform="translate(0,24)"></line>
+            <circle cx="41" cy="25" r="5" fill="var(--green)"></circle>
+            <text x="6" y="20" fill="var(--ink-dim)" font-family="IBM Plex Mono, monospace" font-size="9">-2+3i</text>
+            <path d="M 87,52 A 20,20 0 0 1 55,44" fill="none" stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="2,2"></path>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">z = 3 + 2i</span><span class="r">(a=3, b=2)</span></div>
+          <div class="row"><span class="l">i · z = 3i + 2i²</span><span class="r">3i − 2</span></div>
+          <div class="row"><span class="l">Simplify</span><span class="r">−2 + 3i</span></div>
+          <div class="row"><span class="l">Answer: new point</span><span class="r">(−2, 3)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Drag the angle slider to rotate the point $z = 3 + 2i$ around the origin. Watch what happens right
+        at 90° — that's exactly multiplication by $i$.
+      </p>
+      <div class="interactive-card">
+        <div id="cplxRotator">
+          <svg id="crPlane" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Complex plane with a rotating point">
+            <line x1="10" y1="110" x2="210" y2="110" stroke="var(--line)" stroke-width="1"></line>
+            <line x1="110" y1="10" x2="110" y2="210" stroke="var(--line)" stroke-width="1"></line>
+            <circle cx="110" cy="110" r="80" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,4"></circle>
+            <line id="crOrigLine" x1="110" y1="110" x2="170" y2="70" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="3,3"></line>
+            <circle id="crOrigPoint" cx="170" cy="70" r="4" fill="var(--ink-faint)"></circle>
+            <line id="crLine" x1="110" y1="110" x2="170" y2="70" stroke="var(--amber)" stroke-width="2"></line>
+            <circle id="crPoint" cx="170" cy="70" r="6" fill="var(--amber)"></circle>
+          </svg>
+          <div class="cr-controls">
+            <label for="crSlider">Rotation angle θ = <span id="crAngleVal">0°</span></label>
+            <input type="range" id="crSlider" min="-180" max="180" step="1" value="0">
+          </div>
+          <div class="cr-readout">
+            <span id="crResult">w = 3.00 + 2.00i</span>
+            <span id="crFlag" class="cr-flag">Aligned with ×i at θ = 90°</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ i \cdot (a + bi) = -b + ai $$</div>
+      <p>
+        More generally, multiplying any complex number by $\cos\theta + i\sin\theta$ rotates it by angle
+        $\theta$ around the origin without changing its distance from the origin. Multiplying by $i$ is just
+        the special case $\theta = 90°$.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$a, b$</span><span class="legend-text">The real and imaginary parts of the starting point</span></div>
+        <div class="legend-item"><span class="legend-sym">$i$</span><span class="legend-text">The imaginary unit, defined so that $i^2 = -1$</span></div>
+        <div class="legend-item"><span class="legend-sym">$-b + ai$</span><span class="legend-text">The same point after a 90° counterclockwise turn</span></div>
+        <div class="legend-item"><span class="legend-sym">$\theta$</span><span class="legend-text">The rotation angle when multiplying by a point on the unit circle</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>What point do you land on if you multiply by $i$ twice in a row, and how does that match $i^2 = -1$?</li>
+          <li>If multiplying by $i$ is a 90° rotation, what rotation does multiplying by $-i$ perform?</li>
+          <li>An audio signal's phase shift is applied by multiplying by $\cos\theta + i\sin\theta$. Why does this leave the signal's amplitude (distance from origin) unchanged?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Two 90° rotations land you 180° from where you started, which is the same as flipping the point to its negative — exactly what multiplying by $i^2 = -1$ does.</li>
+              <li>Multiplying by $-i$ rotates 90° in the opposite direction (clockwise), since $-i$ sits at $-90°$ on the unit circle.</li>
+              <li>$\cos\theta + i\sin\theta$ always has distance 1 from the origin, and multiplying two complex numbers multiplies their distances — so multiplying by a distance-1 number leaves distance unchanged, only the angle shifts.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style id="cplxRotatorStyle">
+    #cplxRotator { font-family: var(--font-body); }
+    #cplxRotator svg { width: min(260px, 100%); height: auto; display: block; margin: 0 auto; }
+    #cplxRotator .cr-controls {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: var(--font-mono);
+      color: var(--ink);
+      font-size: .9rem;
+    }
+    #cplxRotator .cr-controls input[type="range"] { width: 100%; accent-color: var(--amber); }
+    #cplxRotator .cr-readout {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+      font-size: .9rem;
+      text-align: center;
+    }
+    #cplxRotator .cr-flag {
+      color: var(--ink-faint);
+      font-size: .78rem;
+    }
+    #cplxRotator .cr-flag.is-active {
+      color: var(--green);
+    }
+    #cplxRotator .cr-flag.is-active ~ #crPoint,
+    #cplxRotator.cr-hit #crPoint {
+      fill: var(--green);
+    }
+  </style>
+
+  <script>
+    (function () {
+      var a0 = 3, b0 = 2;
+      var cx = 110, cy = 110, scale = 20;
+
+      var slider = document.getElementById('crSlider');
+      var angleVal = document.getElementById('crAngleVal');
+      var line = document.getElementById('crLine');
+      var point = document.getElementById('crPoint');
+      var result = document.getElementById('crResult');
+      var flag = document.getElementById('crFlag');
+
+      function toSvg(x, y) {
+        return [cx + x * scale, cy - y * scale];
+      }
+
+      function update() {
+        var thetaDeg = parseFloat(slider.value);
+        var theta = thetaDeg * Math.PI / 180;
+        var x = a0 * Math.cos(theta) - b0 * Math.sin(theta);
+        var y = a0 * Math.sin(theta) + b0 * Math.cos(theta);
+        var svgPt = toSvg(x, y);
+
+        angleVal.textContent = thetaDeg.toFixed(0) + '°';
+        line.setAttribute('x2', svgPt[0]);
+        line.setAttribute('y2', svgPt[1]);
+        point.setAttribute('cx', svgPt[0]);
+        point.setAttribute('cy', svgPt[1]);
+
+        var sign = y >= 0 ? ' + ' : ' − ';
+        result.textContent = 'w = ' + x.toFixed(2) + sign + Math.abs(y).toFixed(2) + 'i';
+
+        var isAligned = Math.abs(thetaDeg - 90) < 2.5;
+        if (isAligned) {
+          flag.classList.add('is-active');
+          point.setAttribute('fill', 'var(--green)');
+          line.setAttribute('stroke', 'var(--green)');
+        } else {
+          flag.classList.remove('is-active');
+          point.setAttribute('fill', 'var(--amber)');
+          line.setAttribute('stroke', 'var(--amber)');
+        }
+      }
+
+      slider.addEventListener('input', update);
+      update();
+    })();
+  </script>
+</body>
+</html>
