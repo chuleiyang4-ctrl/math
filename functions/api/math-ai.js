@@ -67,31 +67,23 @@ export async function onRequestPost(context) {
             "Explain reasoning step by step, define notation, and prefer hints before giving a final answer. " +
             "Use plain-text LaTeX delimiters $...$ and $$...$$ for formulas. " +
             "Do not claim to have seen material that was not supplied. " +
-            "If a question is unrelated to mathematics or the course, gently redirect the learner."
+            "If a question is unrelated to mathematics or the course, gently redirect the learner.\n\n" +
+            `Course context:\n${lessonContext || "General mathematics course."}`
         }
       ]
     },
     contents: [
-      {
-        role: "user",
-        parts: [{ text: `Course context:\n${lessonContext || "General mathematics course."}` }]
-      },
-      {
-        role: "model",
-        parts: [{ text: "I will use this course context to tutor the learner." }]
-      },
       ...history,
       { role: "user", parts: [{ text: message }] }
     ],
     generationConfig: {
-      temperature: 0.4,
       maxOutputTokens: 1200
     }
   };
 
   try {
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
       {
         method: "POST",
         headers: {
