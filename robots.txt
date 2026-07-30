@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://math-ek4.pages.dev/sitemap.xml
