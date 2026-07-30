@@ -1,34 +1,14 @@
 (() => {
   "use strict";
 
-  const STORAGE_THEME = "math-theme";
-  const STORAGE_FONT = "math-font";
   const DATA_URL = "course-data.json";
   const REPOSITORY_CONTENTS_URL =
     "https://api.github.com/repos/chuleiyang4-ctrl/math/contents?ref=main";
+  const SITE_ORIGIN = "https://math-ek4.pages.dev";
 
   const fileForLesson = (id) =>
     `module-${String(id).trim().toLowerCase().replaceAll(".", "-")}.html`;
 
-  const setPreference = (type, value) => {
-    document.body.dataset[type] = value;
-    localStorage.setItem(type === "theme" ? STORAGE_THEME : STORAGE_FONT, value);
-    document.querySelectorAll(`[data-set-${type}]`).forEach((button) => {
-      button.setAttribute(
-        "aria-pressed",
-        String(button.dataset[`set${type[0].toUpperCase()}${type.slice(1)}`] === value)
-      );
-    });
-  };
-
-  const applySavedPreferences = () => {
-    setPreference("theme", localStorage.getItem(STORAGE_THEME) || "dark");
-    setPreference("font", localStorage.getItem(STORAGE_FONT) || "sans");
-  };
-
-  // NOTE: course-data.json uses "moduleName" and "moduleId" (not "title"/
-  // "name"/"id" on the module object) — fixed here so moduleTitle resolves
-  // correctly if it's ever surfaced in the nav UI.
   const flattenLessons = (data) =>
     (data.modules || []).flatMap((module) =>
       (module.lessons || []).map((lesson) => ({
@@ -44,58 +24,133 @@
       index >= 0 && index < lessons.length;
       index += direction
     ) {
-      if (files.has(lessons[index].file)) return lessons[index];
+      if (files.has(lessons[index].file.toLowerCase())) return lessons[index];
     }
     return null;
   };
 
-  const navLink = (label, href, className = "") => {
+  const showComingSoon = (label) => {
+    let toast = document.querySelector(".course-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.className = "course-toast";
+      toast.setAttribute("role", "status");
+      document.body.append(toast);
+    }
+    toast.textContent = `${label} is coming soon.`;
+    toast.classList.add("is-visible");
+    window.clearTimeout(showComingSoon.timer);
+    showComingSoon.timer = window.setTimeout(
+      () => toast.classList.remove("is-visible"),
+      2200
+    );
+  };
+
+  const addCourseTopbar = () => {
+    if (document.querySelector(".course-topbar")) return;
+
+    document.querySelectorAll(".topbar, .course-page-nav").forEach((element) => element.remove());
+    document.querySelectorAll(".course-home-link").forEach((element) => element.remove());
+    document.body.classList.add("has-course-topbar");
+
+    const header = document.createElement("header");
+    header.className = "course-topbar";
+    header.innerHTML = `
+      <div class="course-topbar-inner">
+        <a class="course-brand" href="index.html" aria-label="Mathematics home">
+          <span class="course-brand-mark">∑</span>
+          <span class="course-brand-name">Mathematics</span>
+        </a>
+        <a class="course-tool-button" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
+        <form class="course-search" role="search">
+          <label class="sr-only" for="course-search-input">Search courses</label>
+          <input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off">
+        </form>
+        <button class="course-tool-button course-notebook-button" type="button" data-coming-soon="Notebook"><span aria-hidden="true">▤</span> Notebook</button>
+        <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
+        <button class="course-profile-button" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
+      </div>`;
+
+    const panel = document.createElement("aside");
+    panel.id = "math-ai-panel";
+    panel.className = "math-ai-panel";
+    panel.setAttribute("aria-hidden", "true");
+    panel.innerHTML = `
+      <div class="math-ai-head">
+        <div><small>ASSISTANT</small><strong>Math AI</strong></div>
+        <button type="button" class="math-ai-close" aria-label="Close Math AI">×</button>
+      </div>
+      <div class="math-ai-body">
+        <p>Ask questions about the lesson, request another explanation, or work through a problem.</p>
+        <div class="math-ai-placeholder">Math AI will be connected here in a future update.</div>
+      </div>`;
+
+    document.body.prepend(header);
+    document.body.append(panel);
+
+    header.querySelector(".course-search").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = header.querySelector("#course-search-input").value.trim();
+      window.location.href = query
+        ? `index.html?q=${encodeURIComponent(query)}#courses`
+        : "index.html#courses";
+    });
+
+    header.querySelectorAll("[data-coming-soon]").forEach((button) => {
+      button.addEventListener("click", () => showComingSoon(button.dataset.comingSoon));
+    });
+
+    const aiButton = header.querySelector(".course-ai-button");
+    const closeButton = panel.querySelector(".math-ai-close");
+    const setPanel = (open) => {
+      panel.classList.toggle("is-open", open);
+      panel.setAttribute("aria-hidden", String(!open));
+      aiButton.setAttribute("aria-expanded", String(open));
+    };
+    aiButton.addEventListener("click", () => setPanel(!panel.classList.contains("is-open")));
+    closeButton.addEventListener("click", () => setPanel(false));
+  };
+
+  const navCard = (lesson, direction) => {
     const link = document.createElement("a");
-    link.textContent = label;
-    link.href = href;
-    link.className = className;
+    if (!lesson) {
+      link.className = "nav-disabled";
+      link.href = "#";
+      link.setAttribute("aria-disabled", "true");
+      link.innerHTML = `<small>${direction}</small><strong>No published lesson</strong>`;
+      return link;
+    }
+
+    link.href = lesson.file;
+    link.innerHTML =
+      `<small>${direction} · ${lesson.id}</small>` +
+      `<strong>${lesson.title || `Lesson ${lesson.id}`}</strong>`;
     return link;
   };
 
-  const buildNavigation = (previous, next) => {
-    if (document.querySelector(".course-page-nav")) return;
-
+  const addBottomNavigation = (previous, next) => {
+    document.querySelectorAll(".course-page-nav").forEach((element) => element.remove());
+    if (document.querySelector(".lesson-course-nav")) return;
+    const main = document.querySelector("main") || document.body;
+    const footer = main.querySelector(".lesson-footer");
     const nav = document.createElement("nav");
-    nav.className = "course-page-nav";
-    nav.setAttribute("aria-label", "Course navigation");
+    nav.className = "lesson-course-nav";
+    nav.setAttribute("aria-label", "Previous and next lessons");
+    nav.append(navCard(previous, "Previous lesson"));
+    nav.append(navCard(next, "Next lesson"));
+    footer ? main.insertBefore(nav, footer) : main.append(nav);
+  };
 
-    nav.append(navLink("Home", "index.html", "nav-primary"));
-    nav.append(
-      previous
-        ? navLink(`← ${previous.id}`, previous.file)
-        : navLink("← Previous", "#", "nav-disabled")
-    );
-    nav.append(
-      next
-        ? navLink(`${next.id} →`, next.file)
-        : navLink("Curriculum →", "index.html#courses")
-    );
-
-    const spacer = document.createElement("span");
-    spacer.className = "course-nav-spacer";
-    nav.append(spacer);
-
-    [
-      ["Dark", "theme", "dark"],
-      ["Eye", "theme", "eye"],
-      ["Aa", "font", "sans"],
-      ["Serif", "font", "reader"]
-    ].forEach(([label, type, value]) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = label;
-      button.dataset[`set${type[0].toUpperCase()}${type.slice(1)}`] = value;
-      button.addEventListener("click", () => setPreference(type, value));
-      nav.append(button);
-    });
-
-    document.body.prepend(nav);
-    applySavedPreferences();
+  const showLessonIdWarning = (lessonId) => {
+    if (document.querySelector(".lesson-id-warning")) return;
+    const main = document.querySelector("main") || document.body;
+    const warning = document.createElement("div");
+    warning.className = "lesson-id-warning";
+    warning.setAttribute("role", "alert");
+    warning.textContent = lessonId
+      ? `Lesson ID "${lessonId}" was not found in course-data.json. Check data-lesson-id before publishing.`
+      : "This page has no data-lesson-id. Add the exact lesson ID from course-data.json before publishing.";
+    main.prepend(warning);
   };
 
   const renderMath = () => {
@@ -110,28 +165,63 @@
     }
   };
 
-  // Keeps the invisible SEO meta description in sync with the visible
-  // .lesson-summary text, so nobody has to remember to fill in both.
-  // Google shows this as the snippet under the search result title.
-  const syncMetaDescription = () => {
+  const upsertMeta = (selector, attributes) => {
+    let element = document.head.querySelector(selector);
+    if (!element) {
+      element = document.createElement(attributes.tag || "meta");
+      document.head.append(element);
+    }
+    Object.entries(attributes).forEach(([name, value]) => {
+      if (name !== "tag") element.setAttribute(name, value);
+    });
+    return element;
+  };
+
+  const improveSeo = (lessonId) => {
     const summary = document.querySelector(".lesson-summary");
-    const meta = document.querySelector('meta[name="description"]');
-    if (summary && meta) {
-      const text = summary.textContent.trim().replace(/\s+/g, " ");
-      if (text) meta.setAttribute("content", text);
+    const description =
+      summary?.textContent.trim().replace(/\s+/g, " ") ||
+      document.querySelector('meta[name="description"]')?.content ||
+      "Interactive mathematics lesson for AI, science, and engineering.";
+    const canonicalUrl = `${SITE_ORIGIN}/${window.location.pathname.split("/").pop()}`;
+
+    upsertMeta('meta[name="description"]', { name: "description", content: description });
+    upsertMeta('link[rel="canonical"]', { tag: "link", rel: "canonical", href: canonicalUrl });
+    upsertMeta('meta[property="og:type"]', { property: "og:type", content: "article" });
+    upsertMeta('meta[property="og:title"]', { property: "og:title", content: document.title });
+    upsertMeta('meta[property="og:description"]', { property: "og:description", content: description });
+    upsertMeta('meta[property="og:url"]', { property: "og:url", content: canonicalUrl });
+    upsertMeta('meta[name="twitter:card"]', { name: "twitter:card", content: "summary" });
+
+    if (!document.head.querySelector('script[data-course-schema="true"]')) {
+      const schema = document.createElement("script");
+      schema.type = "application/ld+json";
+      schema.dataset.courseSchema = "true";
+      schema.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        name: document.querySelector("h1")?.textContent.trim() || document.title,
+        description,
+        url: canonicalUrl,
+        inLanguage: "en",
+        learningResourceType: "lesson",
+        isPartOf: {
+          "@type": "Course",
+          name: "Mathematics",
+          url: `${SITE_ORIGIN}/`
+        },
+        position: lessonId || undefined
+      });
+      document.head.append(schema);
     }
   };
 
   const initialize = async () => {
-    applySavedPreferences();
+    addCourseTopbar();
     renderMath();
-    syncMetaDescription();
 
     const lessonId = document.body.dataset.lessonId;
-    if (!lessonId) {
-      buildNavigation(null, null);
-      return;
-    }
+    improveSeo(lessonId);
 
     try {
       const [dataResponse, filesResponse] = await Promise.all([
@@ -149,23 +239,30 @@
       const currentIndex = lessons.findIndex(
         (lesson) => String(lesson.id) === String(lessonId)
       );
-      const remoteFiles = filesResponse.ok ? await filesResponse.json() : [];
-      const files = new Set(
-        Array.isArray(remoteFiles) ? remoteFiles.map((item) => item.name) : []
-      );
 
-      if (currentIndex < 0) {
-        buildNavigation(null, null);
+      if (!lessonId || currentIndex < 0) {
+        showLessonIdWarning(lessonId);
+        addBottomNavigation(null, null);
         return;
       }
 
-      buildNavigation(
+      const remoteFiles = filesResponse.ok ? await filesResponse.json() : [];
+      const files = new Set(
+        Array.isArray(remoteFiles)
+          ? remoteFiles
+              .filter((item) => item.type === "file")
+              .map((item) => item.name.toLowerCase())
+          : []
+      );
+
+      addBottomNavigation(
         findPublishedNeighbor(lessons, files, currentIndex, -1),
         findPublishedNeighbor(lessons, files, currentIndex, 1)
       );
     } catch (error) {
-      console.warn(error);
-      buildNavigation(null, null);
+      console.error(error);
+      showLessonIdWarning(lessonId);
+      addBottomNavigation(null, null);
     }
   };
 
