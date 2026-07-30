@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How a random variable's outcomes settle into a predictable distribution shape">
+  <title>Random Variables &amp; Distributions | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    /* Scoped to #distShaper only — no shared classes redefined */
+    #distShaper {
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+    #distShaper .ds-mode {
+      display: flex;
+      gap: 8px;
+    }
+    #distShaper .ds-mode-btn {
+      min-height: 34px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      cursor: pointer;
+    }
+    #distShaper .ds-mode-btn.is-active {
+      border-color: color-mix(in srgb, var(--cyan) 55%, var(--line));
+      color: var(--cyan);
+    }
+    #distShaper .ds-chart {
+      width: min(460px, 100%);
+      height: 150px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    #distShaper .ds-bar-wrap {
+      flex: 1;
+      max-width: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      height: 100%;
+    }
+    #distShaper .ds-bar {
+      width: 100%;
+      min-height: 2px;
+      border-radius: 4px 4px 0 0;
+      background: var(--cyan);
+      transition: height .25s ease;
+    }
+    #distShaper .ds-bar-label {
+      margin-top: 6px;
+      color: var(--ink-faint);
+      font-family: var(--font-mono);
+      font-size: .68rem;
+    }
+    #distShaper .ds-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    #distShaper .ds-roll-btn {
+      min-height: 40px;
+      padding: 0 22px;
+      border: 1px solid color-mix(in srgb, var(--cyan) 40%, var(--line));
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: .88rem;
+      cursor: pointer;
+    }
+    #distShaper .ds-roll-btn:hover {
+      border-color: color-mix(in srgb, var(--cyan) 65%, var(--line));
+    }
+    #distShaper .ds-count {
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: .84rem;
+    }
+  </style>
+</head>
+<body data-lesson-id="8.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 8 · Lesson 8.2</p>
+      <h1>Random Variables &amp; Distributions</h1>
+      <p class="lesson-summary">
+        See how the outcomes of a random process settle into a predictable shape once you plot enough of them.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        A <strong>random variable</strong> is just a number attached to the outcome of
+        something uncertain — the value on a die, the reading off a noisy sensor, the
+        number of clicks an ad gets in an hour. On its own, one draw looks unpredictable.
+        But if you roll, measure, or sample the same process over and over and stack up
+        the results into a histogram, a shape emerges. That shape — which values show up
+        often, which show up rarely — is the variable's <strong>distribution</strong>.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A distribution doesn't tell you what any single draw will be. It tells you the
+          long-run shape: which outcomes are common, which are rare, and how the
+          probability is spread across all the values the variable could take. The more
+          samples you collect, the more clearly that shape appears — a single roll is
+          noise, but a thousand rolls reveal the pattern hiding underneath.
+        </p>
+      </div>
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Triangular histogram of sums of two dice, peaking at 7">
+            <g fill="#5fd4e8">
+              <rect x="6" y="105" width="16" height="15"></rect>
+              <rect x="26" y="90" width="16" height="30"></rect>
+              <rect x="46" y="75" width="16" height="45"></rect>
+              <rect x="66" y="60" width="16" height="60"></rect>
+              <rect x="86" y="45" width="16" height="75"></rect>
+              <rect x="106" y="30" width="16" height="90" fill="#e8b95f"></rect>
+              <rect x="126" y="45" width="16" height="75"></rect>
+              <rect x="146" y="60" width="16" height="60"></rect>
+              <rect x="166" y="75" width="16" height="45"></rect>
+              <rect x="186" y="90" width="16" height="30"></rect>
+              <rect x="206" y="105" width="16" height="15"></rect>
+            </g>
+            <text x="114" y="24" fill="#9098ae" font-size="10" font-family="monospace" text-anchor="middle">sum = 7</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Ways to roll a sum of 7</span><span class="r">6</span></div>
+          <div class="row"><span class="l">Total two-dice outcomes (6×6)</span><span class="r">36</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">P(X=7) = 6/36 ≈ 0.167</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Pick one die or two, then keep rolling. Watch the bars grow and settle into a
+        shape as the sample count builds up.
+      </p>
+      <div class="interactive-card">
+        <div id="distShaper">
+          <div class="ds-mode">
+            <button type="button" class="ds-mode-btn is-active" data-dice="1" id="dsMode1">1 die</button>
+            <button type="button" class="ds-mode-btn" data-dice="2" id="dsMode2">2 dice</button>
+          </div>
+          <div class="ds-chart" id="dsChart"></div>
+          <div class="ds-actions">
+            <button type="button" class="ds-roll-btn" id="dsRollBtn">Roll</button>
+            <span class="ds-count" id="dsCount">0 rolls</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ P(X = x) = \frac{\text{number of outcomes where } X = x}{\text{total number of possible outcomes}} $$</div>
+      <p>
+        This is the same rule from carving up a circle, just applied value by value. For
+        each possible value $x$ the random variable could take, its probability is the
+        share of all outcomes that land on that value. Line those probabilities up across
+        every possible value and you get the full distribution — the shape you saw settle
+        into place in the lab above.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$X$</span><span class="legend-text">The random variable — a number tied to an uncertain outcome</span></div>
+        <div class="legend-item"><span class="legend-sym">$x$</span><span class="legend-text">One specific value X could take, like a sum of 7</span></div>
+        <div class="legend-item"><span class="legend-sym">$P(X=x)$</span><span class="legend-text">The probability that X lands on that particular value</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does a sum of 7 come up more often than a sum of 2 when rolling two dice?</li>
+          <li>If you switched to one die instead of two, how would the shape of the histogram change, and why?</li>
+          <li>A sensor's reading is the true value plus lots of small, independent random errors added together. Why might that produce a bell-shaped distribution rather than a flat one?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>There's only one way to roll a 2 (1+1), but six different pairs of dice values add up to 7 — more combinations means more ways for that outcome to occur, so it happens more often.</li>
+              <li>With one die, every value from 1 to 6 has exactly one way to occur, so the histogram flattens into a uniform shape instead of a triangle peaked in the middle.</li>
+              <li>When many small random errors are added together, extreme errors mostly cancel each other out while typical-sized errors combine more often, so results pile up near the true value and thin out toward the extremes — the same "more combinations near the middle" effect seen with the two dice, just with many more terms.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var mode1Btn = document.getElementById('dsMode1');
+      var mode2Btn = document.getElementById('dsMode2');
+      var chart = document.getElementById('dsChart');
+      var rollBtn = document.getElementById('dsRollBtn');
+      var countLabel = document.getElementById('dsCount');
+
+      var dice = 1;
+      var counts = {};
+      var totalRolls = 0;
+
+      function valuesForMode() {
+        if (dice === 1) {
+          return [1, 2, 3, 4, 5, 6];
+        }
+        return [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      }
+
+      function resetCounts() {
+        counts = {};
+        totalRolls = 0;
+        valuesForMode().forEach(function (v) { counts[v] = 0; });
+        countLabel.textContent = '0 rolls';
+      }
+
+      function renderChart() {
+        var values = valuesForMode();
+        var maxCount = Math.max(1, Math.max.apply(null, values.map(function (v) { return counts[v]; })));
+        chart.innerHTML = '';
+        values.forEach(function (v) {
+          var wrap = document.createElement('div');
+          wrap.className = 'ds-bar-wrap';
+
+          var bar = document.createElement('div');
+          bar.className = 'ds-bar';
+          var heightPct = (counts[v] / maxCount) * 100;
+          bar.style.height = heightPct + '%';
+
+          var label = document.createElement('div');
+          label.className = 'ds-bar-label';
+          label.textContent = v;
+
+          wrap.appendChild(bar);
+          wrap.appendChild(label);
+          chart.appendChild(wrap);
+        });
+      }
+
+      function setMode(newDice) {
+        dice = newDice;
+        mode1Btn.classList.toggle('is-active', dice === 1);
+        mode2Btn.classList.toggle('is-active', dice === 2);
+        resetCounts();
+        renderChart();
+      }
+
+      function rollDie() {
+        return Math.floor(Math.random() * 6) + 1;
+      }
+
+      rollBtn.addEventListener('click', function () {
+        var value = dice === 1 ? rollDie() : rollDie() + rollDie();
+        counts[value] += 1;
+        totalRolls += 1;
+        countLabel.textContent = totalRolls + (totalRolls === 1 ? ' roll' : ' rolls');
+        renderChart();
+      });
+
+      mode1Btn.addEventListener('click', function () { setMode(1); });
+      mode2Btn.addEventListener('click', function () { setMode(2); });
+
+      resetCounts();
+      renderChart();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Probability as the fraction of a whole a possible outcome takes up">
+  <title>Probability as a Measure of Belief | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    /* Scoped to #probSpinner only — no shared classes redefined */
+    #probSpinner {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      text-align: center;
+    }
+    #probSpinner .ps-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: min(360px, 100%);
+    }
+    #probSpinner .ps-controls label {
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+    #probSpinner input[type="range"] {
+      flex: 1;
+      accent-color: var(--cyan);
+    }
+    #probSpinner .ps-value {
+      min-width: 46px;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    #probSpinner .ps-wheel-wrap {
+      position: relative;
+      width: 190px;
+      height: 190px;
+    }
+    #probSpinner .ps-wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: conic-gradient(var(--cyan) 0% 50%, var(--ink-faint) 50% 100%);
+      transition: transform 2.1s cubic-bezier(.17,.67,.16,1);
+      transform: rotate(0deg);
+    }
+    #probSpinner .ps-pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-top: 14px solid var(--amber);
+    }
+    #probSpinner .ps-spin-btn {
+      min-height: 40px;
+      padding: 0 22px;
+      border: 1px solid color-mix(in srgb, var(--cyan) 40%, var(--line));
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: .88rem;
+      cursor: pointer;
+    }
+    #probSpinner .ps-spin-btn:hover {
+      border-color: color-mix(in srgb, var(--cyan) 65%, var(--line));
+    }
+    #probSpinner .ps-result {
+      min-height: 1.4em;
+      margin: 0;
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: .88rem;
+    }
+    #probSpinner .ps-key {
+      display: flex;
+      gap: 18px;
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: var(--ink-dim);
+    }
+    #probSpinner .ps-key span::before {
+      content: "●";
+      margin-right: 6px;
+    }
+    #probSpinner .ps-key .ps-key-a::before { color: var(--cyan); }
+    #probSpinner .ps-key .ps-key-b::before { color: var(--ink-faint); }
+  </style>
+</head>
+<body data-lesson-id="8.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 8 · Lesson 8.1</p>
+      <h1>Probability as a Measure of Belief</h1>
+      <p class="lesson-summary">
+        Learn to read probability as the fraction of a whole that one outcome carves out.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Imagine a circle representing every single thing that could happen. Now imagine
+        shading in a slice of that circle for one particular outcome you care about.
+        The bigger the slice, the more of the "whole" belongs to that outcome — and the
+        more likely it is. Probability is just a number that describes how big that slice
+        is, measured as a fraction of the entire circle.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A <strong>sample space</strong> is the whole circle — every possible outcome,
+          all together. An <strong>event</strong> is a slice of that circle — one outcome,
+          or a group of outcomes, you're interested in. The probability of an event is
+          simply how much of the circle's area that slice takes up, compared to the whole.
+          A slice covering half the circle has probability 0.5. A slice covering a tenth
+          of the circle has probability 0.1. Nothing more mysterious than that.
+        </p>
+      </div>
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A circle split into four equal quarter slices, two colored cyan and labeled A, one amber labeled B, one green labeled C">
+            <path d="M60,60 L60,10 A50,50 0 0,1 110,60 Z" fill="#5fd4e8"></path>
+            <path d="M60,60 L110,60 A50,50 0 0,1 60,110 Z" fill="#5fd4e8"></path>
+            <path d="M60,60 L60,110 A50,50 0 0,1 10,60 Z" fill="#e8b95f"></path>
+            <path d="M60,60 L10,60 A50,50 0 0,1 60,10 Z" fill="#7ee0a8"></path>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#0a0e1a" stroke-width="1.5"></circle>
+            <text x="83" y="40" fill="#0a0e1a" font-size="9" font-family="monospace" text-anchor="middle">A</text>
+            <text x="37" y="83" fill="#0a0e1a" font-size="9" font-family="monospace" text-anchor="middle">A</text>
+            <text x="37" y="98" fill="#0a0e1a" font-size="9" font-family="monospace" text-anchor="middle">B</text>
+            <text x="37" y="35" fill="#0a0e1a" font-size="9" font-family="monospace" text-anchor="middle">C</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Total equal slices</span><span class="r">4</span></div>
+          <div class="row"><span class="l">Slices labeled A</span><span class="r">2</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">P(A) = 2/4 = 0.5</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Drag the slider to change how much of the wheel belongs to "Success." Watch the
+        probability update live, then spin to see a single outcome play out.
+      </p>
+      <div class="interactive-card">
+        <div id="probSpinner">
+          <div class="ps-controls">
+            <label for="psSlider">P(Success)</label>
+            <input type="range" id="psSlider" min="1" max="99" value="50" aria-describedby="psValue">
+            <span class="ps-value" id="psValue">50%</span>
+          </div>
+          <div class="ps-wheel-wrap">
+            <div class="ps-wheel" id="psWheel"></div>
+            <div class="ps-pointer" aria-hidden="true"></div>
+          </div>
+          <div class="ps-key">
+            <span class="ps-key-a">Success</span>
+            <span class="ps-key-b">Failure</span>
+          </div>
+          <button class="ps-spin-btn" id="psSpinBtn" type="button">Spin</button>
+          <p class="ps-result" id="psResult" aria-live="polite">Spin to see an outcome.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ P(A) = \frac{\text{area of region } A}{\text{area of the whole sample space}} $$</div>
+      <p>
+        This is the same idea whether you're looking at a spinner, a deck of cards, or an
+        AI model's confidence score. The "area" doesn't have to be physical — it's a stand-in
+        for "share of the possibilities." A model that outputs 0.8 for a class is claiming
+        that class occupies 80% of its internal sense of what's possible.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$P(A)$</span><span class="legend-text">The probability of event A happening</span></div>
+        <div class="legend-item"><span class="legend-sym">$A$</span><span class="legend-text">The event, or slice, you're measuring</span></div>
+        <div class="legend-item"><span class="legend-sym">area of $A$</span><span class="legend-text">How much of the whole is devoted to that event</span></div>
+        <div class="legend-item"><span class="legend-sym">sample space</span><span class="legend-text">The entire circle — every outcome that could happen</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>A spinner has five equally sized slices. What's the probability of landing on any one specific slice, and why?</li>
+          <li>You widen one slice from 25% of the circle to 40%. What must happen to the rest of the circle, and why?</li>
+          <li>A weather forecaster says there's a 70% chance of rain tomorrow. In what way is this like a slice on a spinner — and in what way is it different?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>1/5, or 0.2. Five equal slices split the whole circle into five identical shares, so each one carries the same fraction of the total.</li>
+              <li>The other slices must shrink so their areas still add up to the remaining 60% — every probability in a sample space always sums to 1 (100%), so one slice can't grow without the rest giving up area.</li>
+              <li>It's alike in that 70% still means "this outcome covers 70% of the possibility space." It's different because a spinner's slices are fixed by measurement, while the forecaster's 70% is an estimate built from weather models and past patterns — a measure of belief rather than a physical area you could trace with a ruler.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('psSlider');
+      var valueLabel = document.getElementById('psValue');
+      var wheel = document.getElementById('psWheel');
+      var spinBtn = document.getElementById('psSpinBtn');
+      var result = document.getElementById('psResult');
+      var totalRotation = 0;
+      var spinning = false;
+
+      function paintWheel(percent) {
+        wheel.style.background =
+          'conic-gradient(var(--cyan) 0% ' + percent + '%, var(--ink-faint) ' + percent + '% 100%)';
+      }
+
+      function updateLabel() {
+        var p = slider.value;
+        valueLabel.textContent = p + '%';
+        paintWheel(p);
+      }
+
+      slider.addEventListener('input', updateLabel);
+      updateLabel();
+
+      spinBtn.addEventListener('click', function () {
+        if (spinning) return;
+        spinning = true;
+        result.textContent = 'Spinning…';
+
+        var p = parseInt(slider.value, 10);
+        var extraSpins = 4;
+        var randomAngle = Math.random() * 360;
+        var rotationThisSpin = extraSpins * 360 + randomAngle;
+        totalRotation += rotationThisSpin;
+
+        wheel.style.transform = 'rotate(' + totalRotation + 'deg)';
+
+        setTimeout(function () {
+          var landingAngle = (360 - (totalRotation % 360)) % 360;
+          var thresholdAngle = p * 3.6;
+          var isSuccess = landingAngle < thresholdAngle;
+          result.textContent = isSuccess
+            ? 'Result: Success (this outcome had a ' + p + '% chance)'
+            : 'Result: Failure (this outcome had a ' + (100 - p) + '% chance)';
+          spinning = false;
+        }, 2150);
+      });
+    })();
+  </script>
+</body>
+</html>

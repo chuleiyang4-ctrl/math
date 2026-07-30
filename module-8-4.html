@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How Bayes' theorem shrinks the space of possibilities as new evidence arrives">
+  <title>Bayes' Theorem — Updating Belief With Evidence | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+  <style>
+    /* Scoped to #bayesViz only — no shared classes redefined */
+    #bayesViz {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      width: 100%;
+    }
+    #bayesViz .bv-controls {
+      display: grid;
+      gap: 12px;
+      width: min(420px, 100%);
+    }
+    #bayesViz .bv-control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #bayesViz .bv-control-row label {
+      min-width: 130px;
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: .8rem;
+    }
+    #bayesViz input[type="range"] {
+      flex: 1;
+      accent-color: var(--cyan);
+    }
+    #bayesViz .bv-value {
+      min-width: 42px;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      text-align: right;
+    }
+    #bayesViz .bv-bars {
+      display: grid;
+      gap: 14px;
+      width: min(420px, 100%);
+    }
+    #bayesViz .bv-bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: .78rem;
+    }
+    #bayesViz .bv-bar-label strong {
+      color: var(--ink);
+    }
+    #bayesViz .bv-bar {
+      display: flex;
+      height: 26px;
+      border-radius: 7px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    #bayesViz .bv-bar-disease {
+      background: var(--amber);
+      transition: width .25s ease;
+    }
+    #bayesViz .bv-bar-healthy {
+      background: var(--panel-2);
+      transition: width .25s ease;
+    }
+  </style>
+</head>
+<body data-lesson-id="8.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 8 · Lesson 8.4</p>
+      <h1>Bayes' Theorem — Updating Belief With Evidence</h1>
+      <p class="lesson-summary">
+        Learn how new evidence shrinks the space of possibilities down to a sharper, updated belief.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Before you have any evidence, an event's probability is just its share of every
+        possible outcome — the whole circle from earlier lessons. But the moment you learn
+        something new, like a test result, the space of "still possible" outcomes shrinks.
+        You throw away everything inconsistent with the evidence and recompute probability
+        only over what's left. Bayes' theorem is the formula for doing that shrinking
+        correctly.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Start with a <strong>prior</strong> belief — how likely something is before any
+          evidence. Then evidence arrives, like a positive test result. Some of the
+          population that could have produced that evidence actually has the condition,
+          and some doesn't — a positive test can be a true signal or a false alarm. Bayes'
+          theorem asks: out of everyone who could have produced this exact evidence, what
+          fraction of them actually match what you're trying to detect? That updated
+          fraction is the <strong>posterior</strong> belief.
+        </p>
+      </div>
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 103.5 103.5" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A 10 by 10 grid of 100 people. 8 amber squares are true positives, 2 dark amber squares are false negatives, 9 cyan squares are false positives, and 81 dark squares are true negatives">
+            <rect x="0.0" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="10.5" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="21.0" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="31.5" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="42.0" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="52.5" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="63.0" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="73.5" y="0.0" width="9" height="9" rx="1.5" fill="#e8b95f"></rect>
+            <rect x="84.0" y="0.0" width="9" height="9" rx="1.5" fill="#5c4b2c"></rect>
+            <rect x="94.5" y="0.0" width="9" height="9" rx="1.5" fill="#5c4b2c"></rect>
+            <rect x="0.0" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="10.5" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="21.0" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="31.5" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="42.0" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="52.5" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="63.0" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="73.5" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="84.0" y="10.5" width="9" height="9" rx="1.5" fill="#5fd4e8"></rect>
+            <rect x="94.5" y="10.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="21.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="31.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="42.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="52.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="63.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="73.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="84.0" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="0.0" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="10.5" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="21.0" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="31.5" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="42.0" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="52.5" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="63.0" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="73.5" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="84.0" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+            <rect x="94.5" y="94.5" width="9" height="9" rx="1.5" fill="#101a30"></rect>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Have disease, test positive (true+)</span><span class="r">8</span></div>
+          <div class="row"><span class="l">No disease, test positive (false+)</span><span class="r">9</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">P(D|+) = 8/17 ≈ 0.47</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Drag the base rate and test accuracy sliders. Watch how much of the "positive test"
+        bar is actually disease versus a false alarm.
+      </p>
+      <div class="interactive-card">
+        <div id="bayesViz">
+          <div class="bv-controls">
+            <div class="bv-control-row">
+              <label for="bvPrior">Base rate P(D)</label>
+              <input type="range" id="bvPrior" min="1" max="50" value="10">
+              <span class="bv-value" id="bvPriorValue">10%</span>
+            </div>
+            <div class="bv-control-row">
+              <label for="bvAccuracy">Test accuracy</label>
+              <input type="range" id="bvAccuracy" min="50" max="99" value="90">
+              <span class="bv-value" id="bvAccuracyValue">90%</span>
+            </div>
+          </div>
+          <div class="bv-bars">
+            <div>
+              <div class="bv-bar-label"><span>Before any test</span><strong id="bvPriorLabel">10% disease</strong></div>
+              <div class="bv-bar">
+                <div class="bv-bar-disease" id="bvPriorBar" style="width: 10%;"></div>
+                <div class="bv-bar-healthy" id="bvPriorBarRest" style="width: 90%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="bv-bar-label"><span>Among positive tests</span><strong id="bvPosteriorLabel">47% disease</strong></div>
+              <div class="bv-bar">
+                <div class="bv-bar-disease" id="bvPosteriorBar" style="width: 47%;"></div>
+                <div class="bv-bar-healthy" id="bvPosteriorBarRest" style="width: 53%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ P(D \mid +) = \frac{P(+\mid D)\,P(D)}{P(+\mid D)\,P(D) + P(+\mid \lnot D)\,P(\lnot D)} $$</div>
+      <p>
+        The numerator is the true positives: people who have the condition and correctly
+        test positive. The denominator adds in the false positives too — everyone else who
+        tests positive without having the condition. Dividing true positives by all
+        positives is exactly the "shrink to what's still possible" idea from the lab above,
+        written as a formula. A spam filter runs the same calculation: given that an email
+        contains the word "free," what fraction of all emails containing that word are
+        actually spam?
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$P(D)$</span><span class="legend-text">The prior — probability of the condition before any evidence</span></div>
+        <div class="legend-item"><span class="legend-sym">$P(+\mid D)$</span><span class="legend-text">Sensitivity — chance of a positive test given the condition</span></div>
+        <div class="legend-item"><span class="legend-sym">$P(+\mid \lnot D)$</span><span class="legend-text">False positive rate — chance of a positive test without the condition</span></div>
+        <div class="legend-item"><span class="legend-sym">$P(D \mid +)$</span><span class="legend-text">The posterior — updated probability after seeing a positive test</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Even with a 90%-accurate test, why can a positive result still mean less than a 50% chance of actually having a rare condition?</li>
+          <li>If the same test were used for a much more common condition, what would happen to the posterior probability, and why?</li>
+          <li>How does this same "shrinking space of possibilities" idea apply to a spam filter that sees the word "free" in an email?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>When a condition is rare, most of the population is healthy, so even a small false-positive rate applied to that huge healthy group can generate more false alarms than true detections among the much smaller group who actually have the condition.</li>
+              <li>The posterior probability would rise. With more people truly having the condition to begin with, a larger share of all positive results come from genuine cases rather than false alarms.</li>
+              <li>The filter treats "contains the word free" as evidence, then asks what fraction of all emails containing that word are actually spam — narrowing from "all emails" down to "emails with this word," then further down to "spam among those," is exactly the same shrinking-space calculation.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <script>
+    (function () {
+      var priorSlider = document.getElementById('bvPrior');
+      var accuracySlider = document.getElementById('bvAccuracy');
+      var priorValue = document.getElementById('bvPriorValue');
+      var accuracyValue = document.getElementById('bvAccuracyValue');
+      var priorLabel = document.getElementById('bvPriorLabel');
+      var posteriorLabel = document.getElementById('bvPosteriorLabel');
+      var priorBar = document.getElementById('bvPriorBar');
+      var priorBarRest = document.getElementById('bvPriorBarRest');
+      var posteriorBar = document.getElementById('bvPosteriorBar');
+      var posteriorBarRest = document.getElementById('bvPosteriorBarRest');
+
+      function update() {
+        var prior = parseInt(priorSlider.value, 10) / 100;
+        var accuracy = parseInt(accuracySlider.value, 10) / 100;
+        var falsePositiveRate = 1 - accuracy;
+
+        priorValue.textContent = Math.round(prior * 100) + '%';
+        accuracyValue.textContent = Math.round(accuracy * 100) + '%';
+
+        var truePositive = accuracy * prior;
+        var falsePositive = falsePositiveRate * (1 - prior);
+        var posterior = truePositive / (truePositive + falsePositive);
+        var posteriorPct = Math.round(posterior * 100);
+        var priorPct = Math.round(prior * 100);
+
+        priorLabel.textContent = priorPct + '% disease';
+        posteriorLabel.textContent = posteriorPct + '% disease';
+
+        priorBar.style.width = priorPct + '%';
+        priorBarRest.style.width = (100 - priorPct) + '%';
+        posteriorBar.style.width = posteriorPct + '%';
+        posteriorBarRest.style.width = (100 - posteriorPct) + '%';
+      }
+
+      priorSlider.addEventListener('input', update);
+      accuracySlider.addEventListener('input', update);
+      update();
+    })();
+  </script>
+</body>
+</html>
