@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Why optimizing under a constraint means finding the best point along a boundary, not the unconstrained bottom of the bowl">
+  <title>Constraints — Optimizing on a Boundary | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="9.2">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 9 · Lesson 9.2</p>
+      <h1>Constraints — Optimizing on a Boundary</h1>
+      <p class="lesson-summary">
+        Learn what changes when you're not free to pick any point in the bowl — only points along a fence line running through it.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Lesson 9.1 was about finding the single lowest point of a convex bowl with no
+        restrictions on where you could stand. Real problems are rarely that generous.
+        You have a fixed budget to spend, a fixed amount of material to use, a fixed
+        deadline &mdash; some rule that draws a fence through the middle of the bowl and
+        says "you may only stand along this fence."
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A <strong>constrained optimization</strong> problem asks for the best point of
+          a function while restricted to a boundary &mdash; a line, curve, or surface
+          defined by some other equation. The unconstrained minimum (the true bottom of
+          the bowl) usually isn't on the fence at all, so the best you can do is find the
+          lowest point <em>along</em> the fence, which is typically some point on the
+          slope of the bowl rather than its bottom. Budget-constrained resource
+          allocation is exactly this: you want to minimize cost or maximize value, but
+          you must stay on the line "total spend equals the budget."
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="110" cy="80" r="18" fill="none" stroke="#565f78" stroke-width="1.2"/>
+            <circle cx="110" cy="80" r="36" fill="none" stroke="#565f78" stroke-width="1.2"/>
+            <circle cx="110" cy="80" r="54" fill="none" stroke="#565f78" stroke-width="1.2"/>
+            <line x1="20" y1="150" x2="200" y2="10" stroke="#e8b95f" stroke-width="2"/>
+            <circle cx="110" cy="80" r="3.5" fill="#565f78"/>
+            <circle cx="128" cy="59" r="4.5" fill="#7ee0a8"/>
+            <text x="112" y="72" fill="#9098ae" font-size="9" font-family="monospace">(0,0)</text>
+            <text x="132" y="55" fill="#7ee0a8" font-size="9" font-family="monospace">(2,2)</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Minimize</span><span class="r">f(x, y) = x² + y²</span></div>
+          <div class="row"><span class="l">Constraint (the fence)</span><span class="r">x + y = 4</span></div>
+          <div class="row"><span class="l">Unconstrained minimum</span><span class="r">(0, 0), but off the fence</span></div>
+          <div class="row"><span class="l">Best point on the fence</span><span class="r">(2, 2)</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">f(2, 2) = 8</span></div>
+        </div>
+      </div>
+      <p>
+        Every other point on the line x + y = 4, like (0, 4) or (4, 0), gives a larger
+        value of f (16 in both cases). The constrained minimum sits where the fence is
+        tangent to one of f's circular contour rings &mdash; that's the closest the fence
+        ever gets to the unconstrained center.
+      </p>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Set a budget line x + y = k, then slide a point along that line. Watch the cost
+        value and its contour ring shrink as you approach the point where the fence just
+        grazes the smallest possible circle.
+      </p>
+      <div class="interactive-card">
+        <div id="constraintLab">
+          <svg id="clbSvg" viewBox="0 0 480 320" role="img" aria-label="Interactive constrained optimization chart"></svg>
+          <div class="clb-controls">
+            <label>
+              <span>Budget k (x + y = k): <output id="clbKVal">6.0</output></span>
+              <input type="range" id="clbK" min="2" max="10" step="0.2" value="6">
+            </label>
+            <label>
+              <span>Position along fence: <output id="clbTVal">0.50</output></span>
+              <input type="range" id="clbT" min="0" max="1" step="0.01" value="0.5">
+            </label>
+          </div>
+          <p id="clbStatus" class="clb-status">f(x, y) = 18.00 at (3.00, 3.00)</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \min_{x} f(x) \quad \text{subject to} \quad g(x) = c $$</div>
+      <p>
+        This is the standard shape of a constrained optimization problem. You still want
+        to make f as small as possible, but only among the inputs that satisfy the
+        constraint equation exactly. Everything off the boundary defined by g is off
+        limits, no matter how good f would be there.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$f$</span><span class="legend-text">The quantity you're trying to minimize (or maximize) — cost, loss, distance</span></div>
+        <div class="legend-item"><span class="legend-sym">$x$</span><span class="legend-text">The input you're choosing, possibly with several components like (x, y)</span></div>
+        <div class="legend-item"><span class="legend-sym">$g$</span><span class="legend-text">The rule that defines the fence, e.g. total spend or total resource used</span></div>
+        <div class="legend-item"><span class="legend-sym">$c$</span><span class="legend-text">The fixed value the constraint must equal, such as a total budget</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why is the constrained minimum always at least as large as the unconstrained minimum, never smaller?</li>
+          <li>In the worked example, the best point (2, 2) was where the fence line just touches one contour circle without crossing it. What do you think is special about that touching point compared to a point where the fence crosses through a contour circle?</li>
+          <li>If you doubled the budget in the resource-allocation analogy (moved the fence further from the origin), would you expect the minimum achievable cost to go up or down? Why?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Because the constrained search only looks at a subset of all possible points — the fence — so it can never do better than searching everywhere, only as well or worse.</li>
+              <li>At a touching (tangent) point, the fence and the contour ring share the same direction momentarily, so nudging along the fence in either direction moves you onto a larger contour ring. At a crossing point, you could still slide along the fence toward a smaller ring, so it can't be the minimum yet.</li>
+              <li>Moving the fence away from the origin (a larger budget k) makes the closest point on the fence farther from the unconstrained minimum at the origin, so the minimum achievable cost goes up, not down — this is the general idea that tighter constraints can only hurt, never help, an unconstrained-style objective.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style>
+    #constraintLab { display: flex; flex-direction: column; gap: 18px; }
+    #clbSvg { width: 100%; height: auto; background: var(--panel-2); border-radius: 12px; }
+    .clb-controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .clb-controls label { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: .82rem; color: var(--ink-dim); }
+    .clb-controls input[type="range"] { width: 100%; accent-color: var(--cyan); }
+    .clb-controls output { color: var(--cyan); }
+    .clb-status {
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+    }
+    @media (max-width: 680px) {
+      .clb-controls { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script>
+  (function () {
+    var svg = document.getElementById('clbSvg');
+    var kInput = document.getElementById('clbK');
+    var tInput = document.getElementById('clbT');
+    var kOut = document.getElementById('clbKVal');
+    var tOut = document.getElementById('clbTVal');
+    var status = document.getElementById('clbStatus');
+
+    var W = 480, H = 320, pad = 30;
+    var worldMin = -1, worldMax = 11;
+
+    function toSvgX(x) {
+      return pad + (x - worldMin) / (worldMax - worldMin) * (W - 2 * pad);
+    }
+    function toSvgY(y) {
+      return H - pad - (y - worldMin) / (worldMax - worldMin) * (H - 2 * pad);
+    }
+    function scaleLen(r) {
+      return r / (worldMax - worldMin) * (W - 2 * pad);
+    }
+
+    var svgns = 'http://www.w3.org/2000/svg';
+
+    function render() {
+      var k = parseFloat(kInput.value);
+      var t = parseFloat(tInput.value);
+      kOut.textContent = k.toFixed(1);
+      tOut.textContent = t.toFixed(2);
+
+      var x = t * k;
+      var y = (1 - t) * k;
+      var fVal = x * x + y * y;
+      var r = Math.sqrt(fVal);
+
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+      var axisX = document.createElementNS(svgns, 'line');
+      axisX.setAttribute('x1', toSvgX(worldMin)); axisX.setAttribute('y1', toSvgY(0));
+      axisX.setAttribute('x2', toSvgX(worldMax)); axisX.setAttribute('y2', toSvgY(0));
+      axisX.setAttribute('stroke', 'rgba(231,235,243,0.15)');
+      svg.appendChild(axisX);
+
+      var axisY = document.createElementNS(svgns, 'line');
+      axisY.setAttribute('x1', toSvgX(0)); axisY.setAttribute('y1', toSvgY(worldMin));
+      axisY.setAttribute('x2', toSvgX(0)); axisY.setAttribute('y2', toSvgY(worldMax));
+      axisY.setAttribute('stroke', 'rgba(231,235,243,0.15)');
+      svg.appendChild(axisY);
+
+      [2, 4, 6, 8, 10].forEach(function (ringR) {
+        var c = document.createElementNS(svgns, 'circle');
+        c.setAttribute('cx', toSvgX(0));
+        c.setAttribute('cy', toSvgY(0));
+        c.setAttribute('r', scaleLen(ringR));
+        c.setAttribute('fill', 'none');
+        c.setAttribute('stroke', 'rgba(86,95,120,0.5)');
+        c.setAttribute('stroke-width', '1');
+        svg.appendChild(c);
+      });
+
+      var activeRing = document.createElementNS(svgns, 'circle');
+      activeRing.setAttribute('cx', toSvgX(0));
+      activeRing.setAttribute('cy', toSvgY(0));
+      activeRing.setAttribute('r', scaleLen(r));
+      activeRing.setAttribute('fill', 'none');
+      activeRing.setAttribute('stroke', '#5fd4e8');
+      activeRing.setAttribute('stroke-width', '2');
+      svg.appendChild(activeRing);
+
+      var fenceX1 = 0, fenceY1 = k, fenceX2 = k, fenceY2 = 0;
+      var fence = document.createElementNS(svgns, 'line');
+      fence.setAttribute('x1', toSvgX(fenceX1)); fence.setAttribute('y1', toSvgY(fenceY1));
+      fence.setAttribute('x2', toSvgX(fenceX2)); fence.setAttribute('y2', toSvgY(fenceY2));
+      fence.setAttribute('stroke', '#e8b95f');
+      fence.setAttribute('stroke-width', '2');
+      svg.appendChild(fence);
+
+      var origin = document.createElementNS(svgns, 'circle');
+      origin.setAttribute('cx', toSvgX(0));
+      origin.setAttribute('cy', toSvgY(0));
+      origin.setAttribute('r', 3.5);
+      origin.setAttribute('fill', '#565f78');
+      svg.appendChild(origin);
+
+      var pt = document.createElementNS(svgns, 'circle');
+      pt.setAttribute('cx', toSvgX(x));
+      pt.setAttribute('cy', toSvgY(y));
+      pt.setAttribute('r', 5);
+      pt.setAttribute('fill', '#7ee0a8');
+      svg.appendChild(pt);
+
+      status.textContent = 'f(x, y) = ' + fVal.toFixed(2) + ' at (' + x.toFixed(2) + ', ' + y.toFixed(2) + ')';
+    }
+
+    kInput.addEventListener('input', render);
+    tInput.addEventListener('input', render);
+    render();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Why the constrained optimum sits exactly where the function's gradient and the constraint's gradient point the same way">
+  <title>Lagrange Multipliers — Where Gradients Align | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="9.3">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 9 · Lesson 9.3</p>
+      <h1>Lagrange Multipliers — Where Gradients Align</h1>
+      <p class="lesson-summary">
+        Discover the one geometric signal that marks the exact spot where a constrained optimum sits: the function's gradient and the fence's gradient point the same way.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        In Lesson 9.2, you found the best point along a fence by watching where the fence
+        just barely touches the smallest possible contour ring, instead of slicing
+        through it. "Just touching" has a precise meaning: at that point, the direction
+        the contour ring wants to shrink (the gradient of f) and the direction the fence
+        runs are perfectly perpendicular to each other &mdash; which means the gradient of
+        f and the gradient of the fence itself point along the exact same line.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          The <strong>gradient</strong> of a function is an arrow pointing in the
+          direction of steepest increase, at every point. At a constrained optimum, the
+          gradient of your objective f and the gradient of your constraint g point in the
+          same (or exactly opposite) direction &mdash; they're parallel. If they weren't
+          parallel, you could always slide a little further along the fence and find a
+          smaller value of f, so the point couldn't be optimal yet. That parallel
+          condition is the entire idea behind <strong>Lagrange multipliers</strong>: a
+          scaling factor λ that expresses exactly how many "units of f" you'd gain for
+          loosening the constraint by one unit.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="110" cy="80" r="36" fill="none" stroke="#565f78" stroke-width="1.2"/>
+            <line x1="20" y1="150" x2="200" y2="10" stroke="#e8b95f" stroke-width="2"/>
+            <circle cx="128" cy="59" r="4.5" fill="#7ee0a8"/>
+            <line x1="128" y1="59" x2="152" y2="35" stroke="#5fd4e8" stroke-width="2" marker-end="url(#arrow1)"/>
+            <line x1="128" y1="59" x2="146" y2="41" stroke="#e8b95f" stroke-width="2" marker-end="url(#arrow2)"/>
+            <defs>
+              <marker id="arrow1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5fd4e8"/>
+              </marker>
+              <marker id="arrow2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#e8b95f"/>
+              </marker>
+            </defs>
+            <text x="132" y="55" fill="#7ee0a8" font-size="9" font-family="monospace">(2,2)</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">f(x, y) = x² + y², g(x, y) = x + y</span><span class="r">same as Lesson 9.2</span></div>
+          <div class="row"><span class="l">∇f = (2x, 2y) at (2, 2)</span><span class="r">(4, 4)</span></div>
+          <div class="row"><span class="l">∇g = (1, 1)</span><span class="r">constant everywhere</span></div>
+          <div class="row"><span class="l">Check ∇f = λ∇g</span><span class="r">(4, 4) = 4 · (1, 1)</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">λ = 4, arrows are parallel</span></div>
+        </div>
+      </div>
+      <p>
+        Notice this confirms exactly the point Lesson 9.2 found by testing the contour
+        rings directly: (2, 2). Lagrange multipliers give you a way to find that point
+        algebraically, by solving ∇f = λ∇g together with the constraint, instead of
+        checking every point on the fence by hand.
+      </p>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Slide the point along the fence and watch the two gradient arrows. Notice they
+        only line up into one straight arrow at a single spot.
+      </p>
+      <div class="interactive-card">
+        <div id="lagrangeLab">
+          <svg id="lagSvg" viewBox="0 0 480 320" role="img" aria-label="Interactive Lagrange multiplier alignment chart"></svg>
+          <label class="lag-slider">
+            <span>Position along fence: <output id="lagTVal">0.50</output></span>
+            <input type="range" id="lagT" min="0" max="1" step="0.01" value="0.5">
+          </label>
+          <p id="lagStatus" class="lag-status">Angle between gradients: 0.0° — arrows are parallel, this is the optimum.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ \nabla f(x) = \lambda \, \nabla g(x), \qquad g(x) = c $$</div>
+      <p>
+        At the constrained optimum, the gradient of the objective is some scalar
+        multiple λ of the gradient of the constraint. Solving this vector equation
+        alongside the original constraint equation pins down the exact optimal point,
+        without ever having to check contour rings by eye. The value λ itself is useful
+        too: it measures how much f would improve if the constraint c were relaxed by a
+        small amount, which is exactly why it's called a "multiplier."
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$\nabla f$</span><span class="legend-text">The gradient of the objective — an arrow pointing toward steepest increase in f</span></div>
+        <div class="legend-item"><span class="legend-sym">$\nabla g$</span><span class="legend-text">The gradient of the constraint function, perpendicular to the fence line</span></div>
+        <div class="legend-item"><span class="legend-sym">$\lambda$</span><span class="legend-text">The Lagrange multiplier — how many units of f you'd gain per unit of relaxed constraint</span></div>
+        <div class="legend-item"><span class="legend-sym">$c$</span><span class="legend-text">The fixed value the constraint g must equal</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>If ∇f and ∇g point in exactly opposite directions at some point on the fence (λ is negative), is that point still a valid candidate for the optimum? What does the sign of λ tell you?</li>
+          <li>Support Vector Machines find the widest possible margin between two classes of points while requiring every point to be correctly classified — a constrained optimization problem. Based on this lesson, what role do you think the "support vectors" (the points touching the margin) play, compared to points far from it?</li>
+          <li>What would it mean, geometrically, if at your candidate optimal point the two gradient arrows were perpendicular instead of parallel?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Yes — the sign of λ only tells you which direction relaxing the constraint would push f (increase or decrease); the parallel condition itself, not the sign, is what marks a candidate optimum. The sign becomes important when you also have inequality constraints, since it can then indicate whether the constraint is "active" and helpful or not.</li>
+              <li>The support vectors are exactly the points sitting on the margin boundary — they're the ones actively "touching the fence," so their gradients are what get balanced against the objective's gradient in the Lagrange condition. Points far from the margin play no role in pinning down the optimal boundary, much like fence points other than (2, 2) played no role in Lesson 9.2's answer.</li>
+              <li>Perpendicular gradients would mean the constraint direction and the direction of steepest increase in f share no component in common, which would mean you could still slide along the fence in some direction without changing f at all to first order — a sign that you have not yet found the true tangency point, so this typically wouldn't be a valid optimum unless f were locally flat.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style>
+    #lagrangeLab { display: flex; flex-direction: column; gap: 18px; }
+    #lagSvg { width: 100%; height: auto; background: var(--panel-2); border-radius: 12px; }
+    .lag-slider { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: .82rem; color: var(--ink-dim); }
+    .lag-slider input[type="range"] { width: 100%; accent-color: var(--cyan); }
+    .lag-slider output { color: var(--cyan); }
+    .lag-status {
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      color: var(--green);
+    }
+    .lag-status.is-off { color: var(--amber); }
+  </style>
+
+  <script>
+  (function () {
+    var svg = document.getElementById('lagSvg');
+    var tInput = document.getElementById('lagT');
+    var tOut = document.getElementById('lagTVal');
+    var status = document.getElementById('lagStatus');
+
+    var W = 480, H = 320, pad = 30;
+    var worldMin = -1, worldMax = 11;
+    var k = 6;
+
+    function toSvgX(x) { return pad + (x - worldMin) / (worldMax - worldMin) * (W - 2 * pad); }
+    function toSvgY(y) { return H - pad - (y - worldMin) / (worldMax - worldMin) * (H - 2 * pad); }
+    function scaleLen(r) { return r / (worldMax - worldMin) * (W - 2 * pad); }
+
+    var svgns = 'http://www.w3.org/2000/svg';
+
+    function addArrow(x1, y1, x2, y2, color) {
+      var line = document.createElementNS(svgns, 'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('stroke', color);
+      line.setAttribute('stroke-width', '2.5');
+      line.setAttribute('marker-end', 'url(#lagArrow-' + color.replace('#', '') + ')');
+      svg.appendChild(line);
+    }
+
+    function ensureMarker(color) {
+      var id = 'lagArrow-' + color.replace('#', '');
+      if (svg.querySelector('#' + id)) return;
+      var defs = svg.querySelector('defs') || document.createElementNS(svgns, 'defs');
+      if (!svg.querySelector('defs')) svg.appendChild(defs);
+      var marker = document.createElementNS(svgns, 'marker');
+      marker.setAttribute('id', id);
+      marker.setAttribute('markerWidth', '7');
+      marker.setAttribute('markerHeight', '7');
+      marker.setAttribute('refX', '3.5');
+      marker.setAttribute('refY', '3.5');
+      marker.setAttribute('orient', 'auto');
+      var path = document.createElementNS(svgns, 'path');
+      path.setAttribute('d', 'M0,0 L7,3.5 L0,7 Z');
+      path.setAttribute('fill', color);
+      marker.appendChild(path);
+      defs.appendChild(marker);
+    }
+
+    function render() {
+      var t = parseFloat(tInput.value);
+      tOut.textContent = t.toFixed(2);
+
+      var x = t * k;
+      var y = (1 - t) * k;
+
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      ensureMarker('#5fd4e8');
+      ensureMarker('#e8b95f');
+
+      var axisX = document.createElementNS(svgns, 'line');
+      axisX.setAttribute('x1', toSvgX(worldMin)); axisX.setAttribute('y1', toSvgY(0));
+      axisX.setAttribute('x2', toSvgX(worldMax)); axisX.setAttribute('y2', toSvgY(0));
+      axisX.setAttribute('stroke', 'rgba(231,235,243,0.15)');
+      svg.appendChild(axisX);
+
+      var axisY = document.createElementNS(svgns, 'line');
+      axisY.setAttribute('x1', toSvgX(0)); axisY.setAttribute('y1', toSvgY(worldMin));
+      axisY.setAttribute('x2', toSvgX(0)); axisY.setAttribute('y2', toSvgY(worldMax));
+      axisY.setAttribute('stroke', 'rgba(231,235,243,0.15)');
+      svg.appendChild(axisY);
+
+      var r = Math.sqrt(x * x + y * y);
+      var ring = document.createElementNS(svgns, 'circle');
+      ring.setAttribute('cx', toSvgX(0));
+      ring.setAttribute('cy', toSvgY(0));
+      ring.setAttribute('r', scaleLen(r));
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', 'rgba(86,95,120,0.6)');
+      ring.setAttribute('stroke-width', '1.2');
+      svg.appendChild(ring);
+
+      var fence = document.createElementNS(svgns, 'line');
+      fence.setAttribute('x1', toSvgX(0)); fence.setAttribute('y1', toSvgY(k));
+      fence.setAttribute('x2', toSvgX(k)); fence.setAttribute('y2', toSvgY(0));
+      fence.setAttribute('stroke', '#565f78');
+      fence.setAttribute('stroke-width', '2');
+      svg.appendChild(fence);
+
+      var px = toSvgX(x), py = toSvgY(y);
+
+      var gradF = [2 * x, 2 * y];
+      var gradFLen = Math.hypot(gradF[0], gradF[1]) || 1;
+      var gradFNorm = [gradF[0] / gradFLen, gradF[1] / gradFLen];
+      var arrowLen = 55;
+      addArrow(px, py, px + gradFNorm[0] * arrowLen, py - gradFNorm[1] * arrowLen, '#5fd4e8');
+
+      var gradG = [1, 1];
+      var gradGLen = Math.hypot(gradG[0], gradG[1]);
+      var gradGNorm = [gradG[0] / gradGLen, gradG[1] / gradGLen];
+      addArrow(px, py, px + gradGNorm[0] * arrowLen, py - gradGNorm[1] * arrowLen, '#e8b95f');
+
+      var pt = document.createElementNS(svgns, 'circle');
+      pt.setAttribute('cx', px);
+      pt.setAttribute('cy', py);
+      pt.setAttribute('r', 5);
+      pt.setAttribute('fill', '#7ee0a8');
+      svg.appendChild(pt);
+
+      var dot = gradFNorm[0] * gradGNorm[0] + gradFNorm[1] * gradGNorm[1];
+      dot = Math.max(-1, Math.min(1, dot));
+      var angleDeg = Math.acos(dot) * 180 / Math.PI;
+      var aligned = angleDeg < 1.5;
+
+      status.textContent = 'Angle between gradients: ' + angleDeg.toFixed(1) + '°' +
+        (aligned ? ' — arrows are parallel, this is the optimum.' : ' — arrows diverge, not yet optimal.');
+      status.classList.toggle('is-off', !aligned);
+    }
+
+    tInput.addEventListener('input', render);
+    render();
+  })();
+  </script>
+</body>
+</html>

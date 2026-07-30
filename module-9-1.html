@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Why convex functions have a single guaranteed minimum, and why that matters for training AI models">
+  <title>Convexity — Why Some Bowls Have Only One Bottom | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="9.1">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 9 · Lesson 9.1</p>
+      <h1>Convexity — Why Some Bowls Have Only One Bottom</h1>
+      <p class="lesson-summary">
+        Learn what makes a function "convex," and why that single property guarantees gradient descent will find the true minimum instead of getting stuck.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Picture a mixing bowl sitting on a table. No matter where you drop a marble in,
+        it rolls down to the same single lowest point. Now picture an egg carton lying
+        on its side. Drop a marble in and it settles into whichever dimple it happened
+        to land near &mdash; there are many "lowest points," and most of them aren't the
+        lowest point overall.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          A function is <strong>convex</strong> when its graph looks like the bowl:
+          exactly one valley, and it curves upward everywhere. A function is
+          <strong>non-convex</strong> when its graph looks like the egg carton: several
+          valleys, and rolling downhill only promises you'll reach <em>a</em> low point,
+          not <em>the</em> lowest one. This distinction matters enormously in AI: training
+          a model is just rolling a ball downhill on a loss surface. If that surface is
+          convex, you're guaranteed to reach the best possible answer. If it isn't, you
+          might get stuck in a mediocre dip and never know a better one exists elsewhere.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="10,140 20,120 35,100 55,78 80,58 105,44 130,36 150,34 170,40 190,54 205,72"
+              fill="none" stroke="#5fd4e8" stroke-width="2.5"/>
+            <line x1="20" y1="120" x2="190" y2="54" stroke="#e8b95f" stroke-width="1.6" stroke-dasharray="4 3"/>
+            <circle cx="20" cy="120" r="4" fill="#7ee0a8"/>
+            <circle cx="190" cy="54" r="4" fill="#7ee0a8"/>
+            <circle cx="105" cy="44" r="4" fill="#e8b95f"/>
+            <text x="14" y="135" fill="#9098ae" font-size="10" font-family="monospace">x=-2</text>
+            <text x="176" y="48" fill="#9098ae" font-size="10" font-family="monospace">x=4</text>
+            <text x="88" y="32" fill="#e8b95f" font-size="10" font-family="monospace">midpoint</text>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">f(x) = x²</span><span class="r">bowl-shaped curve</span></div>
+          <div class="row"><span class="l">Endpoints: f(-2), f(4)</span><span class="r">4, 16</span></div>
+          <div class="row"><span class="l">Average of endpoints</span><span class="r">(4 + 16) / 2 = 10</span></div>
+          <div class="row"><span class="l">Midpoint x = 1: f(1)</span><span class="r">1</span></div>
+          <div class="row"><span class="l">Answer</span><span class="r">1 ≤ 10 → chord stays above curve</span></div>
+        </div>
+      </div>
+      <p>
+        That's the whole test. Pick any two points on the curve, draw a straight line
+        (a "chord") between them. If that chord never dips below the curve &mdash; for
+        every pair of points, not just this one &mdash; the function is convex.
+      </p>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Drag the two point sliders to pick different spots on the curve, and drag the
+        bumpiness slider to warp the bowl into an egg carton. Watch when the chord
+        starts dipping below the curve &mdash; that's the moment convexity breaks.
+      </p>
+      <div class="interactive-card">
+        <div id="convexityLab">
+          <svg id="cvxSvg" viewBox="0 0 560 260" role="img" aria-label="Interactive convexity chart"></svg>
+          <div class="cvx-controls">
+            <label>
+              <span>Point x₁: <output id="cvxX1Val">-4.0</output></span>
+              <input type="range" id="cvxX1" min="-5" max="5" step="0.1" value="-4">
+            </label>
+            <label>
+              <span>Point x₂: <output id="cvxX2Val">3.0</output></span>
+              <input type="range" id="cvxX2" min="-5" max="5" step="0.1" value="3">
+            </label>
+            <label>
+              <span>Bumpiness: <output id="cvxAVal">0.0</output></span>
+              <input type="range" id="cvxA" min="0" max="3" step="0.1" value="0">
+            </label>
+          </div>
+          <p id="cvxStatus" class="cvx-status">Chord lies above the curve everywhere between x₁ and x₂ — convex here.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ f\big(\lambda x_1 + (1-\lambda) x_2\big) \le \lambda f(x_1) + (1-\lambda) f(x_2) \quad \text{for all } \lambda \in [0,1] $$</div>
+      <p>
+        This is the formal definition of convexity. The left side is the function's
+        actual value at some blend of two points. The right side is the same blend
+        applied to the two function <em>outputs</em> &mdash; in other words, the chord.
+        The inequality says the curve is never above its own chord. If this holds for
+        every possible pair of points and every blend between them, the function is
+        convex, and any point where the slope is zero is guaranteed to be the single
+        global minimum.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$f$</span><span class="legend-text">The function whose bowl-shape we're testing (for AI, often a loss function)</span></div>
+        <div class="legend-item"><span class="legend-sym">$x_1, x_2$</span><span class="legend-text">Any two input points on the curve</span></div>
+        <div class="legend-item"><span class="legend-sym">$\lambda$</span><span class="legend-text">A blending weight between 0 and 1, sliding from $x_2$ to $x_1$</span></div>
+        <div class="legend-item"><span class="legend-sym">$\le$</span><span class="legend-text">"Never above": the curve stays under or on the straight chord</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does having "only one bottom" make gradient descent's job so much easier for a convex loss function compared to a non-convex one?</li>
+          <li>A straight line, $f(x) = 3x + 1$, technically satisfies the convexity inequality with equality. Is a straight line convex? What does this tell you about the difference between convex and "strictly convex"?</li>
+          <li>Modern neural network loss landscapes are famously non-convex, yet training still often works well in practice. What does that suggest about the relationship between "guaranteed to find the global minimum" and "good enough in practice"?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>Because there's no risk of settling into a "good enough" valley that isn't the best one — every downhill step leads toward the same unique minimum, so the algorithm can't get trapped.</li>
+              <li>Yes, a straight line is convex (the chord and the curve are literally the same line, so the inequality holds as an equality). It just isn't <em>strictly</em> convex, which would require the curve to bend strictly upward, ruling out flat stretches and guaranteeing a genuinely unique minimum rather than a whole flat region of equally good minima.</li>
+              <li>It suggests that in very high-dimensional spaces, most of the "dips" a network finds during training tend to be nearly as good as the true global minimum, even without a convexity guarantee — so practitioners often accept "very good" over provably optimal.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style>
+    #convexityLab { display: flex; flex-direction: column; gap: 18px; }
+    #cvxSvg { width: 100%; height: auto; background: var(--panel-2); border-radius: 12px; }
+    .cvx-controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .cvx-controls label { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: .82rem; color: var(--ink-dim); }
+    .cvx-controls input[type="range"] { width: 100%; accent-color: var(--cyan); }
+    .cvx-controls output { color: var(--cyan); }
+    .cvx-status {
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      font-family: var(--font-display);
+      font-size: .88rem;
+      color: var(--green);
+    }
+    .cvx-status.is-violated { color: var(--amber); border-color: rgba(232, 185, 95, .4); }
+    @media (max-width: 680px) {
+      .cvx-controls { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script>
+  (function () {
+    var svg = document.getElementById('cvxSvg');
+    var x1Input = document.getElementById('cvxX1');
+    var x2Input = document.getElementById('cvxX2');
+    var aInput = document.getElementById('cvxA');
+    var x1Out = document.getElementById('cvxX1Val');
+    var x2Out = document.getElementById('cvxX2Val');
+    var aOut = document.getElementById('cvxAVal');
+    var status = document.getElementById('cvxStatus');
+
+    var W = 560, H = 260, pad = 24;
+    var xMin = -5, xMax = 5;
+    var yMin, yMax;
+
+    function f(x, a) {
+      return x * x + a * Math.sin(2.2 * x) * 3;
+    }
+
+    function toSvgX(x) {
+      return pad + (x - xMin) / (xMax - xMin) * (W - 2 * pad);
+    }
+    function toSvgY(y) {
+      return H - pad - (y - yMin) / (yMax - yMin) * (H - 2 * pad);
+    }
+
+    function render() {
+      var x1 = parseFloat(x1Input.value);
+      var x2 = parseFloat(x2Input.value);
+      var a = parseFloat(aInput.value);
+      if (x1 > x2) { var t = x1; x1 = x2; x2 = t; }
+
+      x1Out.textContent = x1.toFixed(1);
+      x2Out.textContent = x2.toFixed(1);
+      aOut.textContent = a.toFixed(1);
+
+      var samples = [];
+      var steps = 120;
+      var minY = Infinity, maxY = -Infinity;
+      for (var i = 0; i <= steps; i++) {
+        var x = xMin + (xMax - xMin) * i / steps;
+        var y = f(x, a);
+        samples.push([x, y]);
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+      yMin = minY - 2;
+      yMax = maxY + 2;
+
+      var pathPts = samples.map(function (p) { return toSvgX(p[0]) + ',' + toSvgY(p[1]); }).join(' ');
+
+      var y1 = f(x1, a), y2 = f(x2, a);
+      var chordX1 = toSvgX(x1), chordY1 = toSvgY(y1);
+      var chordX2 = toSvgX(x2), chordY2 = toSvgY(y2);
+
+      var violated = false;
+      var checkSteps = 40;
+      for (var j = 0; j <= checkSteps; j++) {
+        var lambda = j / checkSteps;
+        var xc = x1 + lambda * (x2 - x1);
+        var chordY = y1 + lambda * (y2 - y1);
+        var curveY = f(xc, a);
+        if (curveY > chordY + 1e-6) { violated = true; break; }
+      }
+
+      var svgns = 'http://www.w3.org/2000/svg';
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+      var curve = document.createElementNS(svgns, 'polyline');
+      curve.setAttribute('points', pathPts);
+      curve.setAttribute('fill', 'none');
+      curve.setAttribute('stroke', '#5fd4e8');
+      curve.setAttribute('stroke-width', '2.5');
+      svg.appendChild(curve);
+
+      var chord = document.createElementNS(svgns, 'line');
+      chord.setAttribute('x1', chordX1);
+      chord.setAttribute('y1', chordY1);
+      chord.setAttribute('x2', chordX2);
+      chord.setAttribute('y2', chordY2);
+      chord.setAttribute('stroke', violated ? '#e8b95f' : '#7ee0a8');
+      chord.setAttribute('stroke-width', '2');
+      chord.setAttribute('stroke-dasharray', '5 4');
+      svg.appendChild(chord);
+
+      [[chordX1, chordY1], [chordX2, chordY2]].forEach(function (pt) {
+        var c = document.createElementNS(svgns, 'circle');
+        c.setAttribute('cx', pt[0]);
+        c.setAttribute('cy', pt[1]);
+        c.setAttribute('r', 5);
+        c.setAttribute('fill', '#e7ebf3');
+        svg.appendChild(c);
+      });
+
+      status.textContent = violated
+        ? 'Somewhere between x₁ and x₂ the curve pokes above the chord — this pair of points violates convexity.'
+        : 'Chord lies above the curve everywhere between x₁ and x₂ — convex here.';
+      status.classList.toggle('is-violated', violated);
+    }
+
+    [x1Input, x2Input, aInput].forEach(function (el) {
+      el.addEventListener('input', render);
+    });
+
+    render();
+  })();
+  </script>
+</body>
+</html>
