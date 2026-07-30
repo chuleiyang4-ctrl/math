@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See how gradient descent repeatedly steps downhill on a loss surface to train a neural network.">
+  <title>Gradient Descent | Math for AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="course-common.css">
+  <script defer src="course-common.js"></script>
+</head>
+<body data-lesson-id="7.4">
+  <main class="course-shell">
+    <header class="lesson-header">
+      <p class="lesson-kicker">Module 7 · Lesson 7.4</p>
+      <h1>Gradient Descent</h1>
+      <p class="lesson-summary">
+        Training a neural network means repeatedly nudging its weights a little downhill on the loss surface until the loss stops improving.
+      </p>
+    </header>
+
+    <section class="lesson-section">
+      <h2>Intuition</h2>
+      <p>
+        Imagine a ball dropped on a bowl-shaped hill. It doesn't leap straight to the bottom — it rolls a
+        little in whatever direction is steepest, then re-checks the slope from its new spot, then rolls
+        a little more. Eventually it settles near the bottom.
+      </p>
+      <p>
+        Gradient descent does exactly this with a loss function. The gradient tells you the steepest
+        <em>uphill</em> direction, so you step the opposite way — a small distance controlled by the
+        learning rate — and repeat.
+      </p>
+      <div class="concept-card">
+        <h3>Core concept</h3>
+        <p>
+          Each step nudges a weight in the direction that decreases loss the fastest, by an amount scaled by
+          the learning rate. Too large a learning rate and the ball overshoots the bottom and bounces around;
+          too small and it takes forever to get there.
+        </p>
+      </div>
+
+      <div class="concept-card worked-example">
+        <div class="worked-visual">
+          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A ball on a parabola stepping from x=6 toward the minimum at x=2">
+            <path d="M10,100 Q80,-10 150,100" fill="none" stroke="var(--cyan)" stroke-width="2"></path>
+            <circle cx="122" cy="70" r="7" fill="var(--amber)"></circle>
+            <text x="122" y="52" text-anchor="middle" fill="var(--ink-dim)" font-family="IBM Plex Mono, monospace" font-size="11">x=6</text>
+            <circle cx="80" cy="8" r="7" fill="var(--green)"></circle>
+            <text x="80" y="24" text-anchor="middle" fill="var(--ink-dim)" font-family="IBM Plex Mono, monospace" font-size="11">x=2 (min)</text>
+            <line x1="122" y1="70" x2="90" y2="18" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3,3"></line>
+          </svg>
+        </div>
+        <div class="worked-steps">
+          <div class="row"><span class="l">Loss L(x) = (x − 2)²</span><span class="r">start x = 6</span></div>
+          <div class="row"><span class="l">Gradient dL/dx = 2(x − 2)</span><span class="r">2(4) = 8</span></div>
+          <div class="row"><span class="l">Learning rate α</span><span class="r">0.25</span></div>
+          <div class="row"><span class="l">Step = α · gradient</span><span class="r">0.25 × 8 = 2</span></div>
+          <div class="row"><span class="l">Answer: x_new = x − step</span><span class="r">6 − 2 = 4</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Interactive Lab</h2>
+      <p>
+        Set a learning rate, then press Step to watch the ball descend the bowl one gradient step at a time.
+        Try a very large learning rate and see what happens near the bottom.
+      </p>
+      <div class="interactive-card">
+        <div id="gdLab">
+          <svg id="gdCurve" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Loss curve with a ball descending toward the minimum">
+            <path d="M10,150 Q150,-20 290,150" fill="none" stroke="var(--cyan)" stroke-width="2"></path>
+            <line x1="150" y1="0" x2="150" y2="160" stroke="var(--line)" stroke-width="1" stroke-dasharray="2,4"></line>
+            <circle id="gdBall" cx="270" cy="140" r="8" fill="var(--amber)"></circle>
+          </svg>
+          <div class="gd-controls">
+            <label for="gdLr">Learning rate α = <span id="gdLrVal">0.15</span></label>
+            <input type="range" id="gdLr" min="0.02" max="1.1" step="0.01" value="0.15">
+            <div class="gd-buttons">
+              <button type="button" id="gdStepBtn" class="gd-btn">Step</button>
+              <button type="button" id="gdResetBtn" class="gd-btn gd-btn-secondary">Reset</button>
+            </div>
+          </div>
+          <div class="gd-readout">
+            <span>Iteration: <strong id="gdIter">0</strong></span>
+            <span>x = <strong id="gdXVal">6.00</strong></span>
+            <span>Loss = <strong id="gdLossVal">16.00</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Key Idea</h2>
+      <div class="formula">$$ w \leftarrow w - \alpha \nabla L(w) $$</div>
+      <p>
+        This one update rule, applied to every weight after every batch, is the entire engine behind training
+        a neural network. The gradient comes from backpropagation; the learning rate decides how confidently
+        you act on it.
+      </p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-sym">$w$</span><span class="legend-text">A weight (or the whole vector of weights) being trained</span></div>
+        <div class="legend-item"><span class="legend-sym">$\alpha$</span><span class="legend-text">The learning rate — how big a step to take</span></div>
+        <div class="legend-item"><span class="legend-sym">$\nabla L(w)$</span><span class="legend-text">The gradient of the loss with respect to $w$ — the steepest uphill direction</span></div>
+        <div class="legend-item"><span class="legend-sym">$\leftarrow$</span><span class="legend-text">"Update to" — replace the old weight with the new one</span></div>
+      </div>
+    </section>
+
+    <section class="lesson-section">
+      <h2>Think Further</h2>
+      <div class="concept-card">
+        <ol>
+          <li>Why does the ball's step get smaller and smaller as it nears the bottom, even though the learning rate stays fixed?</li>
+          <li>If the learning rate is too large, what do you predict happens to the ball as it crosses the minimum?</li>
+          <li>How might a bowl with a much flatter, wider base change the number of steps needed to reach the bottom?</li>
+        </ol>
+        <details class="answer-reveal">
+          <summary>Show suggested answers</summary>
+          <div class="answer-content">
+            <ol>
+              <li>The step size is α times the gradient, and the gradient itself shrinks as the curve flattens near the minimum — so even a constant α produces smaller and smaller moves.</li>
+              <li>It overshoots the minimum and lands on the opposite side, possibly farther out than before; if the rate is large enough this can repeat and the ball bounces back and forth instead of settling.</li>
+              <li>A flatter bowl means smaller gradients everywhere, so each step is smaller and it takes more iterations to travel the same horizontal distance to the bottom.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="lesson-footer">Math for AI · Interactive Mathematics Course</footer>
+  </main>
+
+  <style id="gdLabStyle">
+    #gdLab { font-family: var(--font-body); }
+    #gdLab svg { width: 100%; height: auto; display: block; }
+    #gdLab #gdBall { transition: cx .25s ease, cy .25s ease; }
+    #gdLab .gd-controls {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: var(--font-mono);
+      color: var(--ink);
+      font-size: .9rem;
+    }
+    #gdLab .gd-controls input[type="range"] { width: 100%; accent-color: var(--cyan); }
+    #gdLab .gd-buttons { display: flex; gap: 10px; margin-top: 4px; }
+    #gdLab .gd-btn {
+      min-height: 36px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: .82rem;
+      cursor: pointer;
+    }
+    #gdLab .gd-btn:hover { border-color: color-mix(in srgb, var(--cyan) 45%, var(--line)); }
+    #gdLab .gd-btn-secondary { color: var(--ink-dim); }
+    #gdLab .gd-readout {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+      font-size: .88rem;
+    }
+    #gdLab .gd-readout strong { color: var(--ink); }
+  </style>
+
+  <script>
+    (function () {
+      var MIN_X = 2;
+      var START_X = 6;
+      var X_LEFT_PX = 10, X_RIGHT_PX = 290, X_MIN_VAL = -1, X_MAX_VAL = 9;
+      var Y_TOP_PX = 5, Y_BOTTOM_PX = 150;
+      var MAX_LOSS = Math.pow(9 - MIN_X, 2);
+
+      var lrSlider = document.getElementById('gdLr');
+      var lrVal = document.getElementById('gdLrVal');
+      var stepBtn = document.getElementById('gdStepBtn');
+      var resetBtn = document.getElementById('gdResetBtn');
+      var ball = document.getElementById('gdBall');
+      var iterEl = document.getElementById('gdIter');
+      var xValEl = document.getElementById('gdXVal');
+      var lossValEl = document.getElementById('gdLossVal');
+
+      var x = START_X;
+      var iter = 0;
+
+      function loss(v) { return Math.pow(v - MIN_X, 2); }
+      function grad(v) { return 2 * (v - MIN_X); }
+
+      function xToPx(v) {
+        var t = (v - X_MIN_VAL) / (X_MAX_VAL - X_MIN_VAL);
+        return X_LEFT_PX + t * (X_RIGHT_PX - X_LEFT_PX);
+      }
+
+      function lossToPx(l) {
+        var t = Math.min(l / MAX_LOSS, 1);
+        return Y_BOTTOM_PX - t * (Y_BOTTOM_PX - Y_TOP_PX);
+      }
+
+      function render() {
+        ball.setAttribute('cx', xToPx(x));
+        ball.setAttribute('cy', lossToPx(loss(x)));
+        iterEl.textContent = iter;
+        xValEl.textContent = x.toFixed(2);
+        lossValEl.textContent = loss(x).toFixed(2);
+      }
+
+      function step() {
+        var alpha = parseFloat(lrSlider.value);
+        var g = grad(x);
+        x = x - alpha * g;
+        iter += 1;
+        render();
+      }
+
+      function reset() {
+        x = START_X;
+        iter = 0;
+        render();
+      }
+
+      lrSlider.addEventListener('input', function () {
+        lrVal.textContent = parseFloat(lrSlider.value).toFixed(2);
+      });
+      stepBtn.addEventListener('click', step);
+      resetBtn.addEventListener('click', reset);
+
+      render();
+    })();
+  </script>
+</body>
+</html>
