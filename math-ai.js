@@ -23,7 +23,7 @@
     const safeTitle = context.title.replace(/[<>&"]/g, "");
 
     panel.innerHTML = `
-      <div class="math-ai-head"><div><small>GEMINI TUTOR</small><strong>Math AI</strong></div><button type="button" class="math-ai-close" aria-label="Close Math AI">×</button></div>
+      <div class="math-ai-head"><div><small>AI TUTOR</small><strong>Math AI</strong></div><button type="button" class="math-ai-close" aria-label="Close Math AI">×</button></div>
       <div class="math-ai-conversation" aria-live="polite"><div class="math-ai-message assistant">Ask about this lesson, request a simpler explanation, or work through a problem step by step.</div></div>
       <form class="math-ai-form">
         <div class="math-ai-share-chip"><span aria-hidden="true">✦</span><span>Sharing “${safeTitle}”</span><button type="button" class="math-ai-share-close" aria-label="Stop sharing this page">×</button></div>
