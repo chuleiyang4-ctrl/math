@@ -1,5 +1,18 @@
 (() => {
   "use strict";
+  const refreshAuthStyles = () => {
+    const versionedHref = "auth.css?v=20260808-mobile-2";
+    const existing = document.querySelector('link[href^="auth.css"]');
+    if (existing) {
+      existing.setAttribute("href", versionedHref);
+      return;
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = versionedHref;
+    document.head.append(link);
+  };
+  refreshAuthStyles();
   const config = window.LEARNING_AUTH_CONFIG || window.MATH_AUTH_CONFIG || {};
   let client = null;
   let modal = null;
