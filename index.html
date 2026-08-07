@@ -25,6 +25,11 @@
     }
   </script>
   <link rel="stylesheet" href="math-ai.css">
+  <link rel="stylesheet" href="notebook.css">
+  <link rel="stylesheet" href="auth.css">
+  <script defer src="auth-config.js"></script>
+  <script defer src="auth.js"></script>
+  <script defer src="notebook.js"></script>
   <script defer src="math-ai.js"></script>
   <style>
     :root{
@@ -173,9 +178,9 @@
       <a class="brand" href="index.html" aria-label="Mathematics home"><span class="brand-mark">∑</span><span>Mathematics</span></a>
       <a class="top-tool" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
       <form class="top-search" role="search"><input id="top-search" type="search" placeholder="Search courses" aria-label="Search courses" autocomplete="off"></form>
-      <button class="top-tool notebook-tool" type="button" data-coming-soon="Notebook"><span aria-hidden="true">▤</span> Notebook</button>
+      <button class="top-tool notebook-tool" type="button"><span aria-hidden="true">▤</span> Notebook</button>
       <button class="top-tool ai-tool" type="button" aria-expanded="false" aria-controls="home-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
-      <button class="profile-tool" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
+      <button class="profile-tool" type="button" aria-label="Sign in or open profile">Profile</button>
     </div>
   </header>
   <aside class="ai-panel" id="home-ai-panel" aria-hidden="true">
