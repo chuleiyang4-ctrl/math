@@ -118,6 +118,52 @@
   </style>
 </head>
 <body>
+  <!-- Supabase Auth Guard -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+  (async function checkAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    if (!session) {
+      // Not logged in - redirect to login
+      window.location.href = '/login.html';
+      return;
+    }
+    
+    // Logged in - show user info in top-right corner
+    const userBar = document.createElement('div');
+    userBar.style.cssText = `
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      z-index: 9999;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      padding: 8px 18px;
+      border-radius: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #eaeaea;
+    `;
+    userBar.innerHTML = `
+      <span style="color:#2C3E50;">👤 ${session.user.email}</span>
+      <span style="color:#ddd;">|</span>
+      <a href="#" onclick="signOut()" style="color:#e74c3c;text-decoration:none;font-weight:500;">Sign Out</a>
+    `;
+    document.body.prepend(userBar);
+    
+    // Make signOut globally accessible
+    window.signOut = async function() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '/login.html';
+    };
+  })();
+</script>
+<!-- End Auth Guard -->
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="index.html" aria-label="Mathematics home"><span class="brand-mark">∑</span><span>Mathematics</span></a>
