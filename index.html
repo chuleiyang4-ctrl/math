@@ -122,13 +122,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script>
-  (async function checkAuth() {
+(async function checkAuth() {
+    // 加上这一句，从全局取回客户端
+    const supabaseClient = window.supabaseClient; 
+
+    // 下面保持你原来的代码不变
     const { data: { session } } = await supabaseClient.auth.getSession();
-    
+
     if (!session) {
-      // Not logged in - redirect to login
-      window.location.href = '/login.html';
-      return;
+        // Not logged in - redirect to login
+        window.location.href = '/login.html';
+        return;
     }
     
     // Logged in - show user info in top-right corner
