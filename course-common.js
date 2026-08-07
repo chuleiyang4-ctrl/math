@@ -54,6 +54,19 @@
       document.head.append(style);
     }
 
+    if (!document.querySelector('link[href="notebook.css"]')) {
+      const notebookStyle = document.createElement("link");
+      notebookStyle.rel = "stylesheet";
+      notebookStyle.href = "notebook.css";
+      document.head.append(notebookStyle);
+    }
+    if (!document.querySelector('link[href="auth.css"]')) {
+      const authStyle = document.createElement("link");
+      authStyle.rel = "stylesheet";
+      authStyle.href = "auth.css";
+      document.head.append(authStyle);
+    }
+
     if (window.MathAI) {
       window.MathAI.initialize();
       return;
@@ -63,6 +76,24 @@
       script.src = "math-ai.js";
       script.defer = true;
       document.head.append(script);
+    }
+    if (!window.MathNotebook && !document.querySelector('script[src="notebook.js"]')) {
+      const notebookScript = document.createElement("script");
+      notebookScript.src = "notebook.js";
+      notebookScript.defer = true;
+      document.head.append(notebookScript);
+    }
+    if (!document.querySelector('script[src="auth-config.js"]')) {
+      const authConfig = document.createElement("script");
+      authConfig.src = "auth-config.js";
+      document.head.append(authConfig);
+      authConfig.addEventListener("load", () => {
+        if (!document.querySelector('script[src="auth.js"]')) {
+          const authScript = document.createElement("script");
+          authScript.src = "auth.js";
+          document.head.append(authScript);
+        }
+      });
     }
   };
 
@@ -86,9 +117,9 @@
           <label class="sr-only" for="course-search-input">Search courses</label>
           <input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off">
         </form>
-        <button class="course-tool-button course-notebook-button" type="button" data-coming-soon="Notebook"><span aria-hidden="true">▤</span> Notebook</button>
+        <button class="course-tool-button course-notebook-button" type="button"><span aria-hidden="true">▤</span> Notebook</button>
         <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
-        <button class="course-profile-button" type="button" data-coming-soon="Profile" aria-label="Sign in or open profile">Profile</button>
+        <button class="course-profile-button" type="button" aria-label="Sign in or open profile">Profile</button>
       </div>`;
 
     const panel = document.createElement("aside");
