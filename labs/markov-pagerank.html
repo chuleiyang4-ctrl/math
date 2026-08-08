@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PageRank Walker — Math Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:       #060911;
+    --panel:    #0b101c;
+    --panel-2:  #0e1420;
+    --ink:      #eef1f8;
+    --ink-dim:  #7d869e;
+    --ink-faint:#454e66;
+    --cyan:     #5fd4e8;
+    --amber:    #e8b95f;
+    --violet:   #b28dff;
+    --green:    #7ee0a8;
+    --line:     rgba(238,241,248,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Mono', monospace; -webkit-font-smoothing:antialiased; }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--line); font-size:11px; letter-spacing:0.05em; flex-wrap:wrap; gap:6px; }
+  .topbar .brand{ font-family:'Space Grotesk'; font-weight:600; font-size:13.5px; color:var(--ink); }
+  .topbar .brand span{ color:var(--violet); }
+  .topbar .tag{ color:var(--ink-faint); text-transform:uppercase; }
+  .topbar a{ color:inherit; text-decoration:none; }
+  .topbar a:hover{ color:var(--cyan); }
+  .lab-nav{ display:flex; align-items:center; gap:14px; }
+
+  .layout{ display:flex; flex-direction:column; max-width:980px; margin:0 auto; }
+  .stage{ position:relative; width:100%; display:flex; align-items:center; justify-content:center; padding:14px; }
+  canvas{ display:block; width:100%; max-width:640px; height:auto; border-radius:8px; }
+
+  .panel{ padding:6px 18px 28px; }
+  .desc{ font-size:12px; color:var(--ink-dim); line-height:1.6; margin:8px 0 4px; }
+  .section-label{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin:18px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+
+  .controls-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .btn{ font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.03em; background:var(--panel-2); border:1px solid var(--line); color:var(--ink); padding:9px 16px; border-radius:6px; cursor:pointer; flex:0 0 auto; }
+  .btn.primary{ background:var(--violet); color:#0d0918; border-color:var(--violet); font-weight:600; }
+  .btn.ghost{ color:var(--ink-dim); }
+  .btn.on{ border-color:var(--violet); color:var(--violet); }
+
+  .slider-row{ margin-top:14px; }
+  .slider-row .lbl{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-dim); margin-bottom:6px; }
+  .slider-row .lbl b{ color:var(--amber); }
+  input[type=range]{ width:100%; accent-color:var(--amber); }
+
+  .hud{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+  .hud-cell{ background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:11px 13px; }
+  .hud-cell .k{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px; }
+  .hud-cell .v{ font-size:13.5px; color:var(--cyan); }
+
+  .ranklist{ margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+  .rank-row{ display:flex; align-items:center; gap:8px; font-size:11.5px; }
+  .rank-row .node-lbl{ width:16px; color:var(--ink-dim); }
+  .rank-row .bar-track{ flex:1; height:8px; background:var(--panel-2); border-radius:4px; overflow:hidden; border:1px solid var(--line); }
+  .rank-row .bar-fill{ height:100%; background:var(--violet); }
+  .rank-row .pct{ width:44px; text-align:right; color:var(--ink-dim); }
+
+  .status{ margin-top:14px; font-size:12px; padding:10px 13px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim); line-height:1.6; }
+  .status.converge{ border-color:rgba(126,224,168,0.4); color:var(--green); }
+
+  @media (min-width:760px){
+    .layout{ flex-direction:row; align-items:flex-start; max-width:none; }
+    .stage{ flex:1; }
+    .panel{ width:300px; flex:0 0 auto; border-left:1px solid var(--line); padding:22px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="../index.html"><span>∑</span> Mathematics</a>
+  <div class="lab-nav"><a href="index.html">⚗ Lab</a><div class="tag">Related: Module 8</div></div>
+</div>
+
+<div class="layout">
+  <div class="stage">
+    <canvas id="graph" width="640" height="480"></canvas>
+  </div>
+
+  <div class="panel">
+    <p class="desc">A random walker jumps from page to page, following links. Where does it spend most of its time in the long run? That long-run frequency is the page's rank.</p>
+
+    <div class="section-label">Network</div>
+    <div class="controls-row">
+      <button class="btn on" id="pWeb" data-p="web">Small Web</button>
+      <button class="btn" id="pCycle" data-p="cycle">Cycle</button>
+      <button class="btn" id="pHub" data-p="hub">Hub &amp; Spoke</button>
+    </div>
+
+    <div class="slider-row">
+      <div class="lbl"><span>Damping factor d</span><b id="dVal">0.85</b></div>
+      <input type="range" id="damping" min="0.5" max="0.98" step="0.01" value="0.85">
+    </div>
+
+    <div class="controls-row" style="margin-top:14px;">
+      <button class="btn primary" id="stepBtn">Step</button>
+      <button class="btn" id="runBtn">▶ Run</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="section-label">Rank Vector</div>
+    <div class="ranklist" id="rankList"></div>
+
+    <div class="hud">
+      <div class="hud-cell"><div class="k">Iteration</div><div class="v" id="hudIter">0</div></div>
+      <div class="hud-cell"><div class="k">Δ (L1)</div><div class="v" id="hudDelta">—</div></div>
+    </div>
+
+    <div class="status" id="status">v₀ starts uniform: each page has probability 1/N.</div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('graph');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// ---- graph presets: directed edge lists over 6 labeled nodes ----
+const presets = {
+  web: {
+    nodes: ['A','B','C','D','E','F'],
+    edges: [['A','B'],['A','C'],['B','C'],['C','A'],['D','C'],['E','C'],['E','D'],['F','C'],['F','E']]
+  },
+  cycle: {
+    nodes: ['A','B','C','D','E','F'],
+    edges: [['A','B'],['B','C'],['C','D'],['D','E'],['E','F'],['F','A']]
+  },
+  hub: {
+    nodes: ['A','B','C','D','E','F'],
+    edges: [['A','B'],['A','C'],['A','D'],['A','E'],['A','F'],['B','A'],['C','A'],['D','A'],['E','A'],['F','A']]
+  }
+};
+
+let current = 'web';
+let nodes = [];
+let edges = [];
+let P = [];        // raw transition matrix, row-stochastic (with dangling-node fix)
+let v = [];         // current rank vector
+let vPrev = [];
+let iter = 0;
+let running = false;
+
+function buildMatrix(preset){
+  nodes = preset.nodes;
+  edges = preset.edges;
+  const n = nodes.length;
+  const idx = Object.fromEntries(nodes.map((id,i)=>[id,i]));
+  const outDeg = new Array(n).fill(0);
+  edges.forEach(([a,b])=> outDeg[idx[a]]++);
+  const M = Array.from({length:n}, ()=> new Array(n).fill(0));
+  edges.forEach(([a,b])=>{ M[idx[a]][idx[b]] += 1/outDeg[idx[a]]; });
+  // dangling nodes (no outgoing links) distribute uniformly — keeps matrix row-stochastic
+  for(let i=0;i<n;i++){
+    if(outDeg[i] === 0){ for(let j=0;j<n;j++) M[i][j] = 1/n; }
+  }
+  P = M;
+  v = new Array(n).fill(1/n);
+  vPrev = [...v];
+  iter = 0;
+}
+
+// google matrix step: v_new[j] = sum_i v[i] * ( d*P[i][j] + (1-d)/n )
+function step(){
+  const n = nodes.length;
+  const d = parseFloat(document.getElementById('damping').value);
+  const vNew = new Array(n).fill(0);
+  for(let i=0;i<n;i++){
+    for(let j=0;j<n;j++){
+      vNew[j] += v[i] * (d*P[i][j] + (1-d)/n);
+    }
+  }
+  vPrev = v;
+  v = vNew;
+  iter++;
+  const delta = v.reduce((s,val,i)=> s + Math.abs(val - vPrev[i]), 0);
+  updateHUD(delta);
+  layoutPositions();
+  render();
+  return delta;
+}
+
+function layoutPositions(){
+  const n = nodes.length;
+  const cx = W/2, cy = H/2 - 10, R = Math.min(W,H)*0.32;
+  nodes = nodes.map((id,i)=>{
+    const angle = -Math.PI/2 + (i/n)*Math.PI*2;
+    return { id, x: cx + R*Math.cos(angle), y: cy + R*Math.sin(angle) };
+  });
+}
+
+function drawArrow(x1,y1,x2,y2,r1,r2,color){
+  const dx = x2-x1, dy = y2-y1;
+  const dist = Math.hypot(dx,dy);
+  const ux = dx/dist, uy = dy/dist;
+  const sx = x1 + ux*r1, sy = y1 + uy*r1;
+  const ex = x2 - ux*r2, ey = y2 - uy*r2;
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
+  const ang = Math.atan2(ey-sy, ex-sx);
+  const hl = 8;
+  ctx.beginPath();
+  ctx.moveTo(ex,ey);
+  ctx.lineTo(ex-hl*Math.cos(ang-0.32), ey-hl*Math.sin(ang-0.32));
+  ctx.lineTo(ex-hl*Math.cos(ang+0.32), ey-hl*Math.sin(ang+0.32));
+  ctx.closePath(); ctx.fill();
+}
+
+function radiusFor(val){
+  const n = nodes.length;
+  const rel = val * n; // 1.0 = exactly average rank
+  return 16 + Math.min(1.6, Math.max(0, rel-0.3)) * 14;
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+  const idx = Object.fromEntries(nodes.map((nd,i)=>[nd.id,i]));
+
+  edges.forEach(([a,b])=>{
+    const A = nodes[idx[a]], B = nodes[idx[b]];
+    drawArrow(A.x,A.y,B.x,B.y, radiusFor(v[idx[a]]), radiusFor(v[idx[b]]), 'rgba(178,141,255,0.38)');
+  });
+
+  nodes.forEach((nd,i)=>{
+    const r = radiusFor(v[i]);
+    ctx.beginPath();
+    ctx.arc(nd.x, nd.y, r, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(178,141,255,0.14)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(178,141,255,0.85)'; ctx.lineWidth = 1.6;
+    ctx.shadowColor = 'rgba(178,141,255,0.6)'; ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#eef1f8';
+    ctx.font = '600 14px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(nd.id, nd.x, nd.y);
+  });
+
+  renderRankList();
+}
+
+function renderRankList(){
+  const box = document.getElementById('rankList');
+  box.innerHTML = '';
+  const maxV = Math.max(...v);
+  nodes.forEach((nd,i)=>{
+    const row = document.createElement('div');
+    row.className = 'rank-row';
+    const pct = (v[i]*100).toFixed(1);
+    const width = Math.max(2, (v[i]/maxV)*100);
+    row.innerHTML = `<span class="node-lbl">${nd.id}</span><span class="bar-track"><span class="bar-fill" style="width:${width}%"></span></span><span class="pct">${pct}%</span>`;
+    box.appendChild(row);
+  });
+}
+
+function updateHUD(delta){
+  document.getElementById('hudIter').textContent = iter;
+  const status = document.getElementById('status');
+  if(delta === undefined){
+    document.getElementById('hudDelta').textContent = '—';
+    status.className = 'status';
+    status.textContent = 'v₀ starts uniform: each page has probability 1/N.';
+    return;
+  }
+  document.getElementById('hudDelta').textContent = delta.toExponential(2);
+  if(delta < 1e-5){
+    status.className = 'status converge';
+    status.textContent = `Converged after ${iter} steps — the walker's long-run visit frequencies have stabilized. This is the dominant eigenvector of the Google matrix (eigenvalue 1).`;
+    running = false;
+    document.getElementById('runBtn').textContent = '▶ Run';
+  } else {
+    status.className = 'status';
+    status.textContent = 'Each step: v ← v · G, where G blends the link matrix with a small chance of teleporting anywhere.';
+  }
+}
+
+function loadPreset(key){
+  current = key;
+  buildMatrix(presets[key]);
+  layoutPositions();
+  updateHUD(undefined);
+  render();
+}
+
+document.querySelectorAll('[data-p]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-p]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    running = false;
+    document.getElementById('runBtn').textContent = '▶ Run';
+    loadPreset(btn.dataset.p);
+  });
+});
+
+document.getElementById('damping').addEventListener('input', (e)=>{
+  document.getElementById('dVal').textContent = parseFloat(e.target.value).toFixed(2);
+});
+
+document.getElementById('stepBtn').addEventListener('click', step);
+document.getElementById('resetBtn').addEventListener('click', ()=>{ running=false; document.getElementById('runBtn').textContent='▶ Run'; loadPreset(current); });
+document.getElementById('runBtn').addEventListener('click', (e)=>{
+  running = !running;
+  e.target.textContent = running ? '⏸ Pause' : '▶ Run';
+});
+
+let lastTime = 0;
+function loop(ts){
+  if(running && ts - lastTime > 450){ step(); lastTime = ts; }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+loadPreset('web');
+</script>
+
+</body>
+</html>

@@ -13,6 +13,34 @@
       "description": "Drop a point on a loss surface and explore how step size changes its path.",
       "relatedLesson": "7.4",
       "file": "gradient-descent.html"
+    },
+    {
+      "id": "fourier-synthesizer",
+      "title": "Fourier Synthesizer",
+      "description": "Build a square wave out of nothing but sine waves, then hear the harmonics stack up.",
+      "relatedLesson": "11",
+      "file": "fourier-synthesizer.html"
+    },
+    {
+      "id": "markov-pagerank",
+      "title": "PageRank Walker",
+      "description": "Follow a random walker across a link graph and watch its long-run address converge.",
+      "relatedLesson": "8",
+      "file": "markov-pagerank.html"
+    },
+    {
+      "id": "neural-network-trainer",
+      "title": "Neural Network Trainer",
+      "description": "Train a tiny network live and watch it fold the plane until it can separate the classes.",
+      "relatedLesson": "7",
+      "file": "neural-network-trainer.html"
+    },
+    {
+      "id": "chaos-attractor",
+      "title": "Strange Attractor",
+      "description": "Nudge a Lorenz trajectory by a hair's width and watch the butterfly effect unfold.",
+      "relatedLesson": "10",
+      "file": "chaos-attractor.html"
     }
   ]
 }

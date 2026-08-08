@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fourier Synthesizer — Math Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:       #060911;
+    --panel:    #0b101c;
+    --panel-2:  #0e1420;
+    --ink:      #eef1f8;
+    --ink-dim:  #7d869e;
+    --ink-faint:#454e66;
+    --cyan:     #5fd4e8;
+    --amber:    #e8b95f;
+    --violet:   #b28dff;
+    --green:    #7ee0a8;
+    --line:     rgba(238,241,248,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    -webkit-font-smoothing:antialiased;
+  }
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; border-bottom:1px solid var(--line);
+    font-size:11px; letter-spacing:0.05em; flex-wrap:wrap; gap:6px;
+  }
+  .topbar .brand{ font-family:'Space Grotesk'; font-weight:600; font-size:13.5px; color:var(--ink); }
+  .topbar .brand span{ color:var(--cyan); }
+  .topbar .tag{ color:var(--ink-faint); text-transform:uppercase; }
+  .topbar a{ color:inherit; text-decoration:none; }
+  .topbar a:hover{ color:var(--cyan); }
+  .lab-nav{ display:flex; align-items:center; gap:14px; }
+
+  .layout{ display:flex; flex-direction:column; max-width:980px; margin:0 auto; }
+  .stage{ position:relative; width:100%; display:flex; align-items:center; justify-content:center; padding:14px; }
+  canvas{ display:block; width:100%; max-width:640px; height:auto; border-radius:8px; }
+
+  .panel{ padding:6px 18px 28px; }
+  .desc{ font-size:12px; color:var(--ink-dim); line-height:1.6; margin:8px 0 4px; }
+  .section-label{
+    font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);
+    margin:18px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+
+  .controls-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .btn{
+    font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.03em;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    padding:9px 16px; border-radius:6px; cursor:pointer; flex:0 0 auto;
+  }
+  .btn.primary{ background:var(--cyan); color:#06110d; border-color:var(--cyan); font-weight:600; }
+  .btn.on{ border-color:var(--cyan); color:var(--cyan); }
+
+  .slider-row{ margin-top:14px; }
+  .slider-row .lbl{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-dim); margin-bottom:6px; }
+  .slider-row .lbl b{ color:var(--amber); }
+  input[type=range]{ width:100%; accent-color:var(--amber); }
+
+  .hud{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+  .hud-cell{ background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:11px 13px; }
+  .hud-cell .k{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px; }
+  .hud-cell .v{ font-size:13.5px; color:var(--cyan); }
+
+  .harmonics{ display:flex; align-items:flex-end; gap:2px; height:64px; margin-top:14px; background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:8px; }
+  .harmonics .bar{ flex:1; background:var(--ink-faint); border-radius:2px 2px 0 0; transition:height .15s, background .15s; }
+  .harmonics .bar.active{ background:var(--amber); }
+
+  .status{
+    margin-top:14px; font-size:12px; padding:10px 13px; border-radius:8px;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim); line-height:1.6;
+  }
+
+  .legend-note{ font-size:11px; color:var(--ink-faint); line-height:1.7; margin-top:20px; }
+  .legend-note .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+
+  @media (min-width:760px){
+    .layout{ flex-direction:row; align-items:flex-start; max-width:none; }
+    .stage{ flex:1; }
+    .panel{ width:300px; flex:0 0 auto; border-left:1px solid var(--line); padding:22px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="../index.html"><span>∑</span> Mathematics</a>
+  <div class="lab-nav"><a href="index.html">⚗ Lab</a><div class="tag">Related: Module 11</div></div>
+</div>
+
+<div class="layout">
+  <div class="stage">
+    <canvas id="wave" width="640" height="360"></canvas>
+  </div>
+
+  <div class="panel">
+    <p class="desc">A square wave is built from nothing but sine waves. Add harmonics one at a time and watch the jagged edge sharpen — it never quite gets there.</p>
+
+    <div class="section-label">Target Shape</div>
+    <div class="controls-row">
+      <button class="btn on" id="wSquare" data-w="square">Square</button>
+      <button class="btn" id="wSaw" data-w="saw">Sawtooth</button>
+      <button class="btn" id="wTri" data-w="triangle">Triangle</button>
+    </div>
+
+    <div class="slider-row">
+      <div class="lbl"><span>Harmonics (N)</span><b id="nVal">3</b></div>
+      <input type="range" id="n" min="1" max="30" step="1" value="3">
+    </div>
+
+    <div class="harmonics" id="harmonicBars"></div>
+
+    <div class="controls-row" style="margin-top:14px;">
+      <button class="btn primary" id="playBtn">▶ Play tone</button>
+    </div>
+
+    <div class="hud">
+      <div class="hud-cell"><div class="k">RMS error</div><div class="v" id="hudErr">—</div></div>
+      <div class="hud-cell"><div class="k">Overshoot</div><div class="v" id="hudOvershoot">—</div></div>
+    </div>
+
+    <div class="status" id="status">The dashed line is the true square wave. The solid line is the sum of the first N sine harmonics.</div>
+
+    <div class="legend-note">
+      <span class="dot" style="background:var(--ink-faint)"></span>target waveform (ideal)<br>
+      <span class="dot" style="background:var(--cyan)"></span>Fourier partial sum (N terms)
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('wave');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const cy = H/2, amp = H*0.36;
+const PERIODS = 2;
+
+let waveType = 'square';
+let N = 3;
+
+// ---- exact closed-form target functions (period = 1) ----
+function target(t, type){
+  const ph = ((t % 1) + 1) % 1; // 0..1
+  if(type === 'square') return ph < 0.5 ? 1 : -1;
+  if(type === 'saw') return 2*(ph - Math.floor(ph + 0.5));
+  // triangle, closed form via arcsin of sine
+  return (2/Math.PI) * Math.asin(Math.sin(2*Math.PI*ph));
+}
+
+// ---- Fourier coefficients (standard textbook series, period = 1, angular freq 2*pi*k) ----
+// square:   f(t) = (4/pi) * sum_{k odd} sin(2*pi*k*t) / k
+// saw:      f(t) = (2/pi) * sum_{k>=1} (-1)^(k+1) sin(2*pi*k*t) / k
+// triangle: f(t) = (8/pi^2) * sum_{k odd} (-1)^((k-1)/2) sin(2*pi*k*t) / k^2
+function coeff(k, type){
+  if(type === 'square'){
+    if(k % 2 === 0) return 0;
+    return 4/(Math.PI*k);
+  }
+  if(type === 'saw'){
+    return (2/Math.PI) * (Math.pow(-1, k+1) / k);
+  }
+  // triangle
+  if(k % 2 === 0) return 0;
+  const sign = Math.pow(-1, (k-1)/2);
+  return (8/(Math.PI*Math.PI)) * sign / (k*k);
+}
+
+function partialSum(t, type, n){
+  let s = 0;
+  for(let k=1; k<=n; k++) s += coeff(k, type) * Math.sin(2*Math.PI*k*t);
+  return s;
+}
+
+function drawAxes(){
+  ctx.strokeStyle = 'rgba(238,241,248,0.08)'; ctx.lineWidth = 1;
+  for(let x=0; x<=W; x+=W/(PERIODS*8)){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(238,241,248,0.16)';
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+  drawAxes();
+
+  // target (dashed)
+  ctx.setLineDash([5,4]);
+  ctx.strokeStyle = 'rgba(125,134,158,0.9)'; ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  for(let px=0; px<=W; px++){
+    const t = (px/W) * PERIODS;
+    const y = cy - target(t, waveType) * amp;
+    if(px===0) ctx.moveTo(px,y); else ctx.lineTo(px,y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // partial sum (solid)
+  ctx.strokeStyle = '#5fd4e8'; ctx.lineWidth = 2.2;
+  ctx.shadowColor = 'rgba(95,212,232,0.5)'; ctx.shadowBlur = 6;
+  ctx.beginPath();
+  let maxAbs = 0, sumSq = 0, count = 0;
+  for(let px=0; px<=W; px++){
+    const t = (px/W) * PERIODS;
+    const yVal = partialSum(t, waveType, N);
+    const err = yVal - target(t, waveType);
+    sumSq += err*err; count++;
+    if(Math.abs(yVal) > maxAbs) maxAbs = Math.abs(yVal);
+    const y = cy - yVal * amp;
+    if(px===0) ctx.moveTo(px,y); else ctx.lineTo(px,y);
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  const rms = Math.sqrt(sumSq/count);
+  document.getElementById('hudErr').textContent = rms.toFixed(3);
+  const overshoot = Math.max(0, (maxAbs - 1) * 100);
+  document.getElementById('hudOvershoot').textContent = overshoot > 1 ? `+${overshoot.toFixed(1)}%` : '—';
+
+  renderHarmonicBars();
+}
+
+function renderHarmonicBars(){
+  const box = document.getElementById('harmonicBars');
+  box.innerHTML = '';
+  const maxK = 16;
+  for(let k=1; k<=maxK; k++){
+    const c = Math.abs(coeff(k, waveType));
+    const h = Math.max(2, c * 56);
+    const bar = document.createElement('div');
+    bar.className = 'bar' + (k <= N && c > 0.001 ? ' active' : '');
+    bar.style.height = h + 'px';
+    box.appendChild(bar);
+  }
+}
+
+// ---- controls ----
+document.querySelectorAll('[data-w]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-w]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    waveType = btn.dataset.w;
+    render();
+  });
+});
+
+const nSlider = document.getElementById('n');
+const nVal = document.getElementById('nVal');
+nSlider.addEventListener('input', ()=>{
+  N = parseInt(nSlider.value);
+  nVal.textContent = N;
+  render();
+});
+
+// ---- audio: sum the actual harmonics as oscillators ----
+let audioCtx = null;
+let oscillators = [];
+let playing = false;
+const playBtn = document.getElementById('playBtn');
+
+function stopAudio(){
+  oscillators.forEach(o => { try{ o.osc.stop(); }catch(e){} });
+  oscillators = [];
+  playing = false;
+  playBtn.textContent = '▶ Play tone';
+}
+
+function startAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const base = 220; // A3
+  const master = audioCtx.createGain();
+  master.gain.value = 0.15;
+  master.connect(audioCtx.destination);
+  for(let k=1; k<=N; k++){
+    const c = coeff(k, waveType);
+    if(Math.abs(c) < 0.001) continue;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = base * k;
+    gain.gain.value = Math.abs(c);
+    osc.connect(gain); gain.connect(master);
+    osc.start();
+    oscillators.push({osc, gain});
+  }
+  playing = true;
+  playBtn.textContent = '■ Stop';
+}
+
+playBtn.addEventListener('click', ()=>{
+  if(playing) stopAudio(); else startAudio();
+});
+
+render();
+</script>
+
+</body>
+</html>

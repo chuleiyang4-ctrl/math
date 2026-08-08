@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strange Attractor — Math Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:       #060911;
+    --panel:    #0b101c;
+    --panel-2:  #0e1420;
+    --ink:      #eef1f8;
+    --ink-dim:  #7d869e;
+    --ink-faint:#454e66;
+    --cyan:     #5fd4e8;
+    --amber:    #e8b95f;
+    --violet:   #b28dff;
+    --green:    #7ee0a8;
+    --line:     rgba(238,241,248,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Mono', monospace; -webkit-font-smoothing:antialiased; }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--line); font-size:11px; letter-spacing:0.05em; flex-wrap:wrap; gap:6px; }
+  .topbar .brand{ font-family:'Space Grotesk'; font-weight:600; font-size:13.5px; color:var(--ink); }
+  .topbar .brand span{ color:var(--amber); }
+  .topbar .tag{ color:var(--ink-faint); text-transform:uppercase; }
+  .topbar a{ color:inherit; text-decoration:none; }
+  .topbar a:hover{ color:var(--cyan); }
+  .lab-nav{ display:flex; align-items:center; gap:14px; }
+
+  .layout{ display:flex; flex-direction:column; max-width:980px; margin:0 auto; }
+  .stage{ position:relative; width:100%; display:flex; align-items:center; justify-content:center; padding:14px; }
+  canvas{ display:block; width:100%; max-width:640px; height:auto; border-radius:8px; }
+
+  .panel{ padding:6px 18px 28px; }
+  .desc{ font-size:12px; color:var(--ink-dim); line-height:1.6; margin:8px 0 4px; }
+  .section-label{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin:18px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+
+  .controls-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .btn{ font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.03em; background:var(--panel-2); border:1px solid var(--line); color:var(--ink); padding:9px 16px; border-radius:6px; cursor:pointer; flex:0 0 auto; }
+  .btn.primary{ background:var(--amber); color:#1a1206; border-color:var(--amber); font-weight:600; }
+  .btn.ghost{ color:var(--ink-dim); }
+
+  .slider-row{ margin-top:14px; }
+  .slider-row .lbl{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-dim); margin-bottom:6px; }
+  .slider-row .lbl b{ color:var(--amber); }
+  input[type=range]{ width:100%; accent-color:var(--amber); }
+
+  .hud{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+  .hud-cell{ background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:11px 13px; }
+  .hud-cell .k{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px; }
+  .hud-cell .v{ font-size:13.5px; color:var(--cyan); }
+
+  canvas#sepCurve{ display:block; width:100%; height:56px; margin-top:12px; border-radius:6px; background:var(--panel-2); border:1px solid var(--line); }
+
+  .status{ margin-top:14px; font-size:12px; padding:10px 13px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim); line-height:1.6; }
+  .status.diverged{ border-color:rgba(232,185,95,0.4); color:var(--amber); }
+
+  .legend-note{ font-size:11px; color:var(--ink-faint); line-height:1.7; margin-top:16px; }
+  .legend-note .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+
+  @media (min-width:760px){
+    .layout{ flex-direction:row; align-items:flex-start; max-width:none; }
+    .stage{ flex:1; }
+    .panel{ width:300px; flex:0 0 auto; border-left:1px solid var(--line); padding:22px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="../index.html"><span>∑</span> Mathematics</a>
+  <div class="lab-nav"><a href="index.html">⚗ Lab</a><div class="tag">Related: Module 10</div></div>
+</div>
+
+<div class="layout">
+  <div class="stage">
+    <canvas id="attractor" width="640" height="480"></canvas>
+  </div>
+
+  <div class="panel">
+    <p class="desc">Two points start a hair's width apart on the Lorenz system and follow the exact same equations. Watch how fast "almost the same" becomes "nowhere near."</p>
+
+    <div class="section-label">Lorenz Parameters</div>
+    <div class="slider-row">
+      <div class="lbl"><span>σ (sigma)</span><b id="sigVal">10.0</b></div>
+      <input type="range" id="sigma" min="1" max="20" step="0.5" value="10">
+    </div>
+    <div class="slider-row">
+      <div class="lbl"><span>ρ (rho)</span><b id="rhoVal">28.0</b></div>
+      <input type="range" id="rho" min="0" max="60" step="0.5" value="28">
+    </div>
+    <div class="slider-row">
+      <div class="lbl"><span>β (beta)</span><b id="betaVal">2.67</b></div>
+      <input type="range" id="beta" min="0.5" max="5" step="0.05" value="2.67">
+    </div>
+    <div class="slider-row">
+      <div class="lbl"><span>Initial separation</span><b id="dVal">1e-5</b></div>
+      <input type="range" id="delta" min="-8" max="-1" step="1" value="-5">
+    </div>
+
+    <div class="controls-row" style="margin-top:14px;">
+      <button class="btn primary" id="playBtn">▶ Run</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="hud">
+      <div class="hud-cell"><div class="k">t</div><div class="v" id="hudT">0.0</div></div>
+      <div class="hud-cell"><div class="k">Separation</div><div class="v" id="hudSep">—</div></div>
+    </div>
+
+    <canvas id="sepCurve" width="300" height="56"></canvas>
+
+    <div class="status" id="status">Trajectories A and B start ~1e-5 apart. Run to watch them ride together, then split.</div>
+
+    <div class="legend-note">
+      <span class="dot" style="background:var(--cyan)"></span>trajectory A<br>
+      <span class="dot" style="background:var(--violet)"></span>trajectory B (perturbed start)
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('attractor');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+function toPx(x,z){ return { x: W/2 + x*8, y: H - 24 - z*8 }; }
+
+// ---- Lorenz system: exact ODEs, integrated with classical RK4 ----
+function deriv(s, sigma, rho, beta){
+  return {
+    dx: sigma*(s.y - s.x),
+    dy: s.x*(rho - s.z) - s.y,
+    dz: s.x*s.y - beta*s.z
+  };
+}
+function rk4(s, dt, sigma, rho, beta){
+  const k1 = deriv(s, sigma, rho, beta);
+  const s2 = { x:s.x+dt/2*k1.dx, y:s.y+dt/2*k1.dy, z:s.z+dt/2*k1.dz };
+  const k2 = deriv(s2, sigma, rho, beta);
+  const s3 = { x:s.x+dt/2*k2.dx, y:s.y+dt/2*k2.dy, z:s.z+dt/2*k2.dz };
+  const k3 = deriv(s3, sigma, rho, beta);
+  const s4 = { x:s.x+dt*k3.dx, y:s.y+dt*k3.dy, z:s.z+dt*k3.dz };
+  const k4 = deriv(s4, sigma, rho, beta);
+  return {
+    x: s.x + dt/6*(k1.dx+2*k2.dx+2*k3.dx+k4.dx),
+    y: s.y + dt/6*(k1.dy+2*k2.dy+2*k3.dy+k4.dy),
+    z: s.z + dt/6*(k1.dz+2*k2.dz+2*k3.dz+k4.dz)
+  };
+}
+
+const dt = 0.008;
+let A, B, t, sepHistory;
+let running = false;
+
+function reset(){
+  const deltaExp = parseInt(document.getElementById('delta').value);
+  const delta = Math.pow(10, deltaExp);
+  A = { x:0.1, y:0, z:0 };
+  B = { x:0.1+delta, y:0, z:0 };
+  t = 0;
+  sepHistory = [];
+  running = false;
+  document.getElementById('playBtn').textContent = '▶ Run';
+  document.getElementById('dVal').textContent = delta.toExponential(0);
+  document.getElementById('hudT').textContent = '0.0';
+  document.getElementById('hudSep').textContent = '—';
+  const status = document.getElementById('status');
+  status.className = 'status';
+  status.textContent = `Trajectories A and B start ${delta.toExponential(0)} apart. Run to watch them ride together, then split.`;
+  ctx.fillStyle = '#060911';
+  ctx.fillRect(0,0,W,H);
+}
+
+function step(){
+  const sigma = parseFloat(document.getElementById('sigma').value);
+  const rho = parseFloat(document.getElementById('rho').value);
+  const beta = parseFloat(document.getElementById('beta').value);
+
+  ctx.fillStyle = 'rgba(6,9,17,0.10)';
+  ctx.fillRect(0,0,W,H);
+
+  const subSteps = 6;
+  for(let i=0;i<subSteps;i++){
+    const pA = toPx(A.x, A.z);
+    const pB = toPx(B.x, B.z);
+    A = rk4(A, dt, sigma, rho, beta);
+    B = rk4(B, dt, sigma, rho, beta);
+    t += dt;
+    const pA2 = toPx(A.x, A.z);
+    const pB2 = toPx(B.x, B.z);
+
+    ctx.strokeStyle = 'rgba(95,212,232,0.85)'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(pA.x,pA.y); ctx.lineTo(pA2.x,pA2.y); ctx.stroke();
+    ctx.strokeStyle = 'rgba(178,141,255,0.85)'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(pB.x,pB.y); ctx.lineTo(pB2.x,pB2.y); ctx.stroke();
+  }
+
+  const sep = Math.hypot(A.x-B.x, A.y-B.y, A.z-B.z);
+  sepHistory.push(Math.log10(Math.max(sep,1e-10)));
+  if(sepHistory.length > 300) sepHistory.shift();
+
+  document.getElementById('hudT').textContent = t.toFixed(1);
+  document.getElementById('hudSep').textContent = sep.toExponential(2);
+
+  const status = document.getElementById('status');
+  if(sep > 5){
+    status.className = 'status diverged';
+    status.textContent = `Separation is now ${sep.toExponential(1)} — a starting gap smaller than a bacterium has grown to the size of the whole attractor. This is the butterfly effect: nearby chaotic trajectories diverge exponentially.`;
+  } else {
+    status.className = 'status';
+  }
+
+  renderSepCurve();
+}
+
+function renderSepCurve(){
+  const sc = document.getElementById('sepCurve');
+  const sctx = sc.getContext('2d');
+  const w = sc.width, h = sc.height;
+  sctx.clearRect(0,0,w,h);
+  if(sepHistory.length < 2) return;
+  const minL = -6, maxL = 2;
+  sctx.strokeStyle = '#e8b95f'; sctx.lineWidth = 1.6;
+  sctx.beginPath();
+  sepHistory.forEach((l,i)=>{
+    const x = (i/(sepHistory.length-1))*w;
+    const clamped = Math.max(minL, Math.min(maxL, l));
+    const yy = h - ((clamped-minL)/(maxL-minL))*h*0.9 - 3;
+    if(i===0) sctx.moveTo(x,yy); else sctx.lineTo(x,yy);
+  });
+  sctx.stroke();
+}
+
+document.getElementById('playBtn').addEventListener('click', (e)=>{
+  running = !running;
+  e.target.textContent = running ? '⏸ Pause' : '▶ Run';
+});
+document.getElementById('resetBtn').addEventListener('click', reset);
+['sigma','rho','beta'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', (e)=>{
+    document.getElementById(id.slice(0,3)+'Val') && null;
+  });
+});
+document.getElementById('sigma').addEventListener('input', e=> document.getElementById('sigVal').textContent = parseFloat(e.target.value).toFixed(1));
+document.getElementById('rho').addEventListener('input', e=> document.getElementById('rhoVal').textContent = parseFloat(e.target.value).toFixed(1));
+document.getElementById('beta').addEventListener('input', e=> document.getElementById('betaVal').textContent = parseFloat(e.target.value).toFixed(2));
+document.getElementById('delta').addEventListener('input', ()=> reset());
+
+let lastTime = 0;
+function loop(ts){
+  if(running && ts - lastTime > 30){ step(); lastTime = ts; }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+reset();
+</script>
+
+</body>
+</html>
