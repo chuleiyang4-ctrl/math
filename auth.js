@@ -17,7 +17,7 @@
   let client = null;
   let modal = null;
   let currentSession = null;
-  const profileButtons = () => document.querySelectorAll(".course-profile-button, .profile-tool");
+  const profileButtons = () => document.querySelectorAll(".course-profile-button, .profile-tool, .profile-button, [data-auth-open]");
   const setOpen = (open) => {
     if (!modal) return;
     modal.hidden = !open;
@@ -75,7 +75,7 @@
     modal = document.createElement("div"); modal.className = "auth-modal"; modal.hidden = true; modal.setAttribute("aria-hidden", "true");
     modal.innerHTML = `<section class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <button class="auth-close" type="button" aria-label="Close sign in">×</button><small>OPTIONAL ACCOUNT</small>
-      <div class="auth-signed-out"><h2 id="auth-title">Sign in with Email</h2><p>Courses and Math Lab are open to everyone. Sign in to use Notebook and sync your learning data.</p>
+      <div class="auth-signed-out"><h2 id="auth-title">Sign in with Email</h2><p>Courses are open to everyone. Sign in to use your shared Notebook and sync learning data across subjects.</p>
       <form class="auth-email-form"><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" required placeholder="you@example.com"><button type="submit">Email me a sign-in link</button></form><button class="auth-guest" type="button">Continue as guest</button></div>
       <div class="auth-signed-in" hidden><h2>You're signed in</h2><p class="auth-user-email"></p><p>Notebook is now available from the top navigation.</p><button class="auth-sign-out" type="button">Sign out</button></div><p class="auth-status" role="status"></p></section>`;
     document.body.append(modal);
