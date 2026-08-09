@@ -139,6 +139,9 @@
     const panel = document.createElement("aside");
     panel.id = "math-ai-panel";
     panel.className = "math-ai-panel";
+    panel.dataset.aiName = "Math AI";
+    panel.dataset.aiEndpoint = "/api/math-ai";
+    panel.dataset.aiIntro = "Ask about this lesson, request another explanation, or work through a problem step by step.";
     panel.setAttribute("aria-hidden", "true");
     panel.innerHTML = `
       <div class="math-ai-head">
