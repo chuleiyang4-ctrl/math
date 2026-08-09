@@ -109,15 +109,15 @@
     header.innerHTML = `
       <div class="course-topbar-inner">
         <a class="course-brand" href="index.html" aria-label="Mathematics home">
-          <span class="course-brand-mark">鈭?/span>
+          <span class="course-brand-mark">∑</span>
           <span class="course-brand-name">Mathematics</span>
         </a>
-        <a class="course-tool-button" href="labs/index.html"><span aria-hidden="true">鈿?/span> Lab</a>
+        <a class="course-tool-button" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
         <form class="course-search" role="search">
           <label class="sr-only" for="course-search-input">Search courses</label>
           <input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off">
         </form>
-        <button class="course-tool-button course-notebook-button" type="button" data-notebook-open><span aria-hidden="true">鈻?/span> Notebook</button>
+        <button class="course-tool-button course-notebook-button" type="button" data-notebook-open><span aria-hidden="true">▤</span> Notebook</button>
         <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
         <button class="course-profile-button" type="button" aria-label="Sign in or open profile">Profile</button>
       </div>`;
@@ -129,7 +129,7 @@
     panel.innerHTML = `
       <div class="math-ai-head">
         <div><small>ASSISTANT</small><strong>Math AI</strong></div>
-        <button type="button" class="math-ai-close" aria-label="Close Math AI">脳</button>
+        <button type="button" class="math-ai-close" aria-label="Close Math AI">×</button>
       </div>
       <div class="math-ai-body">
         <p>Ask questions about the lesson, request another explanation, or work through a problem.</p>
@@ -175,7 +175,7 @@
 
     link.href = lesson.file;
     link.innerHTML =
-      `<small>${direction} 路 ${lesson.id}</small>` +
+      `<small>${direction} · ${lesson.id}</small>` +
       `<strong>${lesson.title || `Lesson ${lesson.id}`}</strong>`;
     return link;
   };
