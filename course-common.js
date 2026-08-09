@@ -77,9 +77,9 @@
       window.MathAI.initialize();
       return;
     }
-    if (!document.querySelector('script[src="math-ai.js"]')) {
+    if (!document.querySelector('script[src^="math-ai.js"]')) {
       const script = document.createElement("script");
-      script.src = "math-ai.js";
+      script.src = "math-ai.js?v=20260810-unified-ai";
       script.defer = true;
       document.head.append(script);
     }
