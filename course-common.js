@@ -47,6 +47,12 @@
   };
 
   const loadMathAIAssets = () => {
+    if (!document.querySelector('link[href="atlas-shell.css"]')) {
+      const shellStyle = document.createElement("link");
+      shellStyle.rel = "stylesheet";
+      shellStyle.href = "atlas-shell.css";
+      document.head.append(shellStyle);
+    }
     if (!document.querySelector('link[href="math-ai.css"]')) {
       const style = document.createElement("link");
       style.rel = "stylesheet";
@@ -98,14 +104,14 @@
   };
 
   const addCourseTopbar = () => {
-    if (document.querySelector(".course-topbar")) return;
+    if (document.querySelector(".atlas-topbar")) return;
 
     document.querySelectorAll(".topbar, .course-page-nav").forEach((element) => element.remove());
     document.querySelectorAll(".course-home-link").forEach((element) => element.remove());
     document.body.classList.add("has-course-topbar");
 
     const header = document.createElement("header");
-    header.className = "course-topbar";
+    header.className = "atlas-topbar";
     header.innerHTML = `
       <div class="course-topbar-inner">
         <a class="course-brand" href="index.html" aria-label="Mathematics home">
@@ -120,6 +126,14 @@
         <button class="course-tool-button course-notebook-button" type="button" data-notebook-open><span aria-hidden="true">▤</span> Notebook</button>
         <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
         <button class="course-profile-button" type="button" aria-label="Sign in or open profile">Profile</button>
+      </div>`;
+    header.innerHTML = `
+      <div class="atlas-topbar-inner">
+        <a class="atlas-brand" href="https://luminaatlas.com/" aria-label="Lumina Atlas home"><span class="atlas-brand-mark">Σ</span><span class="atlas-brand-name">Lumina Atlas</span></a>
+        <form class="atlas-search course-search" role="search"><label class="sr-only" for="course-search-input">Search courses</label><input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off"></form>
+        <button class="atlas-tool course-notebook-button" type="button" data-notebook-open><span class="atlas-tool-icon">▤</span><span class="atlas-tool-label">Notebook</span></button>
+        <button class="atlas-tool atlas-ai course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span class="atlas-tool-icon">✦</span><span class="atlas-tool-label">AI</span></button>
+        <button class="atlas-tool atlas-profile course-profile-button" type="button" data-auth-open aria-label="Sign in or open profile"><span class="atlas-tool-icon">●</span><span class="atlas-tool-label">Profile</span></button>
       </div>`;
 
     const panel = document.createElement("aside");

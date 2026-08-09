@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="auth.css">
   <link rel="stylesheet" href="notebook.css">
   <link rel="stylesheet" href="math-ai.css">
+  <link rel="stylesheet" href="atlas-shell.css">
   <meta name="description" content="An interactive, visual mathematics path from foundations to AI.">
   <title>Math for AI — A Unified Interactive Course</title>
   <style>
@@ -100,7 +101,14 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
+  <header class="atlas-topbar"><div class="atlas-topbar-inner">
+    <a class="atlas-brand" href="https://luminaatlas.com/" aria-label="Lumina Atlas home"><span class="atlas-brand-mark">Σ</span><span class="atlas-brand-name">Lumina Atlas</span></a>
+    <form class="atlas-search unified-search" role="search"><input id="unified-top-search" type="search" placeholder="Search courses" aria-label="Search courses" autocomplete="off"></form>
+    <button class="atlas-tool notebook-tool" type="button" data-notebook-open><span class="atlas-tool-icon">▤</span><span class="atlas-tool-label">Notebook</span></button>
+    <button class="atlas-tool atlas-ai ai-tool" type="button" aria-expanded="false" aria-controls="home-ai-panel"><span class="atlas-tool-icon">✦</span><span class="atlas-tool-label">AI</span></button>
+    <button class="atlas-tool atlas-profile profile-tool" type="button" data-auth-open aria-label="Sign in or open profile"><span class="atlas-tool-icon">●</span><span class="atlas-tool-label">Profile</span></button>
+  </div></header>
+  <header class="topbar" hidden>
     <div class="topbar-inner">
       <a class="brand" href="https://luminaatlas.com/" aria-label="Back to Lumina Atlas home"><span class="brand-mark">∑</span><span>Mathematics</span></a>
       <a class="top-tool" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
@@ -137,6 +145,11 @@
         </div>
         <div id="modules" class="modules" aria-live="polite"><div class="empty">Loading course map…</div></div>
       </div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="lab-title">
+      <div class="lab-head"><div><p class="section-label">EXPLORE</p><h2 id="lab-title">Math Lab</h2></div><p>Interactive tools for mathematical exploration</p></div>
+      <div class="lab-grid"><a class="lab-card" href="labs/index.html"><span class="lab-icon">⌁</span><b>Open Math Lab</b><p>Explore visual models, fields, optimization, and future interactive tools.</p><span class="lab-state">Open →</span></a></div>
     </section>
 
   </main>
@@ -198,9 +211,9 @@
       }).join("");
     }
     const initialQuery=new URLSearchParams(location.search).get("q")||"";
-    if(initialQuery){state.query=initialQuery.trim().toLowerCase();document.querySelector("#search").value=initialQuery;document.querySelector("#top-search").value=initialQuery}
+    if(initialQuery){state.query=initialQuery.trim().toLowerCase();document.querySelector("#search").value=initialQuery;document.querySelector("#unified-top-search").value=initialQuery}
     document.querySelector("#search").addEventListener("input",event=>{state.query=event.target.value.trim().toLowerCase();render()});
-    document.querySelector(".top-search").addEventListener("submit",event=>{event.preventDefault();const value=document.querySelector("#top-search").value.trim();state.query=value.toLowerCase();document.querySelector("#search").value=value;render();document.querySelector("#courses").scrollIntoView({behavior:"smooth"})});
+    document.querySelector(".unified-search").addEventListener("submit",event=>{event.preventDefault();const value=document.querySelector("#unified-top-search").value.trim();state.query=value.toLowerCase();document.querySelector("#search").value=value;render();document.querySelector("#courses").scrollIntoView({behavior:"smooth"})});
     let toastTimer;
     const toast=document.querySelector(".site-toast");
     document.querySelectorAll("[data-coming-soon]").forEach(button=>button.addEventListener("click",()=>{toast.textContent=`${button.dataset.comingSoon} is coming soon.`;toast.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("show"),2200)}));
