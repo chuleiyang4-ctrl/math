@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="notebook.css">
   <link rel="stylesheet" href="math-ai.css">
   <meta name="description" content="An interactive, visual mathematics path from foundations to AI.">
-  <title>Math for AI 鈥?A Unified Interactive Course</title>
+  <title>Math for AI — A Unified Interactive Course</title>
   <style>
     :root{
       --bg:#070914;--surface:#0d1120;--surface-2:#12182a;--line:rgba(159,174,255,.16);
@@ -60,7 +60,7 @@
     .path-step:before{content:attr(data-step);position:absolute;top:22px;left:20px;width:29px;height:29px;display:grid;place-items:center;border-radius:50%;background:var(--surface);border:1px solid var(--cyan);color:var(--cyan);font-size:11px;font-weight:800;z-index:1}
     .path-step:nth-child(n+3):before{border-color:var(--violet);color:#bca7ff}.path-step h3{font-size:16px;margin:0 0 7px}.path-step p{font-size:12px;color:var(--muted);margin:0}
     .catalog-tools{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
-    .search{position:relative;flex:1;max-width:620px}.search:before{content:"鈱?;position:absolute;left:16px;top:10px;color:var(--cyan);font-size:21px}
+    .search{position:relative;flex:1;max-width:620px}.search:before{content:"⌕";position:absolute;left:16px;top:10px;color:var(--cyan);font-size:21px}
     .search input{width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:rgba(13,17,32,.85);color:#fff;padding:0 18px 0 46px;outline:none;font:inherit}
     .search input:focus{border-color:rgba(35,213,232,.55);box-shadow:0 0 0 3px rgba(35,213,232,.08)}.search input::placeholder{color:#69738e}
     .filter{display:flex;gap:8px}.filter button{height:40px;border-radius:11px;border:1px solid var(--line);background:transparent;color:var(--muted);padding:0 14px;cursor:pointer}
@@ -102,16 +102,16 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="https://lumina-atlas.pages.dev/" aria-label="Back to Lumina Atlas home"><span class="brand-mark">鈭?/span><span>Mathematics</span></a>
-      <a class="top-tool" href="labs/index.html"><span aria-hidden="true">鈿?/span> Lab</a>
+      <a class="brand" href="https://lumina-atlas.pages.dev/" aria-label="Back to Lumina Atlas home"><span class="brand-mark">∑</span><span>Mathematics</span></a>
+      <a class="top-tool" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
       <form class="top-search" role="search"><input id="top-search" type="search" placeholder="Search courses" aria-label="Search courses" autocomplete="off"></form>
-      <button class="top-tool notebook-tool" type="button" data-notebook-open><span aria-hidden="true">鈻?/span> Notebook</button>
+      <button class="top-tool notebook-tool" type="button" data-notebook-open><span aria-hidden="true">▤</span> Notebook</button>
       <button class="top-tool ai-tool" type="button" aria-expanded="false" aria-controls="home-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
       <button class="profile-tool" type="button" aria-label="Sign in or open profile">Profile</button>
     </div>
   </header>
   <aside class="ai-panel" id="home-ai-panel" aria-hidden="true">
-    <div class="ai-head"><div><small>ASSISTANT</small><strong>Math AI</strong></div><button class="ai-close" type="button" aria-label="Close Math AI">脳</button></div>
+    <div class="ai-head"><div><small>ASSISTANT</small><strong>Math AI</strong></div><button class="ai-close" type="button" aria-label="Close Math AI">×</button></div>
     <div class="ai-body"><p>Ask questions, request another explanation, or work through a problem.</p><div class="ai-placeholder">Math AI will be connected here in a future update.</div></div>
   </aside>
   <div class="site-toast" role="status"></div>
@@ -121,27 +121,27 @@
       <div class="workspace-title">
         <div><h1>Mathematics Courses</h1><p>Course directory and interactive lessons</p></div>
         <div class="mini-stats" aria-label="Course statistics">
-          <div class="mini-stat"><strong id="stat-modules">鈥?/strong><span>Modules</span></div>
-          <div class="mini-stat"><strong id="stat-lessons">鈥?/strong><span>Lessons</span></div>
-          <div class="mini-stat"><strong id="stat-published">鈥?/strong><span>Published</span></div>
+          <div class="mini-stat"><strong id="stat-modules">—</strong><span>Modules</span></div>
+          <div class="mini-stat"><strong id="stat-lessons">—</strong><span>Lessons</span></div>
+          <div class="mini-stat"><strong id="stat-published">—</strong><span>Published</span></div>
         </div>
       </div>
       <div class="course-panel">
         <div class="catalog-tools">
-          <label class="search"><span hidden>Search lessons</span><input id="search" type="search" placeholder="Search vectors, calculus, probability鈥? autocomplete="off"></label>
+          <label class="search"><span hidden>Search lessons</span><input id="search" type="search" placeholder="Search vectors, calculus, probability…" autocomplete="off"></label>
           <div class="filter" role="group" aria-label="Filter curriculum">
             <button class="active" data-filter="all" type="button">All</button>
             <button data-filter="published" type="button">Published</button>
             <button data-filter="soon" type="button">Coming soon</button>
           </div>
         </div>
-        <div id="modules" class="modules" aria-live="polite"><div class="empty">Loading course map鈥?/div></div>
+        <div id="modules" class="modules" aria-live="polite"><div class="empty">Loading course map…</div></div>
       </div>
     </section>
 
   </main>
 
-  <footer class="footer"><div class="wrap footer-row"><span>Mathematics Courses</span><a href="#courses">Back to courses 鈫?/a></div></footer>
+  <footer class="footer"><div class="wrap footer-row"><span>Mathematics Courses</span><a href="#courses">Back to courses ↑</a></div></footer>
 
   <script>
     const FILES = {
@@ -194,7 +194,7 @@
       modulesEl.innerHTML=modules.map((module,index)=>{
         const live=module.lessons.filter(published).length;
         const open=state.query||state.filter!=="all"?" open":"";
-        return `<details class="module"${open}><summary><span class="module-id">${escapeHTML(module.moduleId)}</span><span class="module-title"><strong>${escapeHTML(module.moduleName)}</strong></span><span class="module-count">${live} published 路 ${module.lessons.length} lessons</span><i class="chevron" aria-hidden="true"></i></summary><div class="lessons">${module.lessons.map(lessonHTML).join("")}</div></details>`;
+        return `<details class="module"${open}><summary><span class="module-id">${escapeHTML(module.moduleId)}</span><span class="module-title"><strong>${escapeHTML(module.moduleName)}</strong></span><span class="module-count">${live} published · ${module.lessons.length} lessons</span><i class="chevron" aria-hidden="true"></i></summary><div class="lessons">${module.lessons.map(lessonHTML).join("")}</div></details>`;
       }).join("");
     }
     const initialQuery=new URLSearchParams(location.search).get("q")||"";
@@ -226,4 +226,3 @@
   <script src="math-ai.js"></script>
 </body>
 </html>
-
