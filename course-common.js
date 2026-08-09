@@ -88,9 +88,9 @@
       authConfig.src = "auth-config.js";
       document.head.append(authConfig);
       authConfig.addEventListener("load", () => {
-    if (!document.querySelector('script[src^="auth.js"]')) {
+    if (!document.querySelector('script[src^="account.js"]')) {
           const authScript = document.createElement("script");
-          authScript.src = "auth.js?v=20260809-unified-auth";
+          authScript.src = "account.js?v=20260809-unified-auth";
           document.head.append(authScript);
         }
       });
