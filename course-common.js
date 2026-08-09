@@ -4,7 +4,7 @@
   const DATA_URL = "course-data.json";
   const REPOSITORY_CONTENTS_URL =
     "https://api.github.com/repos/chuleiyang4-ctrl/math/contents?ref=main";
-  const SITE_ORIGIN = "https://math-ek4.pages.dev";
+  const SITE_ORIGIN = "https://math.luminaatlas.com";
 
   const fileForLesson = (id) =>
     `module-${String(id).trim().toLowerCase().replaceAll(".", "-")}.html`;
