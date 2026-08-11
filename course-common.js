@@ -79,7 +79,7 @@
     }
     if (!document.querySelector('script[src^="math-ai.js"]')) {
       const script = document.createElement("script");
-      script.src = "math-ai.js?v=20260810-unified-ai";
+      script.src = "math-ai.js?v=20260812-panel-header";
       script.defer = true;
       document.head.append(script);
     }
@@ -96,7 +96,7 @@
       authConfig.addEventListener("load", () => {
     if (!document.querySelector('script[src^="account.js"]')) {
           const authScript = document.createElement("script");
-          authScript.src = "account.js?v=20260809-unified-auth";
+          authScript.src = "account.js?v=20260812-password-auth";
           document.head.append(authScript);
         }
       });
