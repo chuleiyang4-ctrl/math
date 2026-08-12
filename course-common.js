@@ -118,26 +118,26 @@
     header.innerHTML = `
       <div class="course-topbar-inner">
         <a class="course-brand" href="index.html" aria-label="Mathematics home">
-          <span class="course-brand-mark">鈭?/span>
+          <span class="course-brand-mark">∑</span>
           <span class="course-brand-name">Mathematics</span>
         </a>
-        <a class="course-tool-button" href="labs/index.html"><span aria-hidden="true">鈿?/span> Lab</a>
+        <a class="course-tool-button" href="labs/index.html"><span aria-hidden="true">⚗</span> Lab</a>
         <form class="course-search" role="search">
           <label class="sr-only" for="course-search-input">Search courses</label>
           <input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off">
         </form>
-        <button class="course-tool-button course-notebook-button" type="button" data-notebook-open><span aria-hidden="true">鈻?/span> Notebook</button>
+        <button class="course-tool-button course-notebook-button" type="button" data-notebook-open><span aria-hidden="true">▤</span> Notebook</button>
         <button class="course-tool-button course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span aria-hidden="true">?</span> Math AI</button>
         <button class="course-profile-button" type="button" aria-label="Sign in or open profile">Profile</button>
       </div>`;
     header.innerHTML = `
       <div class="atlas-topbar-inner">
-        <a class="atlas-brand" href="https://luminaatlas.com/" aria-label="Lumina Atlas home"><span class="atlas-brand-mark">危</span><span class="atlas-brand-name">Lumina Atlas</span></a>
+        <a class="atlas-brand" href="https://luminaatlas.com/" aria-label="Lumina Atlas home"><span class="atlas-brand-mark">Σ</span><span class="atlas-brand-name">Lumina Atlas</span></a>
         <form class="atlas-search course-search" role="search"><label class="sr-only" for="course-search-input">Search courses</label><input id="course-search-input" type="search" placeholder="Search courses" autocomplete="off"></form>
         <a class="atlas-tool atlas-pricing-link" href="https://luminaatlas.com/#pricing" aria-label="Pricing">Pricing</a>
-        <button class="atlas-tool course-notebook-button" type="button" data-notebook-open><span class="atlas-tool-icon">鈻?/span><span class="atlas-tool-label">Notebook</span></button>
-        <button class="atlas-tool atlas-ai course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span class="atlas-tool-icon">鉁?/span><span class="atlas-tool-label">AI</span></button>
-        <button class="atlas-tool atlas-profile course-profile-button" type="button" data-auth-open aria-label="Sign in or open profile"><span class="atlas-tool-icon">鈼?/span><span class="atlas-tool-label">Profile</span></button>
+        <button class="atlas-tool course-notebook-button" type="button" data-notebook-open><span class="atlas-tool-icon">▤</span><span class="atlas-tool-label">Notebook</span></button>
+        <button class="atlas-tool atlas-ai course-ai-button" type="button" aria-expanded="false" aria-controls="math-ai-panel"><span class="atlas-tool-icon">✦</span><span class="atlas-tool-label">AI</span></button>
+        <button class="atlas-tool atlas-profile course-profile-button" type="button" data-auth-open aria-label="Sign in or open profile"><span class="atlas-tool-icon">●</span><span class="atlas-tool-label">Profile</span></button>
       </div>`;
 
     const panel = document.createElement("aside");
@@ -150,7 +150,7 @@
     panel.innerHTML = `
       <div class="math-ai-head">
         <div><small>ASSISTANT</small><strong>Math AI</strong></div>
-        <button type="button" class="math-ai-close" aria-label="Close Math AI">脳</button>
+        <button type="button" class="math-ai-close" aria-label="Close Math AI">×</button>
       </div>
       <div class="math-ai-body">
         <p>Ask questions about the lesson, request another explanation, or work through a problem.</p>
@@ -196,7 +196,7 @@
 
     link.href = lesson.file;
     link.innerHTML =
-      `<small>${direction} 路 ${lesson.id}</small>` +
+      `<small>${direction} · ${lesson.id}</small>` +
       `<strong>${lesson.title || `Lesson ${lesson.id}`}</strong>`;
     return link;
   };
@@ -345,4 +345,3 @@
     initialize();
   }
 })();
-
