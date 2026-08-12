@@ -1,6 +1,9 @@
 (() => {
   "use strict";
 
+  const shellStylesheet = document.querySelector('link[href^="atlas-shell.css"]');
+  if (shellStylesheet) shellStylesheet.href = "atlas-shell.css?v=20260813-unified-nav";
+
   const DATA_URL = "course-data.json";
   const REPOSITORY_CONTENTS_URL =
     "https://api.github.com/repos/chuleiyang4-ctrl/math/contents?ref=main";
